@@ -96,7 +96,9 @@ def main():
         m5, m15, h1, h4 = (E.candles(b) for b in ("5m", "15m", "1H", "4H"))
         fr, oi = E.funding(), E.open_interest()
     except Exception as e:
-        print("data error", e); json.dump(S, open("state.json", "w"), indent=1); return
+                print("data error", e)
+        if os.environ.get("GITHUB_EVENT_NAME") == "workflow_dispatch": send(f"⚠️ Data error: {str(e)[:250]}")
+        json.dump(S, open("state.json", "w"), indent=1); return
     S["last_price"] = px = float(m5.c.iloc[-1])
     for t in S["trades"].values():
         if t["status"] != "CLOSED": track(t, m5)
