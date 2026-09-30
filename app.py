@@ -21,3 +21,6 @@ if T:
     sysw = [x for x in T.values() if x["outcome"] and x["outcome"] != "SL HIT" and x["outcome"] != "EXPIRED"]
     st.write(f"System: {len(T)} signals, {len(sysw)} reached ≥T1. User-marked: " + str({r: sum(x['user'].get('result') == r for x in T.values()) for r in ('WIN', 'LOSS')}))
 else: st.write("No trades yet.")
+
+if os.path.exists("backtest_results.json"):
+    st.subheader("Backtest (historical, not a guarantee)"); st.json(json.load(open("backtest_results.json")))

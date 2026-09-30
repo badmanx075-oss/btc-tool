@@ -91,7 +91,7 @@ def track(t, m5):
 def main():
     handle_updates()
     if os.environ.get("GITHUB_EVENT_NAME") == "workflow_dispatch":
-        send("Bot connected. Manual  test run OK BTC2 CLUDE.")
+        send("Bot connected. Manual test run OK.")
     try:
         m5, m15, h1, h4 = (E.candles(b) for b in ("5m", "15m", "1H", "4H"))
         fr, oi = E.funding(), E.open_interest()
@@ -109,7 +109,7 @@ def main():
                        pro=r["pro"], con=r["con"], ts=now.isoformat(timespec="seconds"))
     open_t = [t for t in S["trades"].values() if t["status"] != "CLOSED"]
     last = max((t["created"] for t in S["trades"].values()), default="2000")
-    if r["signal"] != "NO TRADE" and not open_t and (now - dt.datetime.fromisoformat(last if "T" in last else "2000-01-01T00:00:00+00:00")).total_seconds() > 3600:
+    if r["signal"].startswith("EARLY") and not open_t and (now - dt.datetime.fromisoformat(last if "T" in last else "2000-01-01T00:00:00+00:00")).total_seconds() > 3600:
         d = now.strftime("%Y%m%d"); S["n"][d] = S["n"].get(d, 0) + 1; tid = f"BTC-{r['side']}-{d}-{S['n'][d]:03d}"
         t = dict(id=tid, side=r["side"], signal=r["signal"], regime=r["regime"], score=r["score"], pro=r["pro"], con=r["con"],
                  entry=r["entry"], zone=r["zone"], sl=r["sl"], sl0=r["sl"], t1=r["t1"], t2=r["t2"], t3=r["t3"], ext=r["ext"], confirm=r["confirm"],

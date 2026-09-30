@@ -6,13 +6,37 @@ B = "https://www.okx.com/api/v5/"; INST = "BTC-USDT-SWAP"
 def _get(p, **q):
     r = requests.get(B + p, params=q, timeout=15); r.raise_for_status(); return r.json()["data"]
 
+BY = "https://api.bybit.com/v5/market/"; IV = {"5m": "5", "15m": "15", "1H": "60", "4H": "240"}
+
 def candles(bar, limit=300):
-    d = _get("market/candles", instId=INST, bar=bar, limit=limit)
-    df = pd.DataFrame([x[:6] for x in d], columns=["ts", "o", "h", "l", "c", "v"]).astype(float)
+    try:  # primary: OKX
+        rows = [x[:6] for x in _get("market/candles", instId=INST, bar=bar, limit=limit)]
+    except Exception:  # fallback: Bybit
+        r = requests.get(BY + "kline", params=dict(category="linear", symbol="BTCUSDT", interval=IV[bar], limit=limit), timeout=15)
+        r.raise_for_status(); rows = [x[:6] for x in r.json()["result"]["list"]]
+    df = pd.DataFrame(rows, columns=["ts", "o", "h", "l", "c", "v"]).astype(float)
     return df.sort_values("ts").reset_index(drop=True)
 
-def funding(): return float(_get("public/funding-rate", instId=INST)[0]["fundingRate"])
-def open_interest(): return float(_get("public/open-interest", instType="SWAP", instId=INST)[0]["oiUsd"])
+def _tick():
+    r = requests.get(BY + "tickers", params=dict(category="linear", symbol="BTCUSDT"), timeout=15); r.raise_for_status()
+    return r.json()["result"]["list"][0]
+
+def funding():
+    try: return float(_get("public/funding-rate", instId=INST)[0]["fundingRate"])
+    except Exception:
+        try: return float(_tick()["fundingRate"])
+        except Exception: return 0.0
+
+def open_interest():
+    try: return float(_get("public/open-interest", instType="SWAP", instId=INST)[0]["oiUsd"])
+    except Exception:
+        try: return float(_tick()["openInterestValue"])
+        except Exception: return 0.0
+
+TR = {"price near range low": "price near range high", "failed breakdown / liquidity sweep": "failed breakout / sweep of highs",
+      "no sweep of prior lows": "no sweep of prior highs", "higher low forming": "lower high forming", "no higher low yet": "no lower high yet",
+      "selling volume fading": "buying volume fading", "selling volume not fading": "buying volume not fading",
+      "momentum turning up": "momentum turning down"}
 
 def atr_series(df, n=14):
     pc = df.c.shift()
@@ -59,6 +83,7 @@ def scan(m15, h4, h1):
         d = m15 if k == 1 else _mirror(m15)
         bad = (side == "LONG" and reg == "BEARISH TREND") or (side == "SHORT" and reg == "BULLISH TREND")
         sc, pro, con = _long_score(d, bad)
+        if k == -1: pro = [TR.get(x, x) for x in pro]; con = [TR.get(x, x) for x in con]
         a = atr_series(d).iloc[-1]; px = d.c.iloc[-1]
         sl = min(d.l.tail(12).min() - 0.4 * a, px - 0.8 * a); R = px - sl
         lv = dict(entry=px, zone=sorted([k * (px - 0.3 * a), k * (px + 0.1 * a)]), sl=k * sl,
@@ -71,6 +96,7 @@ def scan(m15, h4, h1):
     ratio = pts / a4
     best["move_class"] = "SMALL" if ratio < 1 else "MEDIUM" if ratio < 2 else "LARGE" if ratio < 4 else "VERY LARGE"
     best["risk"] = "Low" if best["score"] >= 80 else "Medium" if best["score"] >= 65 else "High"
-    best["signal"] = ("EARLY " + best["side"] + " SETUP") if best["score"] >= 60 and best["score"] - other["score"] >= 15 else "NO TRADE"
+    gap = best["score"] - other["score"]
+    best["signal"] = "NO TRADE" if best["score"] < 60 or gap < 15 else ("EARLY " + best["side"] + " SETUP" if best["score"] >= 65 else "WATCH: WEAK " + best["side"] + " SETUP")
     best["regime"] = reg
     return best
