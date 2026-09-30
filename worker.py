@@ -90,6 +90,8 @@ def track(t, m5):
 
 def main():
     handle_updates()
+    if os.environ.get("GITHUB_EVENT_NAME") == "workflow_dispatch":
+        send("✅ Bot connected. Manual test run.")
     try:
         m5, m15, h1, h4 = (E.candles(b) for b in ("5m", "15m", "1H", "4H"))
         fr, oi = E.funding(), E.open_interest()
