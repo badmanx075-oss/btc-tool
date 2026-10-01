@@ -3,6 +3,7 @@ import os, json, time, requests, datetime as dt
 from zoneinfo import ZoneInfo
 import engine as E
 import paper
+import faulthandler; faulthandler.dump_traceback_later(240, exit=True)  # if stuck >4 min: print where, then exit
 
 TOK, CHAT = os.environ["TG_TOKEN"], str(os.environ["TG_CHAT_ID"])
 URL = os.environ.get("DASHBOARD_URL", "")
@@ -16,7 +17,7 @@ def tg(method, **kw):
     for _ in range(3):
         try:
             r = requests.post(API + method, json=kw, timeout=20)
-            if r.status_code == 429: time.sleep(r.json().get("parameters", {}).get("retry_after", 3)); continue
+            if r.status_code == 429: time.sleep(min(int(r.json().get("parameters", {}).get("retry_after", 3)), 20)); continue
             if r.ok: return r.json()
         except requests.RequestException: pass
         time.sleep(2)
