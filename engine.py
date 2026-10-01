@@ -33,6 +33,9 @@ def open_interest():
         try: return float(_tick()["openInterestValue"])
         except Exception: return 0.0
 
+SL_MULT = 1.0            # widen/narrow stop after backtest_v3 results
+TP_R = (1.5, 3, 5, 8)     # target multiples of risk (T1,T2,T3,Ext)
+
 TR = {"price near range low": "price near range high", "failed breakdown / liquidity sweep": "failed breakout / sweep of highs",
       "no sweep of prior lows": "no sweep of prior highs", "higher low forming": "lower high forming", "no higher low yet": "no lower high yet",
       "selling volume fading": "buying volume fading", "selling volume not fading": "buying volume not fading",
@@ -74,6 +77,11 @@ def _long_score(d, reg_bad):
     if reg_bad: sc -= 15; con.append("higher-timeframe regime against setup")
     return max(sc, 0), pro, con
 
+def _params():
+    import json, os
+    try: return json.load(open(os.path.join(os.path.dirname(os.path.abspath(__file__)), "params.json")))
+    except Exception: return None
+
 def _mirror(d):
     m = d.copy(); m["o"], m["c"], m["h"], m["l"] = -d.o, -d.c, -d.l, -d.h; return m
 
@@ -83,14 +91,15 @@ def scan(m15, h4, h1):
         d = m15 if k == 1 else _mirror(m15)
         bad = (side == "LONG" and reg == "BEARISH TREND") or (side == "SHORT" and reg == "BULLISH TREND")
         sc, pro, con = _long_score(d, bad)
+        raw = list(pro)
         if k == -1: pro = [TR.get(x, x) for x in pro]; con = [TR.get(x, x) for x in con]
         a = atr_series(d).iloc[-1]; px = d.c.iloc[-1]
-        sl = min(d.l.tail(12).min() - 0.4 * a, px - 0.8 * a); R = px - sl
+        sl = min(d.l.tail(12).min() - 0.4 * a, px - 0.8 * a); R = (px - sl) * SL_MULT; sl = px - R
         lv = dict(entry=px, zone=sorted([k * (px - 0.3 * a), k * (px + 0.1 * a)]), sl=k * sl,
-                  t1=k * (px + 1.5 * R), t2=k * (px + 3 * R), t3=k * (px + 5 * R), ext=k * (px + 8 * R),
+                  t1=k * (px + TP_R[0] * R), t2=k * (px + TP_R[1] * R), t3=k * (px + TP_R[2] * R), ext=k * (px + TP_R[3] * R),
                   confirm=k * d.h.tail(8).max())
         lv["entry"] = k * px
-        res.append(dict(side=side, score=sc, pro=pro, con=con, **lv))
+        res.append(dict(side=side, score=sc, pro=pro, con=con, flags=raw, **lv))
     best = max(res, key=lambda r: r["score"]); other = min(res, key=lambda r: r["score"])
     a4 = atr_series(h4).iloc[-1]; pts = abs(best["t3"] - best["entry"])
     ratio = pts / a4
