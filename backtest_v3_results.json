@@ -1,0 +1,218 @@
+{
+ "note": "mean_R = avg result per trade in R after 0.10% cost. Best config chosen on TRAIN, judged on unseen TEST. cfg=(stop x ATR1h, target R, horizon 15m-bars)",
+ "trades": 944,
+ "original_rules": {
+  "cfg": "orig",
+  "train": {
+   "n": 660,
+   "mean_R": -0.268,
+   "win_%": 39.4,
+   "se": 0.046
+  },
+  "test": {
+   "n": 284,
+   "mean_R": -0.49,
+   "win_%": 32.4,
+   "se": 0.066
+  }
+ },
+ "best": {
+  "cfg": "(3, 3, 24)",
+  "train": {
+   "n": 660,
+   "mean_R": -0.057,
+   "win_%": 45.8,
+   "se": 0.022
+  },
+  "test": {
+   "n": 284,
+   "mean_R": -0.086,
+   "win_%": 39.4,
+   "se": 0.033
+  }
+ },
+ "verdict": "NO RELIABLE EDGE - live levels unchanged",
+ "top5_train": [
+  {
+   "cfg": "(3, 3, 24)",
+   "train": {
+    "n": 660,
+    "mean_R": -0.057,
+    "win_%": 45.8,
+    "se": 0.022
+   },
+   "test": {
+    "n": 284,
+    "mean_R": -0.086,
+    "win_%": 39.4,
+    "se": 0.033
+   }
+  },
+  {
+   "cfg": "(3, 1.5, 24)",
+   "train": {
+    "n": 660,
+    "mean_R": -0.062,
+    "win_%": 45.9,
+    "se": 0.021
+   },
+   "test": {
+    "n": 284,
+    "mean_R": -0.094,
+    "win_%": 39.4,
+    "se": 0.031
+   }
+  },
+  {
+   "cfg": "(3, 2, 24)",
+   "train": {
+    "n": 660,
+    "mean_R": -0.062,
+    "win_%": 45.8,
+    "se": 0.021
+   },
+   "test": {
+    "n": 284,
+    "mean_R": -0.087,
+    "win_%": 39.4,
+    "se": 0.032
+   }
+  },
+  {
+   "cfg": "(3, 1, 24)",
+   "train": {
+    "n": 660,
+    "mean_R": -0.069,
+    "win_%": 46.1,
+    "se": 0.02
+   },
+   "test": {
+    "n": 284,
+    "mean_R": -0.093,
+    "win_%": 39.8,
+    "se": 0.03
+   }
+  },
+  {
+   "cfg": "(3, 3, 48)",
+   "train": {
+    "n": 660,
+    "mean_R": -0.077,
+    "win_%": 45.3,
+    "se": 0.031
+   },
+   "test": {
+    "n": 284,
+    "mean_R": -0.087,
+    "win_%": 40.8,
+    "se": 0.046
+   }
+  }
+ ],
+ "factor_lift": {
+  "price near range low": {
+   "present": {
+    "n": 929,
+    "mean_R": -0.188,
+    "win_%": 40.3,
+    "se": 0.034
+   },
+   "absent": {
+    "n": 15,
+    "mean_R": -0.301,
+    "win_%": 33.3,
+    "se": 0.241
+   }
+  },
+  "failed breakdown / liquidity sweep": {
+   "present": {
+    "n": 494,
+    "mean_R": -0.158,
+    "win_%": 40.7,
+    "se": 0.047
+   },
+   "absent": {
+    "n": 450,
+    "mean_R": -0.225,
+    "win_%": 39.6,
+    "se": 0.047
+   }
+  },
+  "higher low forming": {
+   "present": {
+    "n": 418,
+    "mean_R": -0.237,
+    "win_%": 39.2,
+    "se": 0.049
+   },
+   "absent": {
+    "n": 526,
+    "mean_R": -0.153,
+    "win_%": 40.9,
+    "se": 0.046
+   }
+  },
+  "selling volume fading": {
+   "present": {
+    "n": 761,
+    "mean_R": -0.2,
+    "win_%": 40.3,
+    "se": 0.037
+   },
+   "absent": {
+    "n": 183,
+    "mean_R": -0.148,
+    "win_%": 39.3,
+    "se": 0.078
+   }
+  },
+  "volatility compression": {
+   "present": {
+    "n": 449,
+    "mean_R": -0.239,
+    "win_%": 38.1,
+    "se": 0.047
+   },
+   "absent": {
+    "n": 495,
+    "mean_R": -0.146,
+    "win_%": 42.0,
+    "se": 0.048
+   }
+  },
+  "momentum turning up": {
+   "present": {
+    "n": 591,
+    "mean_R": -0.203,
+    "win_%": 39.3,
+    "se": 0.042
+   },
+   "absent": {
+    "n": 353,
+    "mean_R": -0.168,
+    "win_%": 41.6,
+    "se": 0.056
+   }
+  }
+ },
+ "score_buckets": {
+  "60-64": {
+   "n": 556,
+   "mean_R": -0.166,
+   "win_%": 40.5,
+   "se": 0.044
+  },
+  "65-79": {
+   "n": 355,
+   "mean_R": -0.23,
+   "win_%": 39.4,
+   "se": 0.054
+  },
+  "80+": {
+   "n": 33,
+   "mean_R": -0.152,
+   "win_%": 42.4,
+   "se": 0.184
+  }
+ }
+}
