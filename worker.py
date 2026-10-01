@@ -2,7 +2,7 @@
 import os, json, time, requests, datetime as dt
 from zoneinfo import ZoneInfo
 import engine as E
-import paper
+import paper, learn
 import faulthandler; faulthandler.dump_traceback_later(240, exit=True)  # if stuck >4 min: print where, then exit
 
 TOK, CHAT = os.environ["TG_TOKEN"], str(os.environ["TG_CHAT_ID"])
@@ -65,7 +65,12 @@ def handle_updates():
             if not txt: continue
             if txt[0] == "/active": send("\n".join(f"{i}: {t['signal']} {t['status']}" for i, t in S["trades"].items() if not t["outcome"]) or "No active trades")
             elif txt[0] == "/review" and len(txt) > 1 and txt[1] in S["trades"]: send(review(S["trades"][txt[1]]))
-            else: send("Commands: /active, /review TRADE_ID\nUse buttons under alerts for Taken / Profit / Loss.")
+            elif txt[0] == "/lessons": send(learn.lessons_text(S.get("paper") or {}))
+            elif txt[0] == "/approve" and len(txt) > 1: send(learn.approve(S.setdefault("paper", {}), txt[1]))
+            elif txt[0] == "/revert" and len(txt) > 1: send(learn.revert(S.setdefault("paper", {}), txt[1]))
+            elif txt[0] == "/status": send(paper.status_text(S))
+            elif txt[0] == "/demo": S.setdefault("paper", {})["force_demo"] = True; send("Demo paper trade queued. It opens on the next scan (within ~5 min) and closes within ~1 hour. Your wallet is NOT affected.")
+            else: send("Commands: /status (wallet, position, setup radar), /demo (test the pipeline), /lessons (what the tool learned), /approve N, /revert N, /active, /review TRADE_ID")
 
 def alert(t, title, extra=""):
     send(f"{title}\nTrade ID: {t['id']}\nPrice: {P(S['last_price'])}\n{extra}", t["id"])
@@ -144,9 +149,9 @@ def main():
             today = [t for t in S["trades"].values() if t["created"][:10] == now.strftime("%Y-%m-%d")]
             cnt = lambda s: sum(any(e["type"] == s for e in t["events"]) for t in today)
             if name == "morning":
-                send(f"🌅 GOOD MORNING\nBTC Perpetual Brief\nPrice: {P(px)}\nRegime: {r['regime']}\nSignal: {r['signal']}\nActive trades: {len(open_t)}\nFunding: {fr*100:.4f}%\nSignals are statistical, not guaranteed.")
+                send(f"🌅 GOOD MORNING\nBTC Perpetual Brief\nPrice: {P(px)}\nRegime: {r['regime']}\nSignal: {r['signal']}\nActive trades: {len(open_t)}\nFunding: {fr*100:.4f}%\n{paper.radar_line(S.get('paper', {}))}\nSignals are statistical, not guaranteed.")
             else:
-                send(f"🌆 GOOD EVENING\nDaily Review\nPrice: {P(px)}\nRegime: {r['regime']}\nSignals: {len(today)}\nT1: {cnt('T1 HIT')} T2: {cnt('T2 HIT')} T3: {cnt('T3 HIT')} SL: {cnt('SL HIT')}\nPaper wallet: ₹{S.get('paper', {}).get('balance', 0):,.0f}")
+                send(f"🌆 GOOD EVENING\nDaily Review\nPrice: {P(px)}\nRegime: {r['regime']}\nSignals: {len(today)}\nT1: {cnt('T1 HIT')} T2: {cnt('T2 HIT')} T3: {cnt('T3 HIT')} SL: {cnt('SL HIT')}\nPaper wallet: ₹{S.get('paper', {}).get('balance', 0):,.0f}\n{paper.radar_line(S.get('paper', {}))}")
     json.dump(S, open("state.json", "w"), indent=1)
 
 main()
