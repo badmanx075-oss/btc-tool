@@ -2,6 +2,7 @@
 import os, json, time, requests, datetime as dt
 from zoneinfo import ZoneInfo
 import engine as E
+import paper
 
 TOK, CHAT = os.environ["TG_TOKEN"], str(os.environ["TG_CHAT_ID"])
 URL = os.environ.get("DASHBOARD_URL", "")
@@ -132,6 +133,8 @@ def main():
              f"Entry Zone: {P(t['zone'][0])} – {P(t['zone'][1])}\nInvalidation/SL: {P(t['sl'])}\nT1 {P(t['t1'])} | T2 {P(t['t2'])} | T3 {P(t['t3'])}\nExtended: {P(t['ext'])}+\n"
              f"Confirmation: {'above' if r['side']=='LONG' else 'below'} {P(t['confirm'])}\nMove to T1–T3: {mv[0]:,.0f} to {mv[1]:,.0f} pts ({t['move_class']} vs 4H ATR)\n"
              f"Setup Score: {r['score']}/100 | False-signal risk: {r['risk']}\nFor: {', '.join(r['pro'])}\nAgainst: {', '.join(r['con']) or '-'}{DISC}", tid)
+    try: paper.run(S, send, now)
+    except Exception as e: print("paper error", e)
     loc = now.astimezone(TZ); key = loc.strftime("%Y-%m-%d")
     for name, hr in (("morning", MH), ("evening", EH)):
         if loc.hour == hr and S["sent"].get(name) != key:
@@ -141,7 +144,7 @@ def main():
             if name == "morning":
                 send(f"🌅 GOOD MORNING\nBTC Perpetual Brief\nPrice: {P(px)}\nRegime: {r['regime']}\nSignal: {r['signal']}\nActive trades: {len(open_t)}\nFunding: {fr*100:.4f}%\nSignals are statistical, not guaranteed.")
             else:
-                send(f"🌆 GOOD EVENING\nDaily Review\nPrice: {P(px)}\nRegime: {r['regime']}\nSignals: {len(today)}\nT1: {cnt('T1 HIT')} T2: {cnt('T2 HIT')} T3: {cnt('T3 HIT')} SL: {cnt('SL HIT')}")
+                send(f"🌆 GOOD EVENING\nDaily Review\nPrice: {P(px)}\nRegime: {r['regime']}\nSignals: {len(today)}\nT1: {cnt('T1 HIT')} T2: {cnt('T2 HIT')} T3: {cnt('T3 HIT')} SL: {cnt('SL HIT')}\nPaper wallet: ₹{S.get('paper', {}).get('balance', 0):,.0f}")
     json.dump(S, open("state.json", "w"), indent=1)
 
 main()

@@ -10,7 +10,7 @@ def prep(m15):
     h1["ret30d"] = h1.c / h1.c.shift(720) - 1
     return h1
 
-def side_sigs(h1, k, S):  # short = same logic on mirrored prices
+def side_sigs(h1, k, S, lo_i=800, hi_i=None):  # short = same logic on mirrored prices
     c, o = k * h1.c.values, k * h1.o.values
     hi, lo = (h1.h.values, h1.l.values) if k == 1 else (-h1.l.values, -h1.h.values)
     a, d4, e4, r30 = h1.atr.values, h1.dir4.values * k, h1.er4.values, h1.ret30d.values * k
@@ -18,7 +18,7 @@ def side_sigs(h1, k, S):  # short = same logic on mirrored prices
     hh24, ll24 = P(hi).rolling(24).max().values, P(lo).rolling(24).min().values
     hh48, ph24 = P(hi).shift(1).rolling(48).max().values, P(hi).shift(1).rolling(24).max().values
     comp = (h1.atr / h1.atr.rolling(100).mean()).values
-    for i in range(800, len(c) - 130):
+    for i in range(lo_i, (len(c) - 130) if hi_i is None else hi_i):
         if a[i] != a[i] or e4[i] != e4[i]: continue
         up = d4[i] > 0 and e4[i] > 0.3
         if up and hh24[i] - c[i] >= 1.5 * a[i] and c[i] > ll24[i] + 0.5 * a[i] and c[i] > o[i]: S["trend_pullback"].append((i, k))
