@@ -30,15 +30,21 @@ if os.path.exists("backtest_v3_results.json"):
 
 P = S.get("paper")
 if P:
-    st.subheader("Paper wallet: trend_pullback (virtual money, backtest edge unproven)")
+    st.subheader("Paper trading wallet (virtual money, no real orders): trend_pullback, edge unproven")
     bal, start = P.get("balance", 20000), P.get("start", 20000)
     c = st.columns(4); c[0].metric("Wallet", f"₹{bal:,.0f}", f"{(bal / start - 1) * 100:+.1f}%"); c[1].metric("Start", f"₹{start:,.0f}")
     c[2].metric("Trades closed", len(P["closed"])); c[3].metric("Max drawdown", f"{P.get('max_dd_pct', 0)}%")
-    o = P.get("open")
-    if o and S.get("last_price"):
-        ur = (S["last_price"] - o["entry"]) * o["side"] / o["risk"]
-        st.write(f"**Open:** {o['id']} | entry ${o['entry']:,.0f} | stop ${o['sl']:,.0f} | target ${o['tp']:,.0f} | unrealized {ur:+.2f}R = ₹{ur * o.get('risk_inr', 0):+,.0f}")
-    else: st.write("Open trade: none")
+    st.markdown("**Open position**"); o, lp = P.get("open"), S.get("last_price")
+    if o:
+        q, k, fxr = o.get("qty_btc", 0), o["side"], o.get("fx", 88); u = ((lp - o["entry"]) * k * q) if lp else 0
+        st.table(pd.DataFrame([{"Order ID": o["id"], "Action": "BUY (LONG)" if k == 1 else "SELL (SHORT)", "Qty (BTC)": q, "Entry rate": round(o["entry"]),
+                                "Current rate": round(lp) if lp else None, "Stop-loss": round(o["sl"]), "Target": round(o["tp"]),
+                                "Unrealized $": round(u, 2), "Unrealized ₹": round(u * fxr)}]))
+    else: st.write("No open position")
     if P["closed"]:
-        d = pd.DataFrame(P["closed"]); d["wallet_after"] = start + d.get("pnl_inr", 0).fillna(0).cumsum()
-        st.line_chart(d.set_index("closed")["wallet_after"]); st.dataframe(d[["id", "outcome", "entry", "exit", "R", "pnl_inr", "closed"]], use_container_width=True)
+        d = pd.DataFrame(P["closed"]); d["wallet_after"] = start + d["pnl_inr"].fillna(0).cumsum()
+        st.markdown("**Wallet curve**"); st.line_chart(d.set_index("closed")["wallet_after"])
+        st.markdown("**Trade book**")
+        st.dataframe(d.reindex(columns=["closed", "id", "qty_btc", "entry", "exit", "outcome", "gross_usd", "fees_usd", "pnl_inr", "R"]), use_container_width=True)
+    if P.get("orders"):
+        st.markdown("**Order log (newest first)**"); st.dataframe(pd.DataFrame(P["orders"]).iloc[::-1], use_container_width=True)

@@ -9,6 +9,7 @@ URL = os.environ.get("DASHBOARD_URL", "")
 TZ = ZoneInfo(os.environ.get("TZ_NAME", "Asia/Kolkata"))
 MH, EH = int(os.environ.get("MORNING_HOUR", 8)), int(os.environ.get("EVENING_HOUR", 20))
 API = f"https://api.telegram.org/bot{TOK}/"
+HEADER = "🤖 Notified from BTC Tool\n\n"
 DISC = "\nEXPERIMENTAL: backtests show NO proven edge yet. Paper-trade only. Not a prediction."
 
 def tg(method, **kw):
@@ -21,7 +22,7 @@ def tg(method, **kw):
         time.sleep(2)
 
 def send(text, tid=None):
-    kw = dict(chat_id=CHAT, text=text)
+    kw = dict(chat_id=CHAT, text=HEADER + text)
     if tid:
         rows = [[{"text": "🟢 TRADE TAKEN", "callback_data": f"taken|{tid}"}, {"text": "⚪ IGNORE", "callback_data": f"ign|{tid}"}],
                 [{"text": "🟢 PROFIT", "callback_data": f"win|{tid}"}, {"text": "🔴 LOSS", "callback_data": f"loss|{tid}"}]]
