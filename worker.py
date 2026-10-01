@@ -8,7 +8,7 @@ URL = os.environ.get("DASHBOARD_URL", "")
 TZ = ZoneInfo(os.environ.get("TZ_NAME", "Asia/Kolkata"))
 MH, EH = int(os.environ.get("MORNING_HOUR", 8)), int(os.environ.get("EVENING_HOUR", 20))
 API = f"https://api.telegram.org/bot{TOK}/"
-DISC = "\nStatistical setup, NOT a guaranteed prediction."
+DISC = "\nEXPERIMENTAL: backtests show NO proven edge yet. Paper-trade only. Not a prediction."
 
 def tg(method, **kw):
     for _ in range(3):
@@ -88,6 +88,16 @@ def track(t, m5):
     if (now - dt.datetime.fromisoformat(t["created"])).total_seconds() > 72 * 3600 and t["status"] != "CLOSED":
         t["status"] = "CLOSED"; t["outcome"] = t["outcome"] or "EXPIRED"; ev(t, "TRADE CLOSED", S["last_price"])
 
+def record(px, fr, oi):  # builds our own OI/funding/order-book history for future backtests
+    try:
+        b = E._get("market/books", instId=E.INST, sz=20)[0]
+        bv, av = sum(float(x[1]) for x in b["bids"]), sum(float(x[1]) for x in b["asks"]); imb = round((bv - av) / (bv + av), 4)
+    except Exception: imb = ""
+    new = not os.path.exists("market_log.csv")
+    with open("market_log.csv", "a") as f:
+        if new: f.write("ts,price,funding,oi_usd,book_imbalance\n")
+        f.write(f"{now.isoformat(timespec='seconds')},{px},{fr},{oi},{imb}\n")
+
 def main():
     handle_updates()
     if os.environ.get("GITHUB_EVENT_NAME") == "workflow_dispatch":
@@ -102,6 +112,7 @@ def main():
         json.dump(S, open("state.json", "w"), indent=1)
         return
     S["last_price"] = px = float(m5.c.iloc[-1])
+    record(px, fr, oi)
     for t in S["trades"].values():
         if t["status"] != "CLOSED": track(t, m5)
     r = E.scan(m15, h4, h1)
@@ -117,7 +128,7 @@ def main():
                  mfe=0, mae=0, status="EARLY SETUP", outcome="", events=[], user={})
         ev(t, r["signal"], px); S["trades"][tid] = t
         mv = abs(t["t1"] - t["entry"]), abs(t["t3"] - t["entry"])
-        send(f"🚨 BTC TRADE ALERT\nTrade ID: {tid}\nSignal: {r['signal']}\nRegime: {r['regime']}\nPrice: {P(px)}\n"
+        send(f"🧪 EXPERIMENTAL BTC ALERT (EXPERIMENTAL, no proven edge yet)\nTrade ID: {tid}\nSignal: {r['signal']}\nRegime: {r['regime']}\nPrice: {P(px)}\n"
              f"Entry Zone: {P(t['zone'][0])} – {P(t['zone'][1])}\nInvalidation/SL: {P(t['sl'])}\nT1 {P(t['t1'])} | T2 {P(t['t2'])} | T3 {P(t['t3'])}\nExtended: {P(t['ext'])}+\n"
              f"Confirmation: {'above' if r['side']=='LONG' else 'below'} {P(t['confirm'])}\nMove to T1–T3: {mv[0]:,.0f} to {mv[1]:,.0f} pts ({t['move_class']} vs 4H ATR)\n"
              f"Setup Score: {r['score']}/100 | False-signal risk: {r['risk']}\nFor: {', '.join(r['pro'])}\nAgainst: {', '.join(r['con']) or '-'}{DISC}", tid)
