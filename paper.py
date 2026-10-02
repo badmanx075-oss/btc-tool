@@ -41,6 +41,19 @@ def status_text(S):
     else: L += ["Open trade: none", radar_line(P)]
     return "\n".join(L)
 
+def weekly_text(P, now):
+    cut = (now - dt.timedelta(days=7)).isoformat(); wk = [t for t in P.get("closed", []) if t.get("closed", "") >= cut]; w = sum(t["R"] > 0 for t in wk)
+    pnl = sum(t.get("pnl_inr", 0) for t in wk); bal = P.get("balance", START)
+    return (f"📅 WEEKLY REVIEW (paper wallet)\nTrades closed: {len(wk)} | wins {w} | losses {len(wk) - w}\nNet: {'+' if pnl >= 0 else '-'}₹{abs(pnl):,.0f} ({sum(t['R'] for t in wk):+.2f}R)\n"
+            f"Wallet: ₹{bal:,.0f} ({(bal / P.get('start', START) - 1) * 100:+.1f}% since start) | Max drawdown {P.get('max_dd_pct', 0)}%\n{radar_line(P)}\nSignals are statistical, not guaranteed.")
+
+def why_text(ctx, k, mult=4):
+    up = k == 1
+    return (f"Bade (4H) chart pe BTC ka trend {'upar' if up else 'neeche'} hai (taakat {ctx['er4']:.2f}, kam se kam 0.30 chahiye thi). "
+            f"Us trend ke beech bhaav thoda {'neeche gira' if up else 'upar chadha'} ({ctx['depth']:.1f} ATR ki halchal) aur ab trend ki taraf palat raha hai "
+            f"(pichli 1H candle trend ke saath band hui). Isliye trend ke saath {'BUY' if up else 'SELL'} liya. Stop-loss 3×ATR door rakha taaki chhoti uthal-puthal se na toote, "
+            f"target risk ka {mult} guna. Backtest mein har 3 mein ~2 trade harte hain, isliye loss normal hai.")
+
 def feat(h1, i, k):
     c = k * h1.c.values; hi = h1.h.values if k == 1 else -h1.l.values; a = float(h1.atr.iloc[i]); ts = dt.datetime.fromtimestamp(float(h1.ts.iloc[i]) / 1000, dt.timezone.utc)
     return dict(er4=round(float(h1.er4.iloc[i]), 3), atr_pct=round(a / float(h1.c.iloc[i]) * 100, 3), depth=round((float(hi[i - 23:i + 1].max()) - float(c[i])) / a, 2), hour=ts.hour, wd=ts.weekday())
@@ -113,9 +126,9 @@ def run(S, send, now):
     if demo: tid = f"DEMO-{side}-{now.strftime('%H%M')}"
     else: P["n"] += 1; P["last_entry_ts"] = float(h1.ts.iloc[i]); tid = f"PAPER-{side}-{now.strftime('%Y%m%d')}-{P['n']:03d}"
     P["open"] = dict(id=tid, side=k, entry=e, sl=e - k * risk, tp=e + k * mult * risk, risk=risk, qty_btc=qty, notional_usd=round(notional, 2), risk_inr=risk_inr,
-                     fx=fxr, entry_ts=float(h1.ts.iloc[i]), created=now.isoformat(timespec="seconds"), **({"demo": True} if demo else {"ctx": ctx}))
+                     fx=fxr, entry_ts=float(h1.ts.iloc[i]), created=now.isoformat(timespec="seconds"), **({"demo": True, "why": "Ye sirf test (demo) trade hai: scan, order, monitor, close aur Telegram sab chal rahe hain ya nahi, ye jaanchne ke liye."} if demo else {"ctx": ctx, "why": why_text(ctx, k)}))
     if not demo: log(P, now, tid, act, qty, e, "entry (market, paper fill)")
     body = (f"Order ID: {tid}\nSymbol: BTCUSDT Perpetual\nAction: {act} ({side})\nQty: {qty} BTC\nRate: ${e:,.0f}\n"
             f"Position value: ${notional:,.0f} (₹{notional * fxr:,.0f}, ~{notional * fxr / P['balance']:.1f}x wallet)\nStop-loss: ${e - k * risk:,.0f}\nTarget ({mult}R): ${e + k * mult * risk:,.0f}\n")
     send(("🧪 DEMO ORDER PLACED (test only, wallet NOT affected)\n" + body + "Closes at stop/target or within 1 hour.") if demo else
-         ("📝 PAPER ORDER PLACED (virtual money)\n" + body + f"Risk: ₹{risk_inr:,.0f} ({RISK_PCT}% of ₹{P['balance']:,.0f}) | Expires in 5 days\nStrategy: trend_pullback (backtest edge weak/unproven; ~33% win rate). Not advice."))
+         ("📝 PAPER ORDER PLACED (virtual money)\n" + body + f"💬 Kyun liya: {P['open']['why']}\n" + f"Risk: ₹{risk_inr:,.0f} ({RISK_PCT}% of ₹{P['balance']:,.0f}) | Expires in 5 days\nStrategy: trend_pullback (backtest edge weak/unproven; ~33% win rate). Not advice."))

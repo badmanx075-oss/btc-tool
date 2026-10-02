@@ -1,11 +1,11 @@
 """Runs every 5 min (GitHub Actions): scan, track trades, Telegram alerts + button callbacks."""
-import os, json, time, requests, datetime as dt
+import os, json, time, subprocess, requests, datetime as dt
 from zoneinfo import ZoneInfo
 import engine as E
 import paper, learn
-import faulthandler; faulthandler.dump_traceback_later(240, exit=True)  # if stuck >4 min: print where, then exit
+import faulthandler; faulthandler.dump_traceback_later(330, exit=True)  # if stuck >5.5 min: print where, then exit
 
-TOK, CHAT = os.environ["TG_TOKEN"], str(os.environ["TG_CHAT_ID"])
+TOK, CHAT = os.environ["TG_TOKEN"].strip(), str(os.environ["TG_CHAT_ID"]).strip()
 URL = os.environ.get("DASHBOARD_URL", "")
 TZ = ZoneInfo(os.environ.get("TZ_NAME", "Asia/Kolkata"))
 MH, EH = int(os.environ.get("MORNING_HOUR", 8)), int(os.environ.get("EVENING_HOUR", 20))
@@ -14,12 +14,17 @@ HEADER = "🤖 Notified from BTC Tool\n\n"
 DISC = "\nEXPERIMENTAL: backtests show NO proven edge yet. Paper-trade only. Not a prediction."
 
 def tg(method, **kw):
+    ST = S.setdefault("telegram", {}); key = {"sendMessage": "last_error", "getUpdates": "poll_error"}.get(method, "api_error")
     for _ in range(3):
         try:
-            r = requests.post(API + method, json=kw, timeout=20)
+            r = requests.post(API + method, json=kw, timeout=20 + int(kw.get("timeout", 0)))
             if r.status_code == 429: time.sleep(min(int(r.json().get("parameters", {}).get("retry_after", 3)), 20)); continue
-            if r.ok: return r.json()
-        except requests.RequestException: pass
+            if r.ok:
+                ST[key] = ""
+                if method == "sendMessage": ST["last_send_ok"] = dt.datetime.now(dt.timezone.utc).isoformat(timespec="seconds")
+                return r.json()
+            ST[key] = f"{method}: {r.status_code} {r.text[:120]}"
+        except requests.RequestException as e: ST[key] = f"{method}: network {type(e).__name__}"
         time.sleep(2)
 
 def send(text, tid=None):
@@ -47,30 +52,39 @@ def review(t):
             f"Entry {f(t['entry'])} SL {f(t['sl0'])} T1 {f(t['t1'])} T2 {f(t['t2'])} T3 {f(t['t3'])}\n"
             f"MFE {f(t['mfe'])} MAE {f(t['mae'])} pts\nSystem outcome: {t['outcome'] or 'open'}\nUser: {t['user']}\n\nTimeline:\n{tl}")
 
-def handle_updates():
-    r = tg("getUpdates", offset=S["offset"] + 1, timeout=0) or {"result": []}
+def handle_updates(timeout=0):
+    ST = S.setdefault("telegram", {}); stamp = lambda: dt.datetime.now(dt.timezone.utc).isoformat(timespec="seconds")
+    r = tg("getUpdates", offset=S["offset"] + 1, timeout=timeout)
+    if r is None: return 0
     for u in r["result"]:
-        S["offset"] = u["update_id"]
-        cb, msg = u.get("callback_query"), u.get("message")
-        if cb and str(cb["message"]["chat"]["id"]) == CHAT:
-            act, tid = cb["data"].split("|"); t = S["trades"].get(tid)
+        S["offset"] = u["update_id"]; cb, msg = u.get("callback_query"), u.get("message")
+        src = (cb.get("message") if cb else msg) or {}; chat = str(src.get("chat", {}).get("id", ""))
+        if not chat: continue
+        if chat != CHAT: ST["foreign_chat"] = "…" + chat[-4:]; continue
+        ST["last_cmd_ts"] = stamp()
+        if cb:
+            ST["last_cmd"] = "button"; act, tid = cb["data"].split("|"); t = S["trades"].get(tid)
             if t:
                 lp = S.get("last_price", t["entry"])
                 if act == "taken": t["user"].update(taken=True, entry=lp); ev(t, "USER TRADE TAKEN", lp, once=True)
                 elif act == "ign": t["user"]["taken"] = False; ev(t, "USER IGNORED", lp)
                 elif act in ("win", "loss"): t["user"]["result"] = act.upper(); ev(t, "USER FEEDBACK " + act.upper(), lp, once=False)
                 tg("answerCallbackQuery", callback_query_id=cb["id"], text=f"{tid}: {act} saved")
-        elif msg and str(msg["chat"]["id"]) == CHAT:
-            txt = msg.get("text", "").split()
-            if not txt: continue
-            if txt[0] == "/active": send("\n".join(f"{i}: {t['signal']} {t['status']}" for i, t in S["trades"].items() if not t["outcome"]) or "No active trades")
-            elif txt[0] == "/review" and len(txt) > 1 and txt[1] in S["trades"]: send(review(S["trades"][txt[1]]))
-            elif txt[0] == "/lessons": send(learn.lessons_text(S.get("paper") or {}))
-            elif txt[0] == "/approve" and len(txt) > 1: send(learn.approve(S.setdefault("paper", {}), txt[1]))
-            elif txt[0] == "/revert" and len(txt) > 1: send(learn.revert(S.setdefault("paper", {}), txt[1]))
-            elif txt[0] == "/status": send(paper.status_text(S))
-            elif txt[0] == "/demo": S.setdefault("paper", {})["force_demo"] = True; send("Demo paper trade queued. It opens on the next scan (within ~5 min) and closes within ~1 hour. Your wallet is NOT affected.")
-            else: send("Commands: /status (wallet, position, setup radar), /demo (test the pipeline), /lessons (what the tool learned), /approve N, /revert N, /active, /review TRADE_ID")
+            continue
+        txt = msg.get("text", "").split()
+        if not txt: continue
+        c = txt[0].split("@")[0].lower(); ST["last_cmd"] = c; ts_ = (S.get("market") or {}).get("ts")
+        if c == "/ping": send(f"🏓 pong. Bot is listening. Last market scan: {((now - dt.datetime.fromisoformat(ts_)).total_seconds() / 60):.0f} min ago." if ts_ else "🏓 pong. Bot is listening (no market scan saved yet).")
+        elif c == "/status": send(paper.status_text(S))
+        elif c == "/demo": S.setdefault("paper", {})["force_demo"] = True; send("Demo paper trade queued. It opens within seconds to a few minutes and closes within ~1 hour. Your wallet is NOT affected.")
+        elif c == "/lessons": send(learn.lessons_text(S.get("paper") or {}))
+        elif c == "/approve" and len(txt) > 1: send(learn.approve(S.setdefault("paper", {}), txt[1]))
+        elif c == "/revert" and len(txt) > 1: send(learn.revert(S.setdefault("paper", {}), txt[1]))
+        elif c == "/weekly": send(paper.weekly_text(S.get("paper") or {}, now))
+        elif c == "/active": send("\n".join(f"{i}: {t['signal']} {t['status']}" for i, t in S["trades"].items() if not t["outcome"]) or "No active old-style signals")
+        elif c == "/review" and len(txt) > 1 and txt[1] in S["trades"]: send(review(S["trades"][txt[1]]))
+        else: send("Commands: /ping, /status (wallet, position, radar), /demo (test the pipeline), /lessons, /approve N, /revert N, /weekly, /active, /review ID")
+    return len(r["result"])
 
 def alert(t, title, extra=""):
     send(f"{title}\nTrade ID: {t['id']}\nPrice: {P(S['last_price'])}\n{extra}", t["id"])
@@ -106,7 +120,7 @@ def record(px, fr, oi):  # builds our own OI/funding/order-book history for futu
         if new: f.write("ts,price,funding,oi_usd,book_imbalance\n")
         f.write(f"{now.isoformat(timespec='seconds')},{px},{fr},{oi},{imb}\n")
 
-def main():
+def scan_cycle():
     handle_updates()
     if os.environ.get("GITHUB_EVENT_NAME") == "workflow_dispatch":
         send("Bot connected. Manual test run OK.")
@@ -124,7 +138,7 @@ def main():
     for t in S["trades"].values():
         if t["status"] != "CLOSED": track(t, m5)
     r = E.scan(m15, h4, h1)
-    S["market"] = dict(price=px, regime=r["regime"], signal=r["signal"], side=r["side"], score=r["score"], funding=fr, oi=oi,
+    S["market"] = dict(price=px, regime=r["regime"], signal=r["signal"], side=r["side"], score=r["score"], scores=r["scores"], funding=fr, oi=oi,
                        pro=r["pro"], con=r["con"], ts=now.isoformat(timespec="seconds"))
     open_t = [t for t in S["trades"].values() if t["status"] != "CLOSED"]
     last = max((t["created"] for t in S["trades"].values()), default="2000")
@@ -152,6 +166,34 @@ def main():
                 send(f"🌅 GOOD MORNING\nBTC Perpetual Brief\nPrice: {P(px)}\nRegime: {r['regime']}\nSignal: {r['signal']}\nActive trades: {len(open_t)}\nFunding: {fr*100:.4f}%\n{paper.radar_line(S.get('paper', {}))}\nSignals are statistical, not guaranteed.")
             else:
                 send(f"🌆 GOOD EVENING\nDaily Review\nPrice: {P(px)}\nRegime: {r['regime']}\nSignals: {len(today)}\nT1: {cnt('T1 HIT')} T2: {cnt('T2 HIT')} T3: {cnt('T3 HIT')} SL: {cnt('SL HIT')}\nPaper wallet: ₹{S.get('paper', {}).get('balance', 0):,.0f}\n{paper.radar_line(S.get('paper', {}))}")
+    if loc.hour == EH and loc.weekday() == 6 and S["sent"].get("weekly") != key:
+        S["sent"]["weekly"] = key; send(paper.weekly_text(S.get("paper") or {}, now))
     json.dump(S, open("state.json", "w"), indent=1)
+
+def publish():  # push state to GitHub right away so the dashboard shows new trades within seconds (not at the end of the run)
+    json.dump(S, open("state.json", "w"), indent=1)
+    if not os.environ.get("GITHUB_ACTIONS"): return
+    try:
+        run = lambda *c: subprocess.run(c, timeout=60, capture_output=True)
+        run("git", "config", "user.name", "bot"); run("git", "config", "user.email", "bot@users.noreply.github.com"); run("git", "add", "state.json")
+        if os.path.exists("market_log.csv"): run("git", "add", "market_log.csv")
+        if run("git", "diff", "--cached", "--quiet").returncode: run("git", "commit", "-m", "state"); run("git", "pull", "--rebase"); run("git", "push")
+    except Exception as e: print("publish error", e)
+
+LISTEN_S = int(os.environ.get("LISTEN_SECONDS", 210))
+def listen(seconds):  # stay online and answer commands/buttons within seconds
+    end = time.time() + seconds
+    while time.time() < end:
+        globals()["now"] = dt.datetime.now(dt.timezone.utc)
+        if handle_updates(timeout=int(min(20, max(end - time.time(), 1)))):
+            if (S.get("paper") or {}).get("force_demo"):
+                try: paper.run(S, send, globals()["now"])
+                except Exception as e: print("paper error", e)
+            publish()
+
+def main():
+    ST = S.setdefault("telegram", {}); ST["chat_mask"] = "…" + CHAT[-4:]
+    me = tg("getMe"); ST["token_ok"] = bool(me and me.get("ok")); ST["bot"] = ((me or {}).get("result") or {}).get("username", "")
+    scan_cycle(); publish(); listen(LISTEN_S); ST["last_run"] = dt.datetime.now(dt.timezone.utc).isoformat(timespec="seconds"); json.dump(S, open("state.json", "w"), indent=1)
 
 main()

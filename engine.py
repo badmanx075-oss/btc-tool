@@ -107,5 +107,5 @@ def scan(m15, h4, h1):
     best["risk"] = "Low" if best["score"] >= 80 else "Medium" if best["score"] >= 65 else "High"
     gap = best["score"] - other["score"]
     best["signal"] = "NO TRADE" if best["score"] < 60 or gap < 15 else ("EARLY " + best["side"] + " SETUP" if best["score"] >= 65 else "WATCH: WEAK " + best["side"] + " SETUP")
-    best["regime"] = reg
+    best["regime"] = reg; best["scores"] = {x["side"]: x["score"] for x in res}
     return best

@@ -6,12 +6,12 @@ MIN_TOTAL, MIN_BUCKET, Z_PROPOSE = 40, 15, 2.5
 
 def postmortem(t):
     m, h, R = t.get("mfe_R", 0), t.get("hold_h", 0), t.get("R", 0)
-    if t["outcome"] == "TARGET": return "Win: the plan worked as designed."
+    if t["outcome"] == "TARGET": return "Jeet: plan jaisa socha tha waisa hi chala."
     if t["outcome"] == "STOP-LOSS":
-        if m >= 2: return f"Loss after reaching +{m:.1f}R first: direction was right but it reversed. A closer target or trailing stop might have kept profit (hypothesis, needs testing)."
-        if h <= 6: return f"Fast loss ({h:.0f}h, best +{m:.1f}R): entry timing was poor or a volatility spike hit the stop."
-        return f"Slow loss ({h:.0f}h, best +{m:.1f}R): the trend faded and price never moved in favour."
-    return f"Expired after 5 days at {R:+.1f}R: no decisive move."
+        if m >= 2: return f"Haar, par pehle +{m:.1f}R tak ja chuka tha: disha sahi thi par bhaav palat gaya. Chhota target ya trailing stop shayad profit bacha leta (sirf andaza, test karna hoga)."
+        if h <= 6: return f"Jaldi haar ({h:.0f} ghante, best +{m:.1f}R): entry ka timing theek nahi tha ya achanak volatility ne stop tod diya."
+        return f"Dheere-dheere haar ({h:.0f} ghante, best +{m:.1f}R): trend kamzor pad gaya aur bhaav kabhi hamare favour mein nahi gaya."
+    return f"5 din baad band, {R:+.1f}R: koi saaf move nahi aaya."
 
 def defs(T):
     out = []

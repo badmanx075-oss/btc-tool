@@ -8,7 +8,7 @@ RAW = "https://raw.githubusercontent.com/badmanx075-oss/btc-tool/main/"   # live
 def load(name, kind="json"):
     txt = None
     if not os.environ.get("DASH_LOCAL"):
-        try: r = requests.get(RAW + name, timeout=10); r.raise_for_status(); txt = r.text
+        try: r = requests.get(RAW + name + f"?t={int(dt.datetime.now().timestamp())}", timeout=10); r.raise_for_status(); txt = r.text
         except Exception: txt = None
     if txt is None and os.path.exists(name): txt = open(name).read()
     if txt is None: return None
@@ -61,15 +61,20 @@ def live_widget(o):
     if hasattr(st, "iframe"): st.iframe(html, height=170)
     else: components.html(html, height=170)
 
+T = S.get("telegram") or {}
+def amin(iso): return (now - dt.datetime.fromisoformat(iso)).total_seconds() / 60 if iso else None
 head, btn = st.columns([6, 1]); head.title("📈 BTC Perpetual Tool")
 if btn.button("🔄 Refresh"): st.cache_data.clear(); st.rerun()
 if M:
     age = (now - dt.datetime.fromisoformat(M["ts"])).total_seconds() / 60
     head.caption(f"Last scan {age:.0f} min ago | BTC ${M['price']:,.0f} | Funding {M['funding'] * 100:.4f}% | OI ${M['oi'] / 1e9:.2f}B")
     if age > 30: st.warning("Scanner looks delayed (more than 30 min). Check GitHub Actions.")
+if T.get("token_ok") and not T.get("last_error"): head.caption(f"📨 Telegram: ✅ connected (@{T.get('bot', '')}, checked {(amin(T.get('last_run')) or 0):.0f} min ago)")
+elif T: head.caption(f"📨 Telegram: ❌ problem. {T.get('last_error') or 'bot token not accepted'}")
+else: head.caption("📨 Telegram: no status yet (upload the new worker.py and run the scan once)")
 st.caption("⚠️ Informational and statistical only. Virtual money. Backtests show NO proven edge yet.")
 
-t1, t2, tL, t3, t4, t5 = st.tabs(["🏠 Home", "💰 Wallet", "🧠 Learning", "📡 Old signals (experimental)", "📊 Backtests", "📘 Guide"])
+t1, t2, tL, tH, t3, t4, t5 = st.tabs(["🏠 Home", "💰 Wallet", "🧠 Learning", "🩺 Health", "📡 Old signals (experimental)", "📊 Backtests", "📘 Guide"])
 
 with t1:
     live_widget(o)
@@ -88,6 +93,7 @@ with t1:
         title, why = pos_status(ur, 120 - hrs)
         if o.get("demo"): title, why = "🧪 DEMO TRADE (pipeline test, wallet not affected)", "Closes at stop/target or within 1 hour."
         st.markdown(f"### {title}"); st.caption(why)
+        if o.get("why"): st.info("💬 **Kyun liya:** " + o["why"])
         st.progress(float(min(max((lp - o["sl"]) / (o["tp"] - o["sl"]), 0), 1)), text=f"Stop ${o['sl']:,.0f}  ←  now ${lp:,.0f}  →  Target ${o['tp']:,.0f}")
         st.table(pd.DataFrame([{"Order": o["id"], "Action": "BUY (LONG)" if k == 1 else "SELL (SHORT)", "Qty BTC": q, "Entry": round(o["entry"]), "Now": round(lp),
                                 "Stop": round(o["sl"]), "Target": round(o["tp"]), "Open P/L": inr(usd * o.get("fx", 88)), "Time left": f"{max(120 - hrs, 0):.0f} h"}]))
@@ -102,6 +108,7 @@ with t1:
     st.subheader("Market now")
     if M:
         a, b = st.columns(2); a.markdown(f"**Signal:** {M['signal']} (score {M['score']}/100)"); a.markdown("**For:** " + (", ".join(M["pro"]) or "-")); b.markdown("**Against:** " + (", ".join(M["con"]) or "-"))
+        if M.get("scores"): st.markdown(f"**Accumulation score** (buy-side evidence): {M['scores'].get('LONG', '-')}/100 | **Distribution score** (sell-side evidence): {M['scores'].get('SHORT', '-')}/100")
         st.caption(stage(M["score"], bool(o)))
     lg = load("market_log.csv", "csv")
     if lg is not None and len(lg) > 5:
@@ -110,13 +117,23 @@ with t1:
 with t2:
     c = st.columns(4); c[0].metric("Wallet", inr(bal), f"{(bal / start - 1) * 100:+.1f}%"); c[1].metric("Start", inr(start)); c[2].metric("Trades closed", len(P.get("closed", []))); c[3].metric("Max drawdown", f"{P.get('max_dd_pct', 0)}%")
     st.caption("Rules: strategy trend_pullback | risk 1% of wallet per trade | stop 3×ATR(1H) | target 4R | exit after 5 days | fees 0.10% | no real orders.")
+    with st.expander("🧮 Position size calculator (for your own manual trades)"):
+        x1, x2, x3 = st.columns(3); wv = x1.number_input("Wallet ₹", value=float(bal), step=1000.0); rp = x2.number_input("Risk % per trade", value=1.0, step=0.25); fxv = x3.number_input("₹ per $1", value=88.0)
+        y1, y2 = st.columns(2); en = y1.number_input("Entry price $", value=float(lp or 80000)); sv = y2.number_input("Stop price $", value=float((lp or 80000) * 0.985))
+        if abs(en - sv) > 0: q = (wv * rp / 100) / (abs(en - sv) * fxv); st.write(f"Quantity **{q:.4f} BTC** | position ${q * en:,.0f} (₹{q * en * fxv:,.0f}, {q * en * fxv / wv:.1f}x wallet) | money at risk ₹{wv * rp / 100:,.0f}")
     cl = P.get("closed", [])
     if cl:
         d = pd.DataFrame(cl); d["wallet"] = start + d["pnl_inr"].fillna(0).cumsum(); st.line_chart(d.set_index("closed")["wallet"])
-        st.subheader("Trade book"); st.dataframe(d.reindex(columns=["closed", "id", "qty_btc", "entry", "exit", "outcome", "gross_usd", "fees_usd", "pnl_inr", "R"]).rename(
-            columns={"closed": "Closed", "id": "Order", "qty_btc": "Qty BTC", "entry": "Entry", "exit": "Exit", "outcome": "Result", "gross_usd": "Gross $", "fees_usd": "Fees $", "pnl_inr": "Net ₹"}))
+        st.subheader("Trade book"); st.dataframe(d.reindex(columns=["closed", "id", "qty_btc", "entry", "exit", "outcome", "gross_usd", "fees_usd", "pnl_inr", "R", "why", "lesson"]).rename(
+            columns={"closed": "Closed", "id": "Order", "qty_btc": "Qty BTC", "entry": "Entry", "exit": "Exit", "outcome": "Result", "gross_usd": "Gross $", "fees_usd": "Fees $", "pnl_inr": "Net ₹", "why": "Kyun liya", "lesson": "Kya hua"}))
         w = int((d.pnl_inr > 0).sum()); st.caption(f"Wins {w} | Losses {len(d) - w} | Total {d.R.sum():+.2f}R")
     else: st.info("No closed trades yet. A signal needs several conditions together, so 1-2 trades per week is normal.")
+    st.subheader("Trade journal (saved on GitHub: page refresh ya browser band hone se kuch nahi jaata)")
+    jr = ([o] if o else []) + list(reversed(cl))
+    for t_ in jr[:15]:
+        with st.expander(f"{'🟢 OPEN' if t_ is o else '✔️ CLOSED'}  {t_['id']}  |  {t_.get('outcome', 'running')}  {('%+.2fR' % t_['R']) if 'R' in t_ else ''}", expanded=t_ is o):
+            st.markdown("**Kyun liya:** " + (t_.get("why") or "-")); st.markdown("**Kya hua:** " + (t_.get("lesson") or "abhi trade chal raha hai"))
+            st.caption(f"Qty {t_.get('qty_btc')} BTC | entry ${t_['entry']:,.0f} | stop ${t_['sl']:,.0f} | target ${t_['tp']:,.0f}" + (f" | exit ${t_['exit']:,.0f}, net ₹{t_.get('pnl_inr', 0):,.0f}" if "exit" in t_ else ""))
     if P.get("orders"): st.subheader("Order log (newest first)"); st.dataframe(pd.DataFrame(P["orders"]).iloc[::-1])
 
 with tL:
@@ -133,6 +150,24 @@ with tL:
     for f in P.get("filters", []):
         b = [s["R"] for s in P.get("shadow", []) if s.get("filter") == f["text"] and "R" in s]
         st.write(f"{'✅ ON' if f.get('active', True) else '⏸ OFF'}  Filter #{f['id']}: {f['text']} | blocked trades checked: {len(b)}" + (f", average {sum(b) / len(b):+.2f}R" if b else ""))
+
+with tH:
+    st.caption("One-glance check that every part of the tool is alive.")
+    rl = load("market_log.csv", "csv"); sa = amin(M["ts"]) if M else None; ls = amin(T.get("last_send_ok")); lc = amin(T.get("last_cmd_ts")); pr = amin((P.get("radar") or {}).get("ts"))
+    rows_h = [
+        ["Scanner (GitHub Action)", sa is not None and sa < 30, f"last scan {sa:.0f} min ago" if sa is not None else "no scan yet", "Open the Actions tab, cancel any stuck run, then Run workflow"],
+        ["Exchange data", bool(M) and (M.get("price") or 0) > 0, f"BTC ${M['price']:,.0f}" if M else "no data", "The exchange may be blocking GitHub servers"],
+        ["Telegram bot token", bool(T.get("token_ok")), f"bot @{T.get('bot')}" if T.get("token_ok") else "not verified yet", "Recheck the TG_TOKEN secret"],
+        ["Telegram sending", bool(T.get("last_send_ok")) and not T.get("last_error"), f"last message {ls:.0f} min ago" if ls is not None else "none yet", T.get("last_error") or "Run the workflow manually: 'Bot connected' should arrive"],
+        ["Telegram commands (/ping)", lc is not None, f"last '{T.get('last_cmd')}' {lc:.0f} min ago" if lc is not None else "no command received yet", "Send /ping to your bot. It answers within seconds while the scanner is listening, else on the next run"],
+        ["Data recorder (OI, funding)", rl is not None and len(rl) > 0, f"{len(rl)} rows logged" if rl is not None else "no log yet", "market_log.csv must exist in the repo (scan.yml must git add it)"],
+        ["Paper trading engine", (pr is not None and pr < 30) or bool(o), f"radar updated {pr:.0f} min ago" if pr is not None else ("trade open" if o else "not running"), "Look for 'paper error' in the Run worker log"],
+        ["Learning module", "lessons" in P, "ready" if "lessons" in P else "not started", "Upload learn.py, paper.py and worker.py"]]
+    bad = [r for r in rows_h if not r[1]]
+    (st.success("All checks green.") if not bad else st.warning(f"{len(bad)} check(s) need attention."))
+    st.table(pd.DataFrame([["✅" if r[1] else "❌", r[0], r[2], "" if r[1] else r[3]] for r in rows_h], columns=["", "Check", "Detail", "If red, do this"]))
+    if T.get("foreign_chat"): st.error(f"A message reached the bot from a chat ending {T['foreign_chat']}, but your TG_CHAT_ID secret ends {T.get('chat_mask', '?')}. The bot ignores other chats. Fix the TG_CHAT_ID secret (spaces or a wrong ID).")
+    if T.get("poll_error"): st.error(f"Telegram polling problem: {T['poll_error']}")
 
 with t3:
     st.warning("Early-signal engine. Its backtest was negative (about -0.2R per trade), so this is for learning only. Not connected to the wallet.")
@@ -155,6 +190,10 @@ with t4:
     if v4: rows.append(["V4: 4 other strategies", "trend_pullback looked best, others failed", v4["verdict"]])
     if v5: f = v5["central_fresh_oos"]; rows.append(["V5: 5-year check of trend_pullback", f"older unseen trades: {f.get('mean_R')}R per trade (n={f.get('n')}, error ±{f.get('se')})", v5["verdict"]])
     if rows: st.table(pd.DataFrame(rows, columns=["Test", "Result", "Verdict"]))
+    if v1:
+        a_ = v1["all"]; st.subheader("Historical odds of point moves (early-signal setups, 1 year)")
+        st.table(pd.DataFrame([{"Move reached before the stop": f"+{x:,} points", "Share of setups": f"{a_[f'p{x}_before_stop_%']}%"} for x in (500, 1000, 2000, 5000)]))
+        st.caption(f"Based on {a_['n']} setups. Depends on the stop distance used. An estimate, not a promise.")
     st.info("R = result in units of risk. +0.10R means earning 10% of the amount risked per trade on average. Errors this large mean it cannot be told apart from zero yet.")
     for n, v in (("V5 details", v5), ("V4 details", v4), ("V3 details", v3)):
         if v:
@@ -177,7 +216,7 @@ with t5:
 - **Funding / OI**: crowd positioning in perpetual futures (open interest).
 - **Paper trade**: practice trade with virtual money. No exchange connection, no real orders.
 
-**Telegram commands:** `/lessons` (what the tool learned), `/approve N` and `/revert N` (turn a learned filter on/off), `/status` (wallet, position, radar), `/demo` (opens a test trade that never touches the wallet, to prove the pipeline works). Replies come on the next scan, within a few minutes.
+**Telegram commands:** `/ping` (is the bot alive?), `/weekly` (weekly review), `/lessons` (what the tool learned), `/approve N` and `/revert N` (turn a learned filter on/off), `/status` (wallet, position, radar), `/demo` (opens a test trade that never touches the wallet, to prove the pipeline works). Replies come on the next scan, within a few minutes.
 
 **Honest status**: the machine (scanner, alerts, wallet, dashboard) works. A reliably profitable signal is **not proven**. Treat everything as practice.
 """)
