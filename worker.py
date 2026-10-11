@@ -89,7 +89,7 @@ def handle_updates(timeout=0):
         elif c == "/weekly": send(paper.weekly_text(S.get("paper") or {}, now))
         elif c == "/active": send("\n".join(f"{i}: {t['signal']} {t['status']}" for i, t in S["trades"].items() if not t["outcome"]) or "No active old-style signals")
         elif c == "/review" and len(txt) > 1 and txt[1] in S["trades"]: send(review(S["trades"][txt[1]]))
-        elif c == "/wallet": send(wallet.summary(S.get("paper") or {}))
+        elif c == "/wallet": send(wallet.summary(S.get('paper') or {}))
         elif c == "/ledger": send(paper.ledger_text(S.get("paper") or {}))
         elif c == "/trades": send(wallet.trades_text(S.get("paper") or {}))
         elif c == "/analysis": send(analysis.text(S.get("analysis")))
@@ -187,9 +187,9 @@ def scan_cycle():
             today = [t for t in S["trades"].values() if t["created"][:10] == now.strftime("%Y-%m-%d")]
             cnt = lambda s: sum(any(e["type"] == s for e in t["events"]) for t in today)
             if name == "morning":
-                send(f"🌅 GOOD MORNING\nBTC Perpetual Brief\nPrice: {P(px)}\nRegime: {r['regime']}\nSignal: {r['signal']}\nActive trades: {len(open_t)}\nFunding: {fr*100:.4f}%\n{wallet.summary(S.get("paper") or {})}\n{paper.radar_line(S.get('paper', {}))}\nSignals are statistical, not guaranteed.", cat="morning")
+                send(f"🌅 GOOD MORNING\nBTC Perpetual Brief\nPrice: {P(px)}\nRegime: {r['regime']}\nSignal: {r['signal']}\nActive trades: {len(open_t)}\nFunding: {fr*100:.4f}%\n{wallet.summary(S.get('paper') or {})}\n{paper.radar_line(S.get('paper', {}))}\nSignals are statistical, not guaranteed.", cat="morning")
             else:
-                send(f"🌆 GOOD EVENING\nDaily Review\nPrice: {P(px)}\nRegime: {r['regime']}\nSignals: {len(today)}\nT1: {cnt('T1 HIT')} T2: {cnt('T2 HIT')} T3: {cnt('T3 HIT')} SL: {cnt('SL HIT')}\n{wallet.summary(S.get("paper") or {})}\n{paper.radar_line(S.get('paper', {}))}", cat="evening")
+                send(f"🌆 GOOD EVENING\nDaily Review\nPrice: {P(px)}\nRegime: {r['regime']}\nSignals: {len(today)}\nT1: {cnt('T1 HIT')} T2: {cnt('T2 HIT')} T3: {cnt('T3 HIT')} SL: {cnt('SL HIT')}\n{wallet.summary(S.get('paper') or {})}\n{paper.radar_line(S.get('paper', {}))}", cat="evening")
     if loc.hour == CF["evening_hour"] and loc.weekday() == 6 and S["sent"].get("weekly") != key:
         S["sent"]["weekly"] = key; send(paper.weekly_text(S.get("paper") or {}, now), cat="weekly")
     json.dump(S, open("state.json", "w"), indent=1)
