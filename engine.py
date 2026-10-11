@@ -82,6 +82,23 @@ def _params():
     try: return json.load(open(os.path.join(os.path.dirname(os.path.abspath(__file__)), "params.json")))
     except Exception: return None
 
+def reversal(h1, h4, reg):
+    try:
+        c1, lo24, hi24 = h1.c.iloc[-2], h1.l.iloc[-26:-2].min(), h1.h.iloc[-26:-2].max()
+        c4, lo12, hi12 = h4.c.iloc[-2], h4.l.iloc[-14:-2].min(), h4.h.iloc[-14:-2].max()
+    except Exception: return "none"
+    if reg == "BULLISH TREND": return "BULL->BEAR REVERSAL CONFIRMED" if c4 < lo12 else "BULL->BEAR REVERSAL WATCH" if c1 < lo24 else "none"
+    if reg == "BEARISH TREND": return "BEAR->BULL REVERSAL CONFIRMED" if c4 > hi12 else "BEAR->BULL REVERSAL WATCH" if c1 > hi24 else "none"
+    return "none"
+
+def tf_view(d):  # trend direction and strength on each timeframe (closed candles only)
+    out = {}
+    for name, df in d.items():
+        s = df.c.iloc[-31:-1]
+        if len(s) < 20: continue
+        er_, up = float(_er(s)), bool(s.iloc[-1] > s.iloc[0]); out[name] = dict(er=round(er_, 2), label="FLAT" if er_ < 0.2 else ("UP" if up else "DOWN"))
+    return out
+
 def _mirror(d):
     m = d.copy(); m["o"], m["c"], m["h"], m["l"] = -d.o, -d.c, -d.l, -d.h; return m
 
@@ -107,5 +124,20 @@ def scan(m15, h4, h1):
     best["risk"] = "Low" if best["score"] >= 80 else "Medium" if best["score"] >= 65 else "High"
     gap = best["score"] - other["score"]
     best["signal"] = "NO TRADE" if best["score"] < 60 or gap < 15 else ("EARLY " + best["side"] + " SETUP" if best["score"] >= 65 else "WATCH: WEAK " + best["side"] + " SETUP")
+    best["atr4h"] = float(a4); best["atr1h"] = float(atr_series(h1).iloc[-1]); best["reversal"] = reversal(h1, h4, reg)
     best["regime"] = reg; best["scores"] = {x["side"]: x["score"] for x in res}
     return best
+
+
+def market_map(h1):
+    """Range map + breakout watch (informational, not backtested)."""
+    try:
+        a = atr_series(h1); lc = h1.iloc[-2]; w = h1.iloc[-50:-2]; hi, lo = float(w.h.max()), float(w.l.min()); px = float(h1.c.iloc[-1]); at = float(a.iloc[-2])
+        comp = at / float(a.tail(100).mean()); vr = float(lc.v / h1.v.iloc[-32:-2].mean()); cl = float(lc.c)
+        if cl > hi and vr > 1.3: watch = "BREAKOUT CONFIRMED UP (volume strong)"
+        elif cl < lo and vr > 1.3: watch = "BREAKOUT CONFIRMED DOWN (volume strong)"
+        elif cl > hi or cl < lo: watch = "Range broken without volume: possible FALSE breakout"
+        elif comp < 0.85 and (px >= hi - 0.5 * at or px <= lo + 0.5 * at): watch = "BREAKOUT WATCH: price at range " + ("top" if px >= hi - 0.5 * at else "bottom") + ", volatility compressed"
+        else: watch = "Inside range"
+        return dict(hi=round(hi), lo=round(lo), mid=round((hi + lo) / 2), pos=round((px - lo) / (hi - lo) * 100) if hi > lo else 50, compression=round(comp, 2), vol_ratio=round(vr, 2), watch=watch, atr1h=round(at))
+    except Exception: return {}

@@ -2,7 +2,8 @@
 import os, json, time, subprocess, requests, datetime as dt
 from zoneinfo import ZoneInfo
 import engine as E
-import paper, learn
+import paper, learn, config, wallet, analysis
+import pandas as pd
 import faulthandler; faulthandler.dump_traceback_later(330, exit=True)  # if stuck >5.5 min: print where, then exit
 
 TOK, CHAT = os.environ["TG_TOKEN"].strip(), str(os.environ["TG_CHAT_ID"]).strip()
@@ -27,9 +28,11 @@ def tg(method, **kw):
         except requests.RequestException as e: ST[key] = f"{method}: network {type(e).__name__}"
         time.sleep(2)
 
-def send(text, tid=None):
+def send(text, tid=None, cat=None, buttons=None):
+    if cat and not config.load()["alerts"].get(cat, True): return      # user turned this category off (/notify)
     kw = dict(chat_id=CHAT, text=HEADER + text)
-    if tid:
+    if buttons: kw["reply_markup"] = {"inline_keyboard": [[b if isinstance(b, dict) else {"text": b[0], "callback_data": b[1]} for b in row] for row in buttons]}
+    elif tid:
         rows = [[{"text": "🟢 TRADE TAKEN", "callback_data": f"taken|{tid}"}, {"text": "⚪ IGNORE", "callback_data": f"ign|{tid}"}],
                 [{"text": "🟢 PROFIT", "callback_data": f"win|{tid}"}, {"text": "🔴 LOSS", "callback_data": f"loss|{tid}"}]]
         if URL.startswith("http"): rows.append([{"text": "🔎 CHECK THIS TRADE", "url": f"{URL}?trade={tid}"}])
@@ -63,7 +66,10 @@ def handle_updates(timeout=0):
         if chat != CHAT: ST["foreign_chat"] = "…" + chat[-4:]; continue
         ST["last_cmd_ts"] = stamp()
         if cb:
-            ST["last_cmd"] = "button"; act, tid = cb["data"].split("|"); t = S["trades"].get(tid)
+            ST["last_cmd"] = "button"; act, tid = cb["data"].split("|")
+            if act in ("fbgood", "fbbad"):
+                rep = paper.user_event(S, act, tid, now); tg("answerCallbackQuery", callback_query_id=cb["id"], text=rep[:180]); send(rep); continue
+            t = S["trades"].get(tid)
             if t:
                 lp = S.get("last_price", t["entry"])
                 if act == "taken": t["user"].update(taken=True, entry=lp); ev(t, "USER TRADE TAKEN", lp, once=True)
@@ -83,11 +89,21 @@ def handle_updates(timeout=0):
         elif c == "/weekly": send(paper.weekly_text(S.get("paper") or {}, now))
         elif c == "/active": send("\n".join(f"{i}: {t['signal']} {t['status']}" for i, t in S["trades"].items() if not t["outcome"]) or "No active old-style signals")
         elif c == "/review" and len(txt) > 1 and txt[1] in S["trades"]: send(review(S["trades"][txt[1]]))
-        else: send("Commands: /ping, /status (wallet, position, radar), /demo (test the pipeline), /lessons, /approve N, /revert N, /weekly, /active, /review ID")
+        elif c == "/wallet": send(wallet.summary(S.get("paper") or {}))
+        elif c == "/ledger": send(paper.ledger_text(S.get("paper") or {}))
+        elif c == "/trades": send(wallet.trades_text(S.get("paper") or {}))
+        elif c == "/analysis": send(analysis.text(S.get("analysis")))
+        elif c == "/config": send(config.show())
+        elif c == "/set" and len(txt) > 2: send(config.set_value(txt[1], txt[2]))
+        elif c == "/notify" and len(txt) > 2: send(config.set_notify(txt[1], txt[2]))
+        elif c == "/note" and len(txt) > 2: send(paper.add_note(S, txt[1], " ".join(txt[2:])))
+        elif c == "/myexit" and len(txt) > 2: send(paper.my_exit(S, txt[1], txt[2], " ".join(txt[3:]), now))
+        elif c == "/resetwallet": send(paper.reset_wallet(S, now) if txt[1:2] == ["confirm"] else "Wallet reset karne par purani history archive ho jati hai. Pakka ho to bhejo: /resetwallet confirm")
+        else: send("Commands: /wallet, /ledger, /trades, /config, /set, /notify, /note, /myexit, /resetwallet, /ping, /status (wallet, position, radar), /demo (test the pipeline), /lessons, /approve N, /revert N, /weekly, /active, /review ID")
     return len(r["result"])
 
 def alert(t, title, extra=""):
-    send(f"{title}\nTrade ID: {t['id']}\nPrice: {P(S['last_price'])}\n{extra}", t["id"])
+    send(f"{title}\nTrade ID: {t['id']}\nPrice: {P(S['last_price'])}\n{extra}", t["id"], cat="signals")
 
 def track(t, m5):
     k = 1 if t["side"] == "LONG" else -1
@@ -138,8 +154,11 @@ def scan_cycle():
     for t in S["trades"].values():
         if t["status"] != "CLOSED": track(t, m5)
     r = E.scan(m15, h4, h1)
-    S["market"] = dict(price=px, regime=r["regime"], signal=r["signal"], side=r["side"], score=r["score"], scores=r["scores"], funding=fr, oi=oi,
+    S["market"] = dict(price=px, regime=r["regime"], signal=r["signal"], side=r["side"], score=r["score"], scores=r["scores"], atr1h=r["atr1h"], atr4h=r["atr4h"], reversal=r["reversal"], tf=E.tf_view({"5m": m5, "15m": m15, "1H": h1, "4H": h4}), funding=fr, oi=oi,
                        pro=r["pro"], con=r["con"], ts=now.isoformat(timespec="seconds"))
+    if r["reversal"] != S.get("rev_last", "none"):
+        S["rev_last"] = r["reversal"]
+        if r["reversal"] != "none": send(f"🔄 {r['reversal']}\nBTC ${px:,.0f}. Bade chart pe trend ke ulte palatne ka sanket mila (WATCH = shuruaati, CONFIRMED = pakka hota hua). Ye guarantee nahi, sirf chetavni hai.", cat="reversal")
     open_t = [t for t in S["trades"].values() if t["status"] != "CLOSED"]
     last = max((t["created"] for t in S["trades"].values()), default="2000")
     if r["signal"].startswith("EARLY") and not open_t and (now - dt.datetime.fromisoformat(last if "T" in last else "2000-01-01T00:00:00+00:00")).total_seconds() > 3600:
@@ -153,21 +172,26 @@ def scan_cycle():
         send(f"🧪 EXPERIMENTAL BTC ALERT (EXPERIMENTAL, no proven edge yet)\nTrade ID: {tid}\nSignal: {r['signal']}\nRegime: {r['regime']}\nPrice: {P(px)}\n"
              f"Entry Zone: {P(t['zone'][0])} – {P(t['zone'][1])}\nInvalidation/SL: {P(t['sl'])}\nT1 {P(t['t1'])} | T2 {P(t['t2'])} | T3 {P(t['t3'])}\nExtended: {P(t['ext'])}+\n"
              f"Confirmation: {'above' if r['side']=='LONG' else 'below'} {P(t['confirm'])}\nMove to T1–T3: {mv[0]:,.0f} to {mv[1]:,.0f} pts ({t['move_class']} vs 4H ATR)\n"
-             f"Setup Score: {r['score']}/100 | False-signal risk: {r['risk']}\nFor: {', '.join(r['pro'])}\nAgainst: {', '.join(r['con']) or '-'}{DISC}", tid)
-    try: paper.run(S, send, now)
+             f"Setup Score: {r['score']}/100 | False-signal risk: {r['risk']}\nFor: {', '.join(r['pro'])}\nAgainst: {', '.join(r['con']) or '-'}{DISC}", tid, cat="signals")
+    try:   # full snapshot (spec 31): scores, stage, zones, expected move, checklist
+        stats = json.load(open("move_stats.json")) if os.path.exists("move_stats.json") else None
+        lg = pd.read_csv("market_log.csv") if os.path.exists("market_log.csv") else None
+        S["analysis"] = analysis.snapshot(h1, fr, oi, lg, stats, r["regime"], r["scores"], any((S.get("paper") or {}).get("pos", {}).values()))
+    except Exception as e: print("analysis error", e)
+    try: paper.run(S, send, now, scan=r)
     except Exception as e: print("paper error", e)
-    loc = now.astimezone(TZ); key = loc.strftime("%Y-%m-%d")
-    for name, hr in (("morning", MH), ("evening", EH)):
+    loc = now.astimezone(TZ); key = loc.strftime("%Y-%m-%d"); CF = dict(config.load()["schedule"])
+    for name, hr in (("morning", CF["morning_hour"]), ("evening", CF["evening_hour"])):
         if loc.hour == hr and S["sent"].get(name) != key:
             S["sent"][name] = key
             today = [t for t in S["trades"].values() if t["created"][:10] == now.strftime("%Y-%m-%d")]
             cnt = lambda s: sum(any(e["type"] == s for e in t["events"]) for t in today)
             if name == "morning":
-                send(f"🌅 GOOD MORNING\nBTC Perpetual Brief\nPrice: {P(px)}\nRegime: {r['regime']}\nSignal: {r['signal']}\nActive trades: {len(open_t)}\nFunding: {fr*100:.4f}%\n{paper.radar_line(S.get('paper', {}))}\nSignals are statistical, not guaranteed.")
+                send(f"🌅 GOOD MORNING\nBTC Perpetual Brief\nPrice: {P(px)}\nRegime: {r['regime']}\nSignal: {r['signal']}\nActive trades: {len(open_t)}\nFunding: {fr*100:.4f}%\n{wallet.summary(S.get("paper") or {})}\n{paper.radar_line(S.get('paper', {}))}\nSignals are statistical, not guaranteed.", cat="morning")
             else:
-                send(f"🌆 GOOD EVENING\nDaily Review\nPrice: {P(px)}\nRegime: {r['regime']}\nSignals: {len(today)}\nT1: {cnt('T1 HIT')} T2: {cnt('T2 HIT')} T3: {cnt('T3 HIT')} SL: {cnt('SL HIT')}\nPaper wallet: ₹{S.get('paper', {}).get('balance', 0):,.0f}\n{paper.radar_line(S.get('paper', {}))}")
-    if loc.hour == EH and loc.weekday() == 6 and S["sent"].get("weekly") != key:
-        S["sent"]["weekly"] = key; send(paper.weekly_text(S.get("paper") or {}, now))
+                send(f"🌆 GOOD EVENING\nDaily Review\nPrice: {P(px)}\nRegime: {r['regime']}\nSignals: {len(today)}\nT1: {cnt('T1 HIT')} T2: {cnt('T2 HIT')} T3: {cnt('T3 HIT')} SL: {cnt('SL HIT')}\n{wallet.summary(S.get("paper") or {})}\n{paper.radar_line(S.get('paper', {}))}", cat="evening")
+    if loc.hour == CF["evening_hour"] and loc.weekday() == 6 and S["sent"].get("weekly") != key:
+        S["sent"]["weekly"] = key; send(paper.weekly_text(S.get("paper") or {}, now), cat="weekly")
     json.dump(S, open("state.json", "w"), indent=1)
 
 def publish():  # push state to GitHub right away so the dashboard shows new trades within seconds (not at the end of the run)
@@ -176,6 +200,7 @@ def publish():  # push state to GitHub right away so the dashboard shows new tra
     try:
         run = lambda *c: subprocess.run(c, timeout=60, capture_output=True)
         run("git", "config", "user.name", "bot"); run("git", "config", "user.email", "bot@users.noreply.github.com"); run("git", "add", "state.json")
+        if os.path.exists("config.json"): run("git", "add", "config.json")
         if os.path.exists("market_log.csv"): run("git", "add", "market_log.csv")
         if run("git", "diff", "--cached", "--quiet").returncode: run("git", "commit", "-m", "state"); run("git", "pull", "--rebase"); run("git", "push")
     except Exception as e: print("publish error", e)
@@ -194,6 +219,6 @@ def listen(seconds):  # stay online and answer commands/buttons within seconds
 def main():
     ST = S.setdefault("telegram", {}); ST["chat_mask"] = "…" + CHAT[-4:]
     me = tg("getMe"); ST["token_ok"] = bool(me and me.get("ok")); ST["bot"] = ((me or {}).get("result") or {}).get("username", "")
-    scan_cycle(); publish(); listen(LISTEN_S); ST["last_run"] = dt.datetime.now(dt.timezone.utc).isoformat(timespec="seconds"); json.dump(S, open("state.json", "w"), indent=1)
+    scan_cycle(); publish(); listen(int(os.environ.get("LISTEN_SECONDS", config.load()["schedule"]["listen_seconds"]))); ST["last_run"] = dt.datetime.now(dt.timezone.utc).isoformat(timespec="seconds"); json.dump(S, open("state.json", "w"), indent=1)
 
 main()

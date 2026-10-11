@@ -2,6 +2,7 @@
 import os, sys, json, requests, numpy as np, pandas as pd
 import engine as E, backtest as B, backtest_v3 as V
 
+
 def prep(m15):
     h1, h4 = B.rs(m15, "1h"), B.rs(m15, "4h"); h1["atr"] = E.atr_series(h1)
     net = h4.c - h4.c.shift(30); h4["er"] = net.abs() / h4.c.diff().abs().rolling(30).sum(); h4["dir"] = np.sign(net)
@@ -10,7 +11,7 @@ def prep(m15):
     h1["ret30d"] = h1.c / h1.c.shift(720) - 1
     return h1
 
-def side_sigs(h1, k, S, lo_i=800, hi_i=None):  # short = same logic on mirrored prices
+def side_sigs(h1, k, S, lo_i=800, hi_i=None, er_min=0.30, depth_min=1.5):  # short = same logic on mirrored prices
     c, o = k * h1.c.values, k * h1.o.values
     hi, lo = (h1.h.values, h1.l.values) if k == 1 else (-h1.l.values, -h1.h.values)
     a, d4, e4, r30 = h1.atr.values, h1.dir4.values * k, h1.er4.values, h1.ret30d.values * k
@@ -20,8 +21,8 @@ def side_sigs(h1, k, S, lo_i=800, hi_i=None):  # short = same logic on mirrored 
     comp = (h1.atr / h1.atr.rolling(100).mean()).values
     for i in range(lo_i, (len(c) - 130) if hi_i is None else hi_i):
         if a[i] != a[i] or e4[i] != e4[i]: continue
-        up = d4[i] > 0 and e4[i] > 0.3
-        if up and hh24[i] - c[i] >= 1.5 * a[i] and c[i] > ll24[i] + 0.5 * a[i] and c[i] > o[i]: S["trend_pullback"].append((i, k))
+        up = d4[i] > 0 and e4[i] > er_min
+        if up and hh24[i] - c[i] >= depth_min * a[i] and c[i] > ll24[i] + 0.5 * a[i] and c[i] > o[i]: S["trend_pullback"].append((i, k))
         if up:
             for j in range(1, 9):
                 if c[i - j] > hh48[i - j]:
