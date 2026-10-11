@@ -39,4 +39,5 @@ jobs:
           git add state.json
           if [ -f market_log.csv ]; then git add market_log.csv; fi
           if [ -f config.json ]; then git add config.json; fi
+          if [ -f trade_history.json ]; then git add trade_history.json; fi
           git diff --cached --quiet || (git commit -m "state" && git pull --rebase && git push)
