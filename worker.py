@@ -2,7 +2,7 @@
 import os, json, time, subprocess, requests, datetime as dt
 from zoneinfo import ZoneInfo
 import engine as E
-import paper, learn, config, wallet, analysis
+import paper, learn, config, wallet, analysis, history
 import pandas as pd
 import faulthandler; faulthandler.dump_traceback_later(330, exit=True)  # if stuck >5.5 min: print where, then exit
 
@@ -196,12 +196,15 @@ def scan_cycle():
 
 def publish():  # push state to GitHub right away so the dashboard shows new trades within seconds (not at the end of the run)
     json.dump(S, open("state.json", "w"), indent=1)
+    try: history.seed_from_backups(); history.sync(S)            # permanent trade record (never deleted, separate from state.json)
+    except Exception as e: print("history error", e)
     if not os.environ.get("GITHUB_ACTIONS"): return
     try:
         run = lambda *c: subprocess.run(c, timeout=60, capture_output=True)
         run("git", "config", "user.name", "bot"); run("git", "config", "user.email", "bot@users.noreply.github.com"); run("git", "add", "state.json")
         if os.path.exists("config.json"): run("git", "add", "config.json")
         if os.path.exists("market_log.csv"): run("git", "add", "market_log.csv")
+        if os.path.exists("trade_history.json"): run("git", "add", "trade_history.json")
         if run("git", "diff", "--cached", "--quiet").returncode: run("git", "commit", "-m", "state"); run("git", "pull", "--rebase"); run("git", "push")
     except Exception as e: print("publish error", e)
 

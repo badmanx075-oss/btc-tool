@@ -1,6 +1,6 @@
 import json, os, io, datetime as dt, requests, pandas as pd, streamlit as st
 import streamlit.components.v1 as components
-import config
+import config, history
 
 st.set_page_config(page_title="BTC Tool", page_icon="📈", layout="wide")
 RAW = "https://raw.githubusercontent.com/badmanx075-oss/btc-tool/main/"   # live data written by the 5-minute scanner
@@ -64,7 +64,7 @@ if T.get("token_ok") and not T.get("last_error"): head.caption(f"📨 Telegram: 
 elif T: head.caption(f"📨 Telegram: ❌ problem. {T.get('last_error') or 'bot token not accepted'}")
 else: head.caption("📨 Telegram: no status yet (upload the latest worker.py and run the scan once)")
 st.caption("⚠️ Informational and statistical only. Virtual money, no real orders. Backtests show NO proven edge yet.")
-tH_, tA, tW, tL, tHl, tS, tO, tB, tG = st.tabs(["🏠 Home", "📋 Analysis", "💰 Wallet", "🧠 Learning", "🩺 Health", "⚙️ Settings", "📡 Old signals", "📊 Backtests", "📘 Guide"])
+tH_, tA, tW, tTH, tL, tHl, tS, tO, tB, tG = st.tabs(["🏠 Home", "📋 Analysis", "💰 Wallet", "📒 Trade History", "🧠 Learning", "🩺 Health", "⚙️ Settings", "📡 Old signals", "📊 Backtests", "📘 Guide"])
 
 def position_card(t):
     px = lp or t["entry"]; ur = (px - t["entry"]) * t["side"] / t["risk"]; usd = pl_usd(t, px) + t.get("realized_usd", 0); m = t.get("mgmt")
@@ -154,6 +154,38 @@ with tW:
     if P.get("journal"): st.subheader("Activity log (newest first)"); st.dataframe(pd.DataFrame(P["journal"]).iloc[::-1].head(60))
     if led: st.subheader("Wallet ledger (newest first)"); st.dataframe(pd.DataFrame(led).iloc[::-1].head(80))
     if P.get("orders"): st.subheader("Order log (newest first)"); st.dataframe(pd.DataFrame(P["orders"]).iloc[::-1].head(60))
+
+with tTH:
+    st.caption("Permanent record of every trade the tool has ever taken or alerted. It is stored in its own file (trade_history.json): refreshing the page, upgrading the code or resetting the wallet never deletes it. All times are Indian time (IST).")
+    HF = load("trade_history.json"); rec = dict((HF or {}).get("records", {}))
+    for r_ in history._all_trades(S): rec[r_["id"]] = history._merge(rec.get(r_["id"]), r_)      # live trades not yet written to the file are shown too
+    rows_ = sorted(rec.values(), key=lambda r: r.get("opened") or "", reverse=True)
+    if not rows_: st.info("No trades recorded yet. The first one will appear here as soon as the tool takes or alerts a trade.")
+    else:
+        cl = [r for r in rows_ if r["source"] == "PAPER" and r["status"] == "CLOSED"]; wins = sum(1 for r in cl if (r.get("pnl_inr") or 0) > 0); net = sum(r.get("pnl_inr") or 0 for r in cl)
+        m = st.columns(5); m[0].metric("All trades", len(rows_)); m[1].metric("Open now", sum(r["status"] == "OPEN" for r in rows_)); m[2].metric("Paper closed", len(cl), f"{wins} win / {len(cl) - wins} loss"); m[3].metric("Paper net P/L", inr(net)); m[4].metric("Alert signals", sum(r["source"] == "SIGNAL" for r in rows_))
+        f1, f2, f3, f4 = st.columns(4)
+        fs = f1.multiselect("Type", ["PAPER", "SIGNAL"], default=["PAPER", "SIGNAL"], format_func=lambda x: "Paper wallet trade" if x == "PAPER" else "Early-signal alert")
+        fst = f2.multiselect("Status", ["OPEN", "CLOSED"], default=["OPEN", "CLOSED"]); fsd = f3.multiselect("Side", ["LONG", "SHORT"], default=["LONG", "SHORT"]); q = f4.text_input("Search (ID, reason, outcome)").strip().lower()
+        sel = [r for r in rows_ if r["source"] in fs and r["status"] in fst and r.get("side") in fsd and (not q or q in json.dumps({k: r.get(k) for k in ("id", "why", "outcome", "label", "user_note", "lesson")}, default=str).lower())]
+        fbtxt = lambda r: {"good": "👍 good", "bad": "👎 bad"}.get(r.get("user_rating"), "") + (" " + r["user_note"] if r.get("user_note") else "")
+        tbl = pd.DataFrame([{"Trade ID": r["id"], "Type": "Paper" if r["source"] == "PAPER" else "Alert", "Strategy": r.get("label") or r.get("strategy"), "Side": r.get("side"), "Opened (IST)": r.get("opened_ist"), "Closed (IST)": r.get("closed_ist") or "-",
+                             "Entry": round(r["entry"]) if r.get("entry") else None, "Exit": round(r["exit"]) if r.get("exit") else None, "Status": r["status"], "Outcome": r.get("outcome") or "-", "R": r.get("R"),
+                             "P/L ₹": r.get("pnl_inr"), "Your feedback": fbtxt(r), "Why taken": r.get("why", "")} for r in sel])
+        st.dataframe(tbl, hide_index=True, use_container_width=True); st.download_button("⬇️ Download full history (CSV)", tbl.to_csv(index=False).encode(), "trade_history.csv", "text/csv")
+        if sel:
+            pick_ = st.selectbox("Open one trade", [r["id"] for r in sel]); r = rec[pick_]; st.markdown(f"### {r['id']}  ·  {r.get('label') or ''}  ·  {r.get('side')}")
+            st.write(f"**Opened:** {r.get('opened_ist')}  |  **Closed:** {r.get('closed_ist') or 'still open'}  |  **Status:** {r['status']}  |  **Outcome:** {r.get('outcome') or '-'}")
+            st.info("💬 **Why this trade was taken:** " + (r.get("why") or "-"))
+            plan = {"Entry": r.get("entry"), "Stop-loss": r.get("stop"), **{f"Target {i + 1}": x for i, x in enumerate(r.get("targets") or [])}, "Exit (avg)": r.get("exit"), "Qty BTC": r.get("qty_btc"), "Margin ₹": r.get("margin_inr"), "R": r.get("R"), "P/L ₹": r.get("pnl_inr"), "Hold hours": r.get("hold_h"), "Best R": r.get("best_R"), "Worst R": r.get("worst_R")}
+            st.table(pd.DataFrame([{k: (round(v, 2) if isinstance(v, float) else v) for k, v in plan.items() if v is not None}]))
+            if r.get("lesson"): st.write("**What happened:** " + r["lesson"])
+            if r.get("auto_feedback"): st.write("**Tool's own review:** " + r["auto_feedback"])
+            st.write("**Your feedback:** " + (fbtxt(r) or "none yet (use the 👍 / 👎 buttons or /note on Telegram)") + (f"  ({r['user_feedback_ist']})" if r.get("user_feedback_ist") else ""))
+            if r.get("user_exit"): st.write(f"**Your own exit:** ${r['user_exit']['price']:,.0f} ({r['user_exit']['pct']:+.2f}%) {r['user_exit'].get('note') or ''}")
+            if r.get("timeline"): st.write("**Timeline**"); st.dataframe(pd.DataFrame(r["timeline"]).rename(columns={"time_ist": "Time (IST)", "type": "Event", "price": "Price", "note": "Note"}), hide_index=True, use_container_width=True)
+            with st.expander("Everything stored for this trade (raw)"): st.json(r.get("raw", r))
+    st.caption(f"Record file last updated: {history.ist((HF or {}).get('updated')) or 'not created yet (it is created on the next scan)'}")
 
 with tL:
     st.info("The tool records every trade, studies its losses, and proposes filters. It does NOT rewrite its rules after each loss: with a ~33% win rate most losses are normal. A filter starts only after you approve it in Telegram (/approve N) and switches itself off if the trades it blocks do as well as the ones it allows.")
