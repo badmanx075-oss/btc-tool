@@ -1042,7 +1042,7 @@
     82416.92,
     82469.56
    ],
-   "sl": 82867.75999999998,
+   "sl": 83279.11999999997,
    "sl0": 82182.16,
    "t1": 82867.75999999998,
    "t2": 83279.11999999997,
@@ -1052,11 +1052,11 @@
    "move_class": "MEDIUM",
    "risk": "Medium",
    "created": "2026-10-09T20:53:32+00:00",
-   "last_ts": 1791733800000.0,
-   "mfe": 999.6000000000058,
+   "last_ts": 1791734700000.0,
+   "mfe": 1488.2000000000116,
    "mae": 61.69999999999709,
-   "status": "EXTENDED MOVE WATCH",
-   "outcome": "T2 REACHED",
+   "status": "EXHAUSTION WATCH",
+   "outcome": "T3 REACHED",
    "events": [
     {
      "id": "BTC-LONG-20261009-004-1",
@@ -1099,6 +1099,20 @@
      "ts": "2026-10-11T15:40:25+00:00",
      "price": 82867.75999999998,
      "note": ""
+    },
+    {
+     "id": "BTC-LONG-20261009-004-7",
+     "type": "T3 HIT",
+     "ts": "2026-10-11T16:06:49+00:00",
+     "price": 83827.59999999995,
+     "note": ""
+    },
+    {
+     "id": "BTC-LONG-20261009-004-8",
+     "type": "SL MOVED",
+     "ts": "2026-10-11T16:06:49+00:00",
+     "price": 83279.11999999997,
+     "note": ""
     }
    ],
    "user": {}
@@ -1119,126 +1133,55 @@
   "morning": "2026-10-11",
   "weekly": "2026-10-11"
  },
- "last_price": 83442.1,
+ "last_price": 83733.9,
  "market": {
-  "price": 83442.1,
-  "regime": "UNCLEAR / NO-TRADE",
+  "price": 83733.9,
+  "regime": "RANGE",
   "signal": "NO TRADE",
-  "side": "LONG",
-  "score": 45,
+  "side": "SHORT",
+  "score": 20,
   "scores": {
-   "LONG": 45,
+   "LONG": 15,
    "SHORT": 20
   },
-  "atr1h": 182.528571428571,
-  "atr4h": 439.8428571428563,
+  "atr1h": 226.10000000000062,
+  "atr4h": 411.97857142857225,
   "reversal": "none",
   "tf": {
    "5m": {
-    "er": 0.47,
+    "er": 0.48,
     "label": "UP"
    },
    "15m": {
-    "er": 0.38,
+    "er": 0.58,
     "label": "UP"
    },
    "1H": {
-    "er": 0.13,
-    "label": "FLAT"
+    "er": 0.36,
+    "label": "UP"
    },
    "4H": {
-    "er": 0.26,
-    "label": "DOWN"
+    "er": 0.16,
+    "label": "FLAT"
    }
   },
-  "funding": -2.004585201e-07,
-  "oi": 2495442666.150409,
+  "funding": -6.925432119e-07,
+  "oi": 2463249209.2782097,
   "pro": [
-   "higher low forming",
-   "selling volume fading",
-   "momentum turning up"
+   "price near range high"
   ],
   "con": [
-   "price not at range edge (mid-range risk)",
-   "no sweep of prior lows",
-   "no compression"
+   "no sweep of prior highs",
+   "no lower high yet",
+   "buying volume not fading",
+   "no compression",
+   "momentum not turning"
   ],
-  "ts": "2026-10-11T15:54:46+00:00"
+  "ts": "2026-10-11T16:06:49+00:00"
  },
  "paper": {
-  "closed": [],
-  "n": {
-   "trend_pullback": 1
-  },
-  "balance": 19992.81,
-  "start": 20000.0,
-  "peak": 20000,
-  "max_dd_pct": 0.0,
-  "orders": [
+  "closed": [
    {
-    "ts": "2026-10-10T01:11:44+00:00",
-    "order_id": "PAPER-SHORT-20261010-001",
-    "action": "SELL",
-    "qty_btc": 0.0018,
-    "price": 82525.1,
-    "note": "entry (market, paper fill)"
-   }
-  ],
-  "filters": [],
-  "proposals": [],
-  "shadow": [],
-  "lessons": {},
-  "radar": {
-   "ts": "2026-10-11T15:54:46+00:00",
-   "price": 83442.1,
-   "LONG": [
-    [
-     "4H trend up",
-     false,
-     "strength 0.30, needs above 0.30"
-    ],
-    [
-     "Pullback from recent extreme",
-     false,
-     "0.7 ATR, needs 1.5 or more"
-    ],
-    [
-     "Pullback not broken",
-     true,
-     "price holds above recent swing"
-    ],
-    [
-     "Bounce candle",
-     true,
-     "last 1H candle closed with the trend"
-    ]
-   ],
-   "SHORT": [
-    [
-     "4H trend down",
-     true,
-     "strength 0.30, needs above 0.30"
-    ],
-    [
-     "Pullback from recent extreme",
-     true,
-     "2.0 ATR, needs 1.5 or more"
-    ],
-    [
-     "Pullback not broken",
-     true,
-     "price holds above recent swing"
-    ],
-    [
-     "Bounce candle",
-     false,
-     "last 1H candle closed against the trend"
-    ]
-   ]
-  },
-  "fx": 96.867192,
-  "pos": {
-   "trend_pullback": {
     "id": "PAPER-SHORT-20261010-001",
     "strategy": "trend_pullback",
     "label": "Trend Pullback",
@@ -1257,28 +1200,48 @@
     "qty_btc": 0.0018,
     "notional_usd": 148.55,
     "margin_inr": 4796.38,
-    "margin_released": 0.0,
-    "rem_wallet": 1.0,
+    "margin_released": 4796.38,
+    "rem_wallet": 0.0,
     "leverage": 3,
     "fx": 96.867192,
     "risk_inr": 203.69,
-    "fees_usd": 0.07427259000000001,
-    "realized_usd": 0.0,
+    "fees_usd": 0.15,
+    "realized_usd": -2.1027599999999946,
     "stage": 0,
-    "remaining": 1.0,
-    "mfe_R": 8.56017805220178e-05,
-    "mae_R": 0.7968669748330749,
-    "exits": [],
+    "remaining": 0,
+    "mfe_R": 0.0,
+    "mae_R": 1.22,
+    "exits": [
+     {
+      "ts": "2026-10-11T16:06:49+00:00",
+      "kind": "STOP-LOSS",
+      "price": 83693.3,
+      "frac": 1.0,
+      "pnl_inr": -203.69
+     }
+    ],
     "events": [
      {
       "ts": "2026-10-11T12:45:09+00:00",
       "type": "MIGRATED",
       "price": 82525.1,
       "note": "carried over from the previous version"
+     },
+     {
+      "ts": "2026-10-11T16:06:49+00:00",
+      "type": "STOP-LOSS",
+      "price": 83693.3,
+      "note": "100% of position, P/L -\u20b9204"
+     },
+     {
+      "ts": "2026-10-11T16:06:49+00:00",
+      "type": "CLOSED",
+      "price": 83693.3,
+      "note": "STOP-LOSS"
      }
     ],
     "created": "2026-10-10T01:11:44+00:00",
-    "last_ts": 1791732600000.0,
+    "last_ts": 1791733500000.0,
     "expiry_h": 120,
     "cfg": {
      "enabled": true,
@@ -1327,8 +1290,119 @@
      "volume_ratio": 1.49
     },
     "mstatus": "\ud83d\udfe2 HOLD: THESIS INTACT",
-    "mts": "2026-10-11T12:45:09+00:00"
+    "mts": "2026-10-11T12:45:09+00:00",
+    "closed": "2026-10-11T16:06:49+00:00",
+    "outcome": "STOP-LOSS",
+    "exit": 83693.3,
+    "R": -1.071,
+    "pnl_inr": -218.18,
+    "net_usd": -2.25,
+    "gross_usd": -2.1,
+    "hold_h": 38.9,
+    "lesson": "Dheere-dheere haar (39 ghante, best +0.0R): trend kamzor pad gaya aur bhaav kabhi hamare favour mein nahi gaya.",
+    "feedback": {
+     "auto": {
+      "result": "LOSS",
+      "verdict": "\ud83d\udfe1 Normal haar: sirf tay risk (-1.1R) gaya. Is tarah ki strategy mein aksar 3 mein 2 trade harte hain.",
+      "plan_followed": true,
+      "best_R": 0.0,
+      "worst_R": 1.22
+     },
+     "user": null
+    }
    }
+  ],
+  "n": {
+   "trend_pullback": 1
+  },
+  "balance": 19781.82,
+  "start": 20000.0,
+  "peak": 20000,
+  "max_dd_pct": 1.09,
+  "orders": [
+   {
+    "ts": "2026-10-10T01:11:44+00:00",
+    "order_id": "PAPER-SHORT-20261010-001",
+    "action": "SELL",
+    "qty_btc": 0.0018,
+    "price": 82525.1,
+    "note": "entry (market, paper fill)"
+   },
+   {
+    "ts": "2026-10-11T16:06:49+00:00",
+    "order_id": "PAPER-SHORT-20261010-001",
+    "action": "BUY",
+    "qty_btc": 0.0018,
+    "price": 83693.3,
+    "note": "exit: STOP-LOSS"
+   }
+  ],
+  "filters": [],
+  "proposals": [],
+  "shadow": [],
+  "lessons": {
+   "trend_pullback": {
+    "n": 1,
+    "patterns": [],
+    "note": "Need 40 closed trades with context before patterns are reported (have 1). Earlier 'patterns' are mostly luck."
+   },
+   "early_signal": {
+    "n": 0,
+    "patterns": [],
+    "note": "Need 40 closed trades with context before patterns are reported (have 0). Earlier 'patterns' are mostly luck."
+   }
+  },
+  "radar": {
+   "ts": "2026-10-11T16:06:49+00:00",
+   "price": 83730.1,
+   "LONG": [
+    [
+     "4H trend up",
+     false,
+     "strength 0.17, needs above 0.30"
+    ],
+    [
+     "Pullback from recent extreme",
+     false,
+     "0.4 ATR, needs 1.5 or more"
+    ],
+    [
+     "Pullback not broken",
+     true,
+     "price holds above recent swing"
+    ],
+    [
+     "Bounce candle",
+     true,
+     "last 1H candle closed with the trend"
+    ]
+   ],
+   "SHORT": [
+    [
+     "4H trend down",
+     false,
+     "strength 0.17, needs above 0.30"
+    ],
+    [
+     "Pullback from recent extreme",
+     true,
+     "5.1 ATR, needs 1.5 or more"
+    ],
+    [
+     "Pullback not broken",
+     false,
+     "price broke the recent swing"
+    ],
+    [
+     "Bounce candle",
+     false,
+     "last 1H candle closed against the trend"
+    ]
+   ]
+  },
+  "fx": 96.867192,
+  "pos": {
+   "trend_pullback": null
   },
   "last_entry": {
    "trend_pullback": 1791594000000.0
@@ -1338,12 +1412,22 @@
     "ts": "2026-10-11T12:45:09+00:00",
     "kind": "MIGRATED",
     "text": "PAPER-SHORT-20261010-001 carried over from the previous version (nothing lost)"
+   },
+   {
+    "ts": "2026-10-11T16:06:49+00:00",
+    "kind": "EXIT",
+    "text": "PAPER-SHORT-20261010-001 STOP-LOSS at $83,693 (100%)"
+   },
+   {
+    "ts": "2026-10-11T16:06:49+00:00",
+    "kind": "CLOSED",
+    "text": "PAPER-SHORT-20261010-001 STOP-LOSS -1.07R -\u20b9218"
    }
   ],
   "wallet": {
    "start": 20000.0,
-   "cash": 15196.43,
-   "margin": 4796.38,
+   "cash": 19781.82,
+   "margin": 0.0,
    "touched": true,
    "ledger": [
     {
@@ -1375,6 +1459,36 @@
      "margin": 4796.38,
      "equity": 19992.81,
      "note": "Entry fee"
+    },
+    {
+     "ts": "2026-10-11T16:06:49+00:00",
+     "type": "MARGIN_RELEASE",
+     "trade_id": "PAPER-SHORT-20261010-001",
+     "amount": 4796.38,
+     "cash": 19992.81,
+     "margin": 0.0,
+     "equity": 19992.81,
+     "note": "Margin released: STOP-LOSS (100% of position)"
+    },
+    {
+     "ts": "2026-10-11T16:06:49+00:00",
+     "type": "PNL_REALIZED",
+     "trade_id": "PAPER-SHORT-20261010-001",
+     "amount": -203.69,
+     "cash": 19789.12,
+     "margin": 0.0,
+     "equity": 19789.12,
+     "note": "Gross profit/loss: STOP-LOSS (100% of position)"
+    },
+    {
+     "ts": "2026-10-11T16:06:49+00:00",
+     "type": "FEE_EXIT",
+     "trade_id": "PAPER-SHORT-20261010-001",
+     "amount": -7.3,
+     "cash": 19781.82,
+     "margin": 0.0,
+     "equity": 19781.82,
+     "note": "Exit fee"
     }
    ]
   }
@@ -1386,59 +1500,59 @@
   "bot": "btcstochbot",
   "poll_error": "",
   "last_error": "",
-  "last_send_ok": "2026-10-11T15:40:28+00:00",
+  "last_send_ok": "2026-10-11T16:06:54+00:00",
   "last_run": "2026-10-11T15:58:21+00:00",
   "last_cmd_ts": "2026-10-11T13:04:35+00:00",
   "last_cmd": "/status"
  },
  "analysis": {
-  "price": 83442.1,
-  "regime": "UNCLEAR / NO-TRADE",
+  "price": 83730.1,
+  "regime": "RANGE",
   "stage": "Stage 4-5: trade active",
   "status": "TRADE ACTIVE (see Home)",
   "direction": "LONG",
   "scores": {
    "structure": 100,
-   "volume": 45.77705113170584,
-   "momentum": 59.35704750010753,
-   "order_flow": 60.1825,
-   "liquidity": 48.33598897549596,
-   "htf": 34.94777013016093,
-   "accumulation": 45,
+   "volume": 68.62396987528928,
+   "momentum": 100.0,
+   "order_flow": 26.46,
+   "liquidity": 43.40013140604401,
+   "htf": 41.34010597339223,
+   "accumulation": 15,
    "distribution": 20,
-   "volatility_pct": 29.5,
+   "volatility_pct": 35.5,
    "large_move_potential": null,
-   "continuation": 46.69395625399144,
-   "exhaustion_risk": 10.390020527396802,
-   "setup": 60.368655735298326
+   "continuation": 69.98802528289383,
+   "exhaustion_risk": 75.75361366622758,
+   "setup": 64.93270146979086
   },
   "levels": {
    "early_zone": [
-    83392.34071428572,
-    83458.68642857144
+    83664.87142857144,
+    83751.84285714287
    ],
-   "confirmation": 83212.1,
+   "confirmation": 83944.6,
    "retest_zone": [
-    83162.34071428572,
-    83228.68642857144
+    83879.37142857144,
+    83966.34285714287
    ],
-   "late_above": 83377.96428571429,
-   "hard_invalidation": 82685.65428571429,
-   "preferred_sl": 82685.65428571429,
-   "emergency_sl": 82944.50714285715,
-   "t1": 84576.76857142858,
-   "t2": 85711.43714285715,
-   "t3": 87224.32857142857,
-   "extended": 89493.66571428571,
+   "late_above": 84162.02857142857,
+   "hard_invalidation": 82665.02857142857,
+   "preferred_sl": 82665.02857142857,
+   "emergency_sl": 83077.8142857143,
+   "t1": 85327.70714285717,
+   "t2": 86925.31428571431,
+   "t3": 89055.45714285718,
+   "extended": 92250.67142857148,
    "rr_t1": 1.5,
    "targets_from": "ATR multiples (run research workflow)",
-   "entry_state": "LATE: avoid chasing"
+   "entry_state": "inside EARLY entry zone"
   },
   "expected_move": null,
   "checklist": [
    [
     "Volume not supporting the move",
-    true
+    false
    ],
    [
     "Market structure not supporting",
@@ -1454,7 +1568,7 @@
    ],
    [
     "Momentum not improving",
-    true
+    false
    ],
    [
     "Price rejecting the direction (wick)",
@@ -1477,19 +1591,19 @@
     false
    ]
   ],
-  "false_signal_risk": "Medium",
+  "false_signal_risk": "Low",
   "range": {
-   "high": 83648.9,
+   "high": 83944.6,
    "low": 80351.0,
-   "mid": 81999.95,
-   "position_pct": 93.7293429151888
+   "mid": 82147.8,
+   "position_pct": 94.03105520926091
   },
   "breakout": "none",
   "notes": {
-   "order_flow": "book imbalance -0.59, OI +0.28% (4h)",
-   "atr": 165.8642857142851,
-   "funding": -2.004585201e-07,
-   "oi": 2495442666.150409
+   "order_flow": "book imbalance -0.94, OI -1.00% (4h)",
+   "atr": 217.42857142857142,
+   "funding": -6.925432119e-07,
+   "oi": 2463249209.2782097
   }
  }
 }
