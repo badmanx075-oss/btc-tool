@@ -1052,8 +1052,8 @@
    "move_class": "MEDIUM",
    "risk": "Medium",
    "created": "2026-10-09T20:53:32+00:00",
-   "last_ts": 1791706500000.0,
-   "mfe": 731.6000000000058,
+   "last_ts": 1791722700000.0,
+   "mfe": 755.7000000000116,
    "mae": 61.69999999999709,
    "status": "HOLD / PROTECT PROFIT",
    "outcome": "T1 REACHED",
@@ -1090,7 +1090,7 @@
    "user": {}
   }
  },
- "offset": 928780538,
+ "offset": 928780540,
  "n": {
   "20260930": 2,
   "20261001": 2,
@@ -1104,63 +1104,59 @@
   "evening": "2026-10-10",
   "morning": "2026-10-11"
  },
- "last_price": 82997.8,
+ "last_price": 83116.1,
  "market": {
-  "price": 82997.8,
+  "price": 83116.1,
   "regime": "UNCLEAR / NO-TRADE",
   "signal": "NO TRADE",
   "side": "SHORT",
-  "score": 50,
+  "score": 45,
   "scores": {
-   "LONG": 25,
-   "SHORT": 50
+   "LONG": 15,
+   "SHORT": 45
   },
-  "funding": -1.76242259768e-05,
-  "oi": 2490023757.704881,
+  "atr1h": 164.32142857142858,
+  "atr4h": 417.5499999999998,
+  "reversal": "none",
+  "tf": {
+   "5m": {
+    "er": 0.24,
+    "label": "UP"
+   },
+   "15m": {
+    "er": 0.1,
+    "label": "FLAT"
+   },
+   "1H": {
+    "er": 0.2,
+    "label": "FLAT"
+   },
+   "4H": {
+    "er": 0.26,
+    "label": "DOWN"
+   }
+  },
+  "funding": -8.0120225466e-06,
+  "oi": 2497431246.725362,
   "pro": [
-   "failed breakout / sweep of highs",
-   "buying volume fading",
-   "volatility compression"
+   "price near range high",
+   "failed breakout / sweep of highs"
   ],
   "con": [
-   "price not at range edge (mid-range risk)",
    "no lower high yet",
+   "buying volume not fading",
+   "no compression",
    "momentum not turning"
   ],
-  "ts": "2026-10-11T08:16:29+00:00"
+  "ts": "2026-10-11T12:45:09+00:00"
  },
  "paper": {
-  "open": {
-   "id": "PAPER-SHORT-20261010-001",
-   "side": -1,
-   "entry": 82525.1,
-   "sl": 83693.3,
-   "tp": 77852.30000000003,
-   "risk": 1168.199999999995,
-   "qty_btc": 0.0018,
-   "notional_usd": 148.55,
-   "risk_inr": 203.69,
-   "fx": 96.867192,
-   "entry_ts": 1791590400000.0,
-   "created": "2026-10-10T01:11:44+00:00",
-   "ctx": {
-    "er4": 0.319,
-    "atr_pct": 0.472,
-    "depth": 2.45,
-    "hour": 0,
-    "wd": 5,
-    "side_n": -1,
-    "side": "SHORT",
-    "funding": 6.9775226342e-06,
-    "regime": "BEARISH TREND"
-   },
-   "why": "Bade (4H) chart pe BTC ka trend neeche hai (taakat 0.32, kam se kam 0.30 chahiye thi). Us trend ke beech bhaav thoda upar chadha (2.5 ATR ki halchal) aur ab trend ki taraf palat raha hai (pichli 1H candle trend ke saath band hui). Isliye trend ke saath SELL liya. Stop-loss 3\u00d7ATR door rakha taaki chhoti uthal-puthal se na toote, target risk ka 4 guna. Backtest mein har 3 mein ~2 trade harte hain, isliye loss normal hai."
-  },
   "closed": [],
-  "n": 1,
-  "last_entry_ts": 1791590400000.0,
-  "balance": 20000,
-  "start": 20000,
+  "n": {
+   "trend_pullback": 1
+  },
+  "balance": 19992.81,
+  "start": 20000.0,
   "peak": 20000,
   "max_dd_pct": 0.0,
   "orders": [
@@ -1178,40 +1174,18 @@
   "shadow": [],
   "lessons": {},
   "radar": {
-   "ts": "2026-10-10T01:11:44+00:00",
-   "price": 82613.9,
+   "ts": "2026-10-11T12:45:09+00:00",
+   "price": 83116.1,
    "LONG": [
     [
      "4H trend up",
      false,
-     "strength 0.32, needs above 0.30"
+     "strength 0.30, needs above 0.30"
     ],
     [
      "Pullback from recent extreme",
-     true,
-     "2.5 ATR, needs 1.5 or more"
-    ],
-    [
-     "Pullback not broken",
-     true,
-     "price holds above recent swing"
-    ],
-    [
-     "Bounce candle",
      false,
-     "last 1H candle closed against the trend"
-    ]
-   ],
-   "SHORT": [
-    [
-     "4H trend down",
-     true,
-     "strength 0.32, needs above 0.30"
-    ],
-    [
-     "Pullback from recent extreme",
-     true,
-     "2.5 ATR, needs 1.5 or more"
+     "0.4 ATR, needs 1.5 or more"
     ],
     [
      "Pullback not broken",
@@ -1223,9 +1197,172 @@
      true,
      "last 1H candle closed with the trend"
     ]
+   ],
+   "SHORT": [
+    [
+     "4H trend down",
+     true,
+     "strength 0.30, needs above 0.30"
+    ],
+    [
+     "Pullback from recent extreme",
+     true,
+     "2.3 ATR, needs 1.5 or more"
+    ],
+    [
+     "Pullback not broken",
+     false,
+     "price broke the recent swing"
+    ],
+    [
+     "Bounce candle",
+     false,
+     "last 1H candle closed against the trend"
+    ]
    ]
   },
-  "fx": 96.867192
+  "fx": 96.867192,
+  "pos": {
+   "trend_pullback": {
+    "id": "PAPER-SHORT-20261010-001",
+    "strategy": "trend_pullback",
+    "label": "Trend Pullback",
+    "side": -1,
+    "entry": 82525.1,
+    "sl0": 83693.3,
+    "sl": 83693.3,
+    "risk": 1168.199999999995,
+    "mode": "fixed",
+    "tp": 77852.30000000003,
+    "t1": null,
+    "t2": null,
+    "t3": null,
+    "partial": 0.5,
+    "qty": 0.0018,
+    "qty_btc": 0.0018,
+    "notional_usd": 148.55,
+    "margin_inr": 4796.38,
+    "margin_released": 0.0,
+    "rem_wallet": 1.0,
+    "leverage": 3,
+    "fx": 96.867192,
+    "risk_inr": 203.69,
+    "fees_usd": 0.07427259000000001,
+    "realized_usd": 0.0,
+    "stage": 0,
+    "remaining": 1.0,
+    "mfe_R": 8.56017805220178e-05,
+    "mae_R": 0.5880842321520312,
+    "exits": [],
+    "events": [
+     {
+      "ts": "2026-10-11T12:45:09+00:00",
+      "type": "MIGRATED",
+      "price": 82525.1,
+      "note": "carried over from the previous version"
+     }
+    ],
+    "created": "2026-10-10T01:11:44+00:00",
+    "last_ts": 1791721800000.0,
+    "expiry_h": 120,
+    "cfg": {
+     "enabled": true,
+     "label": "Trend Pullback",
+     "risk_pct": 1.0,
+     "stop_atr": 3.0,
+     "target_r": 4.0,
+     "expiry_hours": 120,
+     "cooldown_hours": 24,
+     "leverage": 3,
+     "fee_per_side": 0.0005
+    },
+    "ctx": {
+     "er4": 0.319,
+     "atr_pct": 0.472,
+     "depth": 2.45,
+     "hour": 0,
+     "wd": 5,
+     "side_n": -1,
+     "side": "SHORT",
+     "funding": 6.9775226342e-06,
+     "regime": "BEARISH TREND"
+    },
+    "why": "Bade (4H) chart pe BTC ka trend neeche hai (taakat 0.32, kam se kam 0.30 chahiye thi). Us trend ke beech bhaav thoda upar chadha (2.5 ATR ki halchal) aur ab trend ki taraf palat raha hai (pichli 1H candle trend ke saath band hui). Isliye trend ke saath SELL liya. Stop-loss 3\u00d7ATR door rakha taaki chhoti uthal-puthal se na toote, target risk ka 4 guna. Backtest mein har 3 mein ~2 trade harte hain, isliye loss normal hai.",
+    "capped": false,
+    "mgmt": {
+     "status": "\ud83d\udfe2 HOLD: THESIS INTACT",
+     "stage": "ENTRY",
+     "uR": -0.51,
+     "mfe_R": 0.0,
+     "exhaustion": 0,
+     "reversal_flags": {
+      "structure_break": false,
+      "momentum_negative": true,
+      "gave_back": false
+     },
+     "reasons": [
+      "Momentum dheema pad raha hai (pichle 3 ghante -0.7 ATR)",
+      "Volume theek hai (normal ka 0.8 guna)"
+     ],
+     "stop_advice": "Stop jaisa hai waisa rakho",
+     "suggested_sl": 83693.3,
+     "hold_vs_book": "Hold: target 4.5R door, stop tak 0.5R (R/R 9.1). Abhi book karo to +-0.5R pakka.",
+     "next_zone": 79020.5,
+     "momentum_atr": -0.71,
+     "volume_ratio": 0.76
+    },
+    "mstatus": "\ud83d\udfe2 HOLD: THESIS INTACT",
+    "mts": "2026-10-11T12:45:09+00:00"
+   }
+  },
+  "last_entry": {
+   "trend_pullback": 1791594000000.0
+  },
+  "journal": [
+   {
+    "ts": "2026-10-11T12:45:09+00:00",
+    "kind": "MIGRATED",
+    "text": "PAPER-SHORT-20261010-001 carried over from the previous version (nothing lost)"
+   }
+  ],
+  "wallet": {
+   "start": 20000.0,
+   "cash": 15196.43,
+   "margin": 4796.38,
+   "touched": true,
+   "ledger": [
+    {
+     "ts": "2026-10-11T12:45:09+00:00",
+     "type": "DEPOSIT",
+     "trade_id": "",
+     "amount": 20000.0,
+     "cash": 20000.0,
+     "margin": 0.0,
+     "equity": 20000.0,
+     "note": "Virtual wallet created"
+    },
+    {
+     "ts": "2026-10-11T12:45:09+00:00",
+     "type": "MARGIN_LOCK",
+     "trade_id": "PAPER-SHORT-20261010-001",
+     "amount": -4796.38,
+     "cash": 15203.62,
+     "margin": 4796.38,
+     "equity": 20000.0,
+     "note": "Margin locked for open trade"
+    },
+    {
+     "ts": "2026-10-11T12:45:09+00:00",
+     "type": "FEE_ENTRY",
+     "trade_id": "PAPER-SHORT-20261010-001",
+     "amount": -7.19,
+     "cash": 15196.43,
+     "margin": 4796.38,
+     "equity": 19992.81,
+     "note": "Entry fee"
+    }
+   ]
+  }
  },
  "telegram": {
   "chat_mask": "\u20266777",
@@ -1234,9 +1371,110 @@
   "bot": "btcstochbot",
   "poll_error": "",
   "last_error": "",
-  "last_send_ok": "2026-10-11T02:37:58+00:00",
+  "last_send_ok": "2026-10-11T12:45:11+00:00",
   "last_run": "2026-10-11T08:20:04+00:00",
-  "last_cmd_ts": "2026-10-09T05:57:34+00:00",
-  "last_cmd": "btc"
+  "last_cmd_ts": "2026-10-11T12:45:09+00:00",
+  "last_cmd": "/start"
+ },
+ "analysis": {
+  "price": 83116.2,
+  "regime": "UNCLEAR / NO-TRADE",
+  "stage": "Stage 1: accumulation/distribution developing",
+  "status": "NO TRADE",
+  "direction": "LONG",
+  "scores": {
+   "structure": 50,
+   "volume": 52.94800050949948,
+   "momentum": 74.75628282477597,
+   "order_flow": 90.39,
+   "liquidity": 48.38361039975746,
+   "htf": 34.94777013016093,
+   "accumulation": 15,
+   "distribution": 45,
+   "volatility_pct": 27.500000000000004,
+   "large_move_potential": null,
+   "continuation": 54.21735115481213,
+   "exhaustion_risk": 37.01260182010266,
+   "setup": 57.6607306007492
+  },
+  "levels": {
+   "early_zone": [
+    83066.83071428571,
+    83132.65642857143
+   ],
+   "confirmation": 83188.0,
+   "retest_zone": [
+    83138.63071428571,
+    83204.45642857143
+   ],
+   "late_above": 83352.56428571428,
+   "hard_invalidation": 82686.17428571428,
+   "preferred_sl": 82686.17428571428,
+   "emergency_sl": 82622.50714285714,
+   "t1": 83761.23857142858,
+   "t2": 84406.27714285714,
+   "t3": 85266.32857142857,
+   "extended": 86556.40571428572,
+   "rr_t1": 1.5,
+   "targets_from": "ATR multiples (run research workflow)",
+   "entry_state": "inside EARLY entry zone"
+  },
+  "expected_move": null,
+  "checklist": [
+   [
+    "Volume not supporting the move",
+    true
+   ],
+   [
+    "Market structure not supporting",
+    false
+   ],
+   [
+    "Liquidity against the trade (level within 1 ATR)",
+    true
+   ],
+   [
+    "Higher timeframe against",
+    true
+   ],
+   [
+    "Momentum not improving",
+    false
+   ],
+   [
+    "Price rejecting the direction (wick)",
+    false
+   ],
+   [
+    "Possible liquidity trap (sweep and reverse)",
+    false
+   ],
+   [
+    "Failed-breakout signs",
+    false
+   ],
+   [
+    "Volatility too high (top 10%)",
+    false
+   ],
+   [
+    "Middle of range",
+    false
+   ]
+  ],
+  "false_signal_risk": "Medium",
+  "range": {
+   "high": 83726.6,
+   "low": 80351.0,
+   "mid": 82038.8,
+   "position_pct": 81.91728877829104
+  },
+  "breakout": "none",
+  "notes": {
+   "order_flow": "book imbalance +0.62, OI +0.32% (4h)",
+   "atr": 164.5642857142853,
+   "funding": -8.0120225466e-06,
+   "oi": 2497431246.725362
+  }
  }
 }
