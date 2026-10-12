@@ -304,11 +304,15 @@ with tO:
 with tB:
     st.caption("What was tested on past data, in plain words.")
     v1, v3, v4, v5, v6, ms = (load(f) for f in ("backtest_results.json", "backtest_v3_results.json", "backtest_v4_results.json", "backtest_v5_results.json", "backtest_v6_results.json", "move_stats.json")); rows = []
-    if v1: a = v1["all"]; rows.append(["V1: early signals", f"{a['n']} signals, target 1 before stop {a['t1_before_stop_%']}% (random ~40%)", "No edge"])
-    if v3: rows.append(["V3: tuned stops and targets", f"unseen test {v3['best']['test'].get('mean_R')}R per trade (original {v3['original_rules']['test'].get('mean_R')}R)", v3["verdict"]])
-    if v4: rows.append(["V4: 4 other strategies", "trend_pullback looked best, others failed", v4["verdict"]])
-    if v5: f = v5["central_fresh_oos"]; rows.append(["V5: 5-year check of trend_pullback", f"older unseen trades: {f.get('mean_R')}R per trade (n={f.get('n')}, error ±{f.get('se')})", v5["verdict"]])
-    if v6: rows.append(["V6: exit styles", f"{v6['trades']} trades, 7 styles", v6["verdict"]])
+    def add_row(name, fn):          # one odd or older results file must never break the whole page
+        try: rows.append([name, *fn()])
+        except Exception: rows.append([name, "result file is in an older format (run the research workflow again)", "-"])
+    def _m(d): return d.get("mean_R", d.get("exp_R")) if isinstance(d, dict) else None
+    if v1: add_row("V1: early signals", lambda: (f"{v1['all']['n']} signals, target 1 before stop {v1['all']['t1_before_stop_%']}% (random ~40%)", "No edge"))
+    if v3: add_row("V3: tuned stops and targets", lambda: (f"unseen test {_m((v3.get('best') or {}).get('test') or v3.get('test'))}R per trade (original {_m((v3.get('original_rules') or {}).get('test') or v3.get('old_config_test'))}R)", v3["verdict"]))
+    if v4: add_row("V4: 4 other strategies", lambda: ("trend_pullback looked best, others failed", v4["verdict"]))
+    if v5: add_row("V5: 5-year check of trend_pullback", lambda: (f"older unseen trades: {v5['central_fresh_oos'].get('mean_R')}R per trade (n={v5['central_fresh_oos'].get('n')}, error ±{v5['central_fresh_oos'].get('se')})", v5["verdict"]))
+    if v6: add_row("V6: exit styles", lambda: (f"{v6['trades']} trades, 7 styles", v6["verdict"]))
     if rows: st.table(pd.DataFrame(rows, columns=["Test", "Result", "Verdict"]))
     if v6: st.subheader("Exit styles (older unseen trades, after fees)"); st.table(pd.DataFrame([{"Style": k, "Avg R": v["fresh_oos"].get("mean_R"), "Win %": v["fresh_oos"].get("win_%"), "Max drawdown R": v["fresh_oos"].get("max_drawdown_R"), "vs live rule": v["vs_current_fresh"]["diff_R"]} for k, v in v6["policies"].items()]))
     if v1:
