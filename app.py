@@ -1,6 +1,6 @@
 import json, os, io, datetime as dt, requests, pandas as pd, streamlit as st
 import streamlit.components.v1 as components
-import config, history
+import config, history, stats
 
 st.set_page_config(page_title="BTC Tool", page_icon="📈", layout="wide")
 RAW = "https://raw.githubusercontent.com/badmanx075-oss/btc-tool/main/"   # live data written by the 5-minute scanner
@@ -63,6 +63,7 @@ if M:
 if T.get("token_ok") and not T.get("last_error"): head.caption(f"📨 Telegram: ✅ connected (@{T.get('bot', '')}, checked {(amin(T.get('last_run')) or 0):.0f} min ago)")
 elif T: head.caption(f"📨 Telegram: ❌ problem. {T.get('last_error') or 'bot token not accepted'}")
 else: head.caption("📨 Telegram: no status yet (upload the latest worker.py and run the scan once)")
+if S.get("paused"): st.warning("⏸ PAUSED: no new trades or alerts will start. Open trades are still managed. Send /resume on Telegram to restart.")
 st.caption("⚠️ Informational and statistical only. Virtual money, no real orders. Backtests show NO proven edge yet.")
 tH_, tA, tW, tTH, tL, tHl, tS, tO, tB, tG = st.tabs(["🏠 Home", "📋 Analysis", "💰 Wallet", "📒 Trade History", "🧠 Learning", "🩺 Health", "⚙️ Settings", "📡 Old signals", "📊 Backtests", "📘 Guide"])
 
@@ -164,6 +165,15 @@ with tTH:
     else:
         cl = [r for r in rows_ if r["source"] == "PAPER" and r["status"] == "CLOSED"]; wins = sum(1 for r in cl if (r.get("pnl_inr") or 0) > 0); net = sum(r.get("pnl_inr") or 0 for r in cl)
         m = st.columns(5); m[0].metric("All trades", len(rows_)); m[1].metric("Open now", sum(r["status"] == "OPEN" for r in rows_)); m[2].metric("Paper closed", len(cl), f"{wins} win / {len(cl) - wins} loss"); m[3].metric("Paper net P/L", inr(net)); m[4].metric("Alert signals", sum(r["source"] == "SIGNAL" for r in rows_))
+        with st.expander("📊 Performance (paper-wallet closed trades)", expanded=len(cl) > 0):
+            A = stats.analyse(rec.values(), float((S.get("paper") or {}).get("wallet", {}).get("start", 20000))); o = A["overall"]; st.info("🧪 " + A["verdict"])
+            if o.get("n"):
+                q = st.columns(6); q[0].metric("Win rate", f"{o['win_pct']}%"); q[1].metric("Avg R / trade", f"{o['mean_R']:+.2f}", f"± {o['se']}" if o.get("se") is not None else None); q[2].metric("Profit factor", o["profit_factor"] or "-"); q[3].metric("Max drawdown", f"{A['max_drawdown_pct']}%")
+                q[4].metric("Best win streak", A["streaks"]["best_win_streak"]); q[5].metric("Worst loss streak", A["streaks"]["worst_loss_streak"])
+                st.line_chart(pd.DataFrame({"Equity ₹ (closed trades)": A["curve"]}))
+                for title, key in (("By side", "by_side"), ("By strategy", "by_strategy"), ("By how it ended", "by_outcome"), ("By weekday (IST, entry time)", "by_weekday"), ("By time of day (IST, entry time)", "by_hour_block")):
+                    if A[key]: st.markdown(f"**{title}**"); st.table(pd.DataFrame(A[key]).T[["n", "win_pct", "mean_R", "net_inr", "profit_factor"]].rename(columns={"n": "Trades", "win_pct": "Win %", "mean_R": "Avg R", "net_inr": "Net ₹", "profit_factor": "Profit factor"}))
+                st.caption("Small groups (under 30 trades) are noise. Do not change any rule based on them.")
         f1, f2, f3, f4 = st.columns(4)
         fs = f1.multiselect("Type", ["PAPER", "SIGNAL"], default=["PAPER", "SIGNAL"], format_func=lambda x: "Paper wallet trade" if x == "PAPER" else "Early-signal alert")
         fst = f2.multiselect("Status", ["OPEN", "CLOSED"], default=["OPEN", "CLOSED"]); fsd = f3.multiselect("Side", ["LONG", "SHORT"], default=["LONG", "SHORT"]); q = f4.text_input("Search (ID, reason, outcome)").strip().lower()

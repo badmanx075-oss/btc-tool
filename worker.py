@@ -2,7 +2,7 @@
 import os, json, time, subprocess, requests, datetime as dt
 from zoneinfo import ZoneInfo
 import engine as E
-import paper, learn, config, wallet, analysis, history
+import paper, learn, config, wallet, analysis, history, stats
 import pandas as pd
 import faulthandler; faulthandler.dump_traceback_later(330, exit=True)  # if stuck >5.5 min: print where, then exit
 
@@ -55,6 +55,20 @@ def review(t):
             f"Entry {f(t['entry'])} SL {f(t['sl0'])} T1 {f(t['t1'])} T2 {f(t['t2'])} T3 {f(t['t3'])}\n"
             f"MFE {f(t['mfe'])} MAE {f(t['mae'])} pts\nSystem outcome: {t['outcome'] or 'open'}\nUser: {t['user']}\n\nTimeline:\n{tl}")
 
+HELP = ("📖 COMMANDS\n/status  wallet + position + radar\n/wallet /ledger /trades  money, every rupee movement, trade list\n/history [n]  last n trades (permanent record)\n/timeline ID  full story of one trade\n"
+        "/stats  win rate, avg R, drawdown, streaks (+ honest verdict)\n/today  today's summary\n/analysis  market analysis\n/active  open early-signal alerts\n/review ID  review an alert\n"
+        "/note ID text  add your remark | /myexit ID price  your own exit\n/pause  stop NEW trades and alerts (open trades keep being managed) | /resume\n"
+        "/config /set name value /notify name on|off  settings\n/lessons /approve N /revert N  what the tool learned\n/weekly  weekly report\n/demo  test the pipeline\n/ping  is the bot alive\n/resetwallet confirm")
+MENU = [("status", "Wallet, position, radar"), ("history", "Last trades"), ("timeline", "One trade in detail"), ("stats", "Performance"), ("today", "Today's summary"), ("wallet", "Wallet"), ("analysis", "Market analysis"),
+        ("pause", "Pause new trades"), ("resume", "Resume trades"), ("help", "All commands"), ("ping", "Is the bot alive")]
+
+def today_text():
+    P_ = S.get("paper") or {}; d = (now + dt.timedelta(hours=5, minutes=30)).strftime("%Y-%m-%d")
+    mine = [r for r in history.load()["records"].values() if history.ist(r.get("opened"))[:11] == (now + dt.timedelta(hours=5, minutes=30)).strftime("%d %b %Y")]
+    closed = [r for r in mine if r["source"] == "PAPER" and r["status"] == "CLOSED"]
+    return (f"📅 TODAY ({d} IST)\nNew trades/alerts: {len(mine)} | paper closed today: {len(closed)} | net ₹{sum(r.get('pnl_inr') or 0 for r in closed):,.0f}\n"
+            f"{wallet.summary(P_)}\n{'⏸ PAUSED: no new trades' if S.get('paused') else '▶️ Running'}")
+
 def handle_updates(timeout=0):
     ST = S.setdefault("telegram", {}); stamp = lambda: dt.datetime.now(dt.timezone.utc).isoformat(timespec="seconds")
     r = tg("getUpdates", offset=S["offset"] + 1, timeout=timeout)
@@ -86,6 +100,13 @@ def handle_updates(timeout=0):
         elif c == "/lessons": send(learn.lessons_text(S.get("paper") or {}))
         elif c == "/approve" and len(txt) > 1: send(learn.approve(S.setdefault("paper", {}), txt[1]))
         elif c == "/revert" and len(txt) > 1: send(learn.revert(S.setdefault("paper", {}), txt[1]))
+        elif c in ("/help", "/start"): send(HELP)
+        elif c == "/history": send(stats.history_text(history.load()["records"].values(), int(txt[1]) if len(txt) > 1 and txt[1].isdigit() else 5))
+        elif c == "/timeline" and len(txt) > 1: rec = history.load()["records"].get(txt[1]); send(stats.timeline_text(rec) if rec else "Trade ID nahi mila. /history se ID dekho.")
+        elif c == "/stats": send(stats.text(history.load()["records"].values(), ((S.get("paper") or {}).get("wallet") or {}).get("start", 20000)))
+        elif c == "/today": send(today_text())
+        elif c == "/pause": S["paused"] = True; send("⏸ Paused. Koi naya trade ya alert nahi aayega. Khule trades ka prabandhan chalta rahega. /resume se chalu karo.")
+        elif c == "/resume": S["paused"] = False; send("▶️ Resumed. Naye trades/alerts wapas chalu.")
         elif c == "/weekly": send(paper.weekly_text(S.get("paper") or {}, now))
         elif c == "/active": send("\n".join(f"{i}: {t['signal']} {t['status']}" for i, t in S["trades"].items() if not t["outcome"]) or "No active old-style signals")
         elif c == "/review" and len(txt) > 1 and txt[1] in S["trades"]: send(review(S["trades"][txt[1]]))
@@ -99,7 +120,7 @@ def handle_updates(timeout=0):
         elif c == "/note" and len(txt) > 2: send(paper.add_note(S, txt[1], " ".join(txt[2:])))
         elif c == "/myexit" and len(txt) > 2: send(paper.my_exit(S, txt[1], txt[2], " ".join(txt[3:]), now))
         elif c == "/resetwallet": send(paper.reset_wallet(S, now) if txt[1:2] == ["confirm"] else "Wallet reset karne par purani history archive ho jati hai. Pakka ho to bhejo: /resetwallet confirm")
-        else: send("Commands: /wallet, /ledger, /trades, /config, /set, /notify, /note, /myexit, /resetwallet, /ping, /status (wallet, position, radar), /demo (test the pipeline), /lessons, /approve N, /revert N, /weekly, /active, /review ID")
+        else: send(HELP)
     return len(r["result"])
 
 def alert(t, title, extra=""):
@@ -161,7 +182,7 @@ def scan_cycle():
         if r["reversal"] != "none": send(f"🔄 {r['reversal']}\nBTC ${px:,.0f}. Bade chart pe trend ke ulte palatne ka sanket mila (WATCH = shuruaati, CONFIRMED = pakka hota hua). Ye guarantee nahi, sirf chetavni hai.", cat="reversal")
     open_t = [t for t in S["trades"].values() if t["status"] != "CLOSED"]
     last = max((t["created"] for t in S["trades"].values()), default="2000")
-    if r["signal"].startswith("EARLY") and not open_t and (now - dt.datetime.fromisoformat(last if "T" in last else "2000-01-01T00:00:00+00:00")).total_seconds() > 3600:
+    if r["signal"].startswith("EARLY") and not S.get("paused") and not open_t and (now - dt.datetime.fromisoformat(last if "T" in last else "2000-01-01T00:00:00+00:00")).total_seconds() > 3600:
         d = now.strftime("%Y%m%d"); S["n"][d] = S["n"].get(d, 0) + 1; tid = f"BTC-{r['side']}-{d}-{S['n'][d]:03d}"
         t = dict(id=tid, side=r["side"], signal=r["signal"], regime=r["regime"], score=r["score"], pro=r["pro"], con=r["con"],
                  entry=r["entry"], zone=r["zone"], sl=r["sl"], sl0=r["sl"], t1=r["t1"], t2=r["t2"], t3=r["t3"], ext=r["ext"], confirm=r["confirm"],
@@ -221,6 +242,7 @@ def listen(seconds):  # stay online and answer commands/buttons within seconds
 
 def main():
     ST = S.setdefault("telegram", {}); ST["chat_mask"] = "…" + CHAT[-4:]
+    tg("setMyCommands", commands=[dict(command=a, description=b) for a, b in MENU])
     me = tg("getMe"); ST["token_ok"] = bool(me and me.get("ok")); ST["bot"] = ((me or {}).get("result") or {}).get("username", "")
     scan_cycle(); publish(); listen(int(os.environ.get("LISTEN_SECONDS", config.load()["schedule"]["listen_seconds"]))); ST["last_run"] = dt.datetime.now(dt.timezone.utc).isoformat(timespec="seconds"); json.dump(S, open("state.json", "w"), indent=1)
 
