@@ -1160,6 +1160,53 @@
    "user": {
     "result": "WIN"
    }
+  },
+  "BTC-SHORT-20261012-001": {
+   "id": "BTC-SHORT-20261012-001",
+   "side": "SHORT",
+   "signal": "EARLY SHORT SETUP",
+   "regime": "RANGE",
+   "score": 75,
+   "pro": [
+    "price near range high",
+    "failed breakout / sweep of highs",
+    "buying volume fading",
+    "momentum turning down"
+   ],
+   "con": [
+    "no lower high yet",
+    "no compression"
+   ],
+   "entry": 84016.0,
+   "zone": [
+    83993.03357142858,
+    84084.89928571429
+   ],
+   "sl": 84440.06571428571,
+   "sl0": 84440.06571428571,
+   "t1": 83379.90142857144,
+   "t2": 82743.80285714287,
+   "t3": 81895.67142857146,
+   "ext": 80623.47428571433,
+   "confirm": 83720.0,
+   "move_class": "VERY LARGE",
+   "risk": "Medium",
+   "created": "2026-10-12T07:32:27+00:00",
+   "last_ts": 1791790200000.0,
+   "mfe": 0,
+   "mae": 0,
+   "status": "EARLY SETUP",
+   "outcome": "",
+   "events": [
+    {
+     "id": "BTC-SHORT-20261012-001-1",
+     "type": "EARLY SHORT SETUP",
+     "ts": "2026-10-12T07:32:27+00:00",
+     "price": 84016.0,
+     "note": ""
+    }
+   ],
+   "user": {}
   }
  },
  "offset": 928780553,
@@ -1170,34 +1217,35 @@
   "20261005": 1,
   "20261006": 3,
   "20261007": 2,
-  "20261009": 4
+  "20261009": 4,
+  "20261012": 1
  },
  "sent": {
   "evening": "2026-10-11",
   "morning": "2026-10-12",
   "weekly": "2026-10-11"
  },
- "last_price": 84169.1,
+ "last_price": 84016.0,
  "market": {
-  "price": 84169.1,
+  "price": 84016.0,
   "regime": "RANGE",
-  "signal": "WATCH: WEAK SHORT SETUP",
+  "signal": "EARLY SHORT SETUP",
   "side": "SHORT",
-  "score": 60,
+  "score": 75,
   "scores": {
-   "LONG": 15,
-   "SHORT": 60
+   "LONG": 30,
+   "SHORT": 75
   },
-  "atr1h": 352.7714285714267,
+  "atr1h": 364.1214285714263,
   "atr4h": 434.028571428571,
   "reversal": "none",
   "tf": {
    "5m": {
-    "er": 0.16,
+    "er": 0.07,
     "label": "FLAT"
    },
    "15m": {
-    "er": 0.19,
+    "er": 0.12,
     "label": "FLAT"
    },
    "1H": {
@@ -1209,19 +1257,19 @@
     "label": "FLAT"
    }
   },
-  "funding": 9.4780176978e-06,
-  "oi": 2467011591.204729,
+  "funding": 1.36820663826e-05,
+  "oi": 2467191604.1445994,
   "pro": [
    "price near range high",
    "failed breakout / sweep of highs",
-   "buying volume fading"
+   "buying volume fading",
+   "momentum turning down"
   ],
   "con": [
    "no lower high yet",
-   "no compression",
-   "momentum not turning"
+   "no compression"
   ],
-  "ts": "2026-10-12T07:08:13+00:00"
+  "ts": "2026-10-12T07:32:27+00:00"
  },
  "paper": {
   "closed": [
@@ -1360,9 +1408,10 @@
    }
   ],
   "n": {
-   "trend_pullback": 1
+   "trend_pullback": 1,
+   "early_signal": 1
   },
-  "balance": 19781.82,
+  "balance": 19772.04,
   "start": 20000.0,
   "peak": 20000,
   "max_dd_pct": 1.09,
@@ -1382,6 +1431,14 @@
     "qty_btc": 0.0018,
     "price": 83693.3,
     "note": "exit: STOP-LOSS"
+   },
+   {
+    "ts": "2026-10-12T07:32:27+00:00",
+    "order_id": "ES-SHORT-20261012-001",
+    "action": "SELL",
+    "qty_btc": 0.0024,
+    "price": 84016.0,
+    "note": "entry (market, paper fill)"
    }
   ],
   "filters": [],
@@ -1400,8 +1457,8 @@
    }
   },
   "radar": {
-   "ts": "2026-10-12T07:08:13+00:00",
-   "price": 84169.0,
+   "ts": "2026-10-12T07:32:27+00:00",
+   "price": 84015.1,
    "LONG": [
     [
      "4H trend up",
@@ -1447,12 +1504,79 @@
     ]
    ]
   },
-  "fx": 96.867192,
+  "fx": 96.964336,
   "pos": {
-   "trend_pullback": null
+   "trend_pullback": null,
+   "early_signal": {
+    "id": "ES-SHORT-20261012-001",
+    "strategy": "early_signal",
+    "label": "Early Signal (experimental)",
+    "side": -1,
+    "entry": 84016.0,
+    "sl0": 84440.06571428571,
+    "sl": 84440.06571428571,
+    "risk": 424.06571428570896,
+    "mode": "staged",
+    "tp": 82743.80285714287,
+    "t1": 83379.90142857144,
+    "t2": 82743.80285714287,
+    "t3": 81895.67142857146,
+    "partial": 0.5,
+    "qty": 0.0024,
+    "qty_btc": 0.0024,
+    "notional_usd": 201.64,
+    "margin_inr": 6517.24,
+    "margin_released": 0.0,
+    "rem_wallet": 1.0,
+    "leverage": 3,
+    "fx": 96.964336,
+    "risk_inr": 98.69,
+    "fees_usd": 0.1008192,
+    "realized_usd": 0.0,
+    "stage": 0,
+    "remaining": 1.0,
+    "mfe_R": 0.0,
+    "mae_R": 0.0,
+    "exits": [],
+    "events": [
+     {
+      "ts": "2026-10-12T07:32:27+00:00",
+      "type": "OPENED",
+      "price": 84016.0,
+      "note": "qty 0.0024 BTC, margin \u20b96,517"
+     }
+    ],
+    "created": "2026-10-12T07:32:27+00:00",
+    "last_ts": 1791790200000.0,
+    "expiry_h": 72,
+    "cfg": {
+     "enabled": true,
+     "label": "Early Signal (experimental)",
+     "risk_pct": 0.5,
+     "min_score": 65,
+     "partial_pct": 50,
+     "expiry_hours": 72,
+     "cooldown_hours": 1,
+     "leverage": 3,
+     "fee_per_side": 0.0005
+    },
+    "ctx": {
+     "score": 75,
+     "regime": "RANGE",
+     "side_n": -1,
+     "side": "SHORT",
+     "hour": 7,
+     "wd": 0,
+     "funding": 1.36820663826e-05,
+     "atr_pct": 0.447
+    },
+    "why": "Bhaav range ke upar (resistance) ke paas tha aur ye cheezein ek saath mili: bhaav range ke upar (resistance ke paas) hai; upar nikalne ki koshish fail hui aur bhaav wapas neeche aaya; kharidne wala volume ghat raha hai; momentum neeche mudne laga hai. Setup score 75/100 (kam se kam 65 chahiye). Kamzor pehlu: lower-high abhi nahi bana; volatility sikudi nahi. Ye 'early' signal hai (palatne se pehle pakadne ki koshish), isliye risk kam rakha aur aadha profit T1 par book hota hai. Iska pichla backtest record negative tha, to ise experiment samjho.",
+    "capped": false
+   }
   },
   "last_entry": {
-   "trend_pullback": 1791594000000.0
+   "trend_pullback": 1791594000000.0,
+   "early_signal": 1791790347755.3
   },
   "journal": [
    {
@@ -1469,12 +1593,22 @@
     "ts": "2026-10-11T16:06:49+00:00",
     "kind": "CLOSED",
     "text": "PAPER-SHORT-20261010-001 STOP-LOSS -1.07R -\u20b9218"
+   },
+   {
+    "ts": "2026-10-12T07:32:27+00:00",
+    "kind": "SIGNAL",
+    "text": "early_signal SHORT signal at $84,016"
+   },
+   {
+    "ts": "2026-10-12T07:32:27+00:00",
+    "kind": "OPENED",
+    "text": "ES-SHORT-20261012-001 SHORT 0.0024 BTC at $84,016 (margin \u20b96,517)"
    }
   ],
   "wallet": {
    "start": 20000.0,
-   "cash": 19781.82,
-   "margin": 0.0,
+   "cash": 13254.8,
+   "margin": 6517.24,
    "touched": true,
    "ledger": [
     {
@@ -1536,6 +1670,26 @@
      "margin": 0.0,
      "equity": 19781.82,
      "note": "Exit fee"
+    },
+    {
+     "ts": "2026-10-12T07:32:27+00:00",
+     "type": "MARGIN_LOCK",
+     "trade_id": "ES-SHORT-20261012-001",
+     "amount": -6517.24,
+     "cash": 13264.58,
+     "margin": 6517.24,
+     "equity": 19781.82,
+     "note": "Margin locked for open trade"
+    },
+    {
+     "ts": "2026-10-12T07:32:27+00:00",
+     "type": "FEE_ENTRY",
+     "trade_id": "ES-SHORT-20261012-001",
+     "amount": -9.78,
+     "cash": 13254.8,
+     "margin": 6517.24,
+     "equity": 19772.04,
+     "note": "Entry fee"
     }
    ]
   }
@@ -1547,13 +1701,13 @@
   "bot": "btcstochbot",
   "poll_error": "",
   "last_error": "",
-  "last_send_ok": "2026-10-12T03:34:03+00:00",
+  "last_send_ok": "2026-10-12T07:32:31+00:00",
   "last_run": "2026-10-12T07:11:48+00:00",
   "last_cmd_ts": "2026-10-12T03:34:02+00:00",
   "last_cmd": "/analysis"
  },
  "analysis": {
-  "price": 84169.0,
+  "price": 84016.0,
   "regime": "RANGE",
   "stage": "Stage 1: accumulation/distribution developing",
   "status": "NO TRADE",
@@ -1562,11 +1716,11 @@
    "structure": 100,
    "volume": 54.031518042168095,
    "momentum": 68.52624380235922,
-   "order_flow": 27.404999999999998,
-   "liquidity": 41.11453049904048,
+   "order_flow": 28.5875,
+   "liquidity": 49.25267377139476,
    "htf": 47.0707650447463,
-   "accumulation": 15,
-   "distribution": 60,
+   "accumulation": 30,
+   "distribution": 75,
    "volatility_pct": 52.0,
    "large_move_potential": 40,
    "continuation": 56.54284229642454,
@@ -1576,27 +1730,27 @@
   "levels": null,
   "expected_move": {
    "expected": [
-    838.32324,
-    1618.56987
+    836.79936,
+    1615.62768
    ],
    "strong": [
-    1618.56987,
-    2747.2761599999994
+    1615.62768,
+    2742.2822399999995
    ],
    "extended": [
-    2747.2761599999994,
-    3799.38866
+    2742.2822399999995,
+    3792.48224
    ],
    "side": "up",
    "sample": 15912,
    "odds": {
     "500": [
-     0.687,
+     0.686,
      0.656
     ],
     "1000": [
-     0.431,
-     0.418
+     0.43,
+     0.417
     ],
     "2000": [
      0.185,
@@ -1618,14 +1772,14 @@
    "high": 84348.2,
    "low": 80351.0,
    "mid": 82349.6,
-   "position_pct": 95.51686180326236
+   "position_pct": 91.68918242769945
   },
   "breakout": "none",
   "notes": {
-   "order_flow": "book imbalance -0.90, OI -0.45% (4h)",
+   "order_flow": "book imbalance -0.86, OI -0.02% (4h)",
    "atr": 376.0071428571412,
-   "funding": 9.4780176978e-06,
-   "oi": 2467011591.204729
+   "funding": 1.36820663826e-05,
+   "oi": 2467191604.1445994
   }
  }
 }
