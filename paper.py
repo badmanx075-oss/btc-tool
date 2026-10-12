@@ -194,7 +194,7 @@ def run(S, send, now, scan=None):
     for name, t in list(P["pos"].items()):
         if t and C["alerts"].get("advice"): advise(P, C, t, hr, px, now, send)
     for name, sc in C["strategies"].items():
-        if not sc.get("enabled") or P["pos"].get(name) or name not in ST.SIGNALS: continue
+        if S.get("paused") or not sc.get("enabled") or P["pos"].get(name) or name not in ST.SIGNALS: continue
         if now.timestamp() * 1000 - P["last_entry"].get(name, 0) < sc.get("cooldown_hours", 1) * 3.6e6: continue
         if len(positions(P)) >= C["wallet"]["max_open_positions"]: continue
         sg = ST.SIGNALS[name](dict(h1=h1, i=i, S=S, scan=scan, now=now), sc)
