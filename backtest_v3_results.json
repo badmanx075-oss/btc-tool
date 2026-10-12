@@ -1,218 +1,257 @@
 {
- "note": "mean_R = avg result per trade in R after 0.10% cost. Best config chosen on TRAIN, judged on unseen TEST. cfg=(stop x ATR1h, target R, horizon 15m-bars)",
- "trades": 944,
- "original_rules": {
-  "cfg": "orig",
-  "train": {
-   "n": 660,
-   "mean_R": -0.268,
-   "win_%": 39.4,
-   "se": 0.046
-  },
-  "test": {
-   "n": 284,
-   "mean_R": -0.49,
-   "win_%": 32.4,
-   "se": 0.066
-  }
- },
- "best": {
-  "cfg": "(3, 3, 24)",
-  "train": {
-   "n": 660,
-   "mean_R": -0.057,
-   "win_%": 45.8,
-   "se": 0.022
-  },
-  "test": {
-   "n": 284,
-   "mean_R": -0.086,
-   "win_%": 39.4,
-   "se": 0.033
-  }
- },
- "verdict": "NO RELIABLE EDGE - live levels unchanged",
- "top5_train": [
+ "note": "Config chosen on TRAIN only; TEST is unseen. exp_R = avg result per trade in risk units, net of 0.1% fees. >0 needed.",
+ "days": 30,
+ "samples": 878,
+ "chosen_config": [
+  "trail",
+  3,
+  2,
+  288
+ ],
+ "train_top5": [
   {
-   "cfg": "(3, 3, 24)",
-   "train": {
-    "n": 660,
-    "mean_R": -0.057,
-    "win_%": 45.8,
-    "se": 0.022
-   },
-   "test": {
-    "n": 284,
-    "mean_R": -0.086,
-    "win_%": 39.4,
-    "se": 0.033
-   }
+   "cfg": [
+    "trail",
+    3,
+    2,
+    288
+   ],
+   "n": 64,
+   "exp_R": 0.165,
+   "win_%": 32.8
   },
   {
-   "cfg": "(3, 1.5, 24)",
-   "train": {
-    "n": 660,
-    "mean_R": -0.062,
-    "win_%": 45.9,
-    "se": 0.021
-   },
-   "test": {
-    "n": 284,
-    "mean_R": -0.094,
-    "win_%": 39.4,
-    "se": 0.031
-   }
+   "cfg": [
+    "trail",
+    3,
+    2,
+    192
+   ],
+   "n": 64,
+   "exp_R": 0.007,
+   "win_%": 39.1
   },
   {
-   "cfg": "(3, 2, 24)",
-   "train": {
-    "n": 660,
-    "mean_R": -0.062,
-    "win_%": 45.8,
-    "se": 0.021
-   },
-   "test": {
-    "n": 284,
-    "mean_R": -0.087,
-    "win_%": 39.4,
-    "se": 0.032
-   }
+   "cfg": [
+    "fixed",
+    3,
+    3,
+    192
+   ],
+   "n": 64,
+   "exp_R": -0.081,
+   "win_%": 40.6
   },
   {
-   "cfg": "(3, 1, 24)",
-   "train": {
-    "n": 660,
-    "mean_R": -0.069,
-    "win_%": 46.1,
-    "se": 0.02
-   },
-   "test": {
-    "n": 284,
-    "mean_R": -0.093,
-    "win_%": 39.8,
-    "se": 0.03
-   }
+   "cfg": [
+    "fixed",
+    3,
+    3,
+    288
+   ],
+   "n": 64,
+   "exp_R": -0.12,
+   "win_%": 32.8
   },
   {
-   "cfg": "(3, 3, 48)",
-   "train": {
-    "n": 660,
-    "mean_R": -0.077,
-    "win_%": 45.3,
-    "se": 0.031
-   },
-   "test": {
-    "n": 284,
-    "mean_R": -0.087,
-    "win_%": 40.8,
-    "se": 0.046
-   }
+   "cfg": [
+    "trail",
+    2,
+    2,
+    192
+   ],
+   "n": 64,
+   "exp_R": -0.172,
+   "win_%": 26.6
   }
  ],
+ "train": {
+  "n": 64,
+  "exp_R": 0.165,
+  "win_%": 32.8
+ },
+ "test": {
+  "n": 49,
+  "exp_R": -0.17,
+  "win_%": 28.6
+ },
+ "old_config_test": {
+  "n": 49,
+  "exp_R": -0.45,
+  "win_%": 38.8
+ },
+ "opposite_direction_test": {
+  "n": 49,
+  "exp_R": -0.638,
+  "win_%": 14.3
+ },
+ "test_long": {
+  "n": 33,
+  "exp_R": -0.732,
+  "win_%": 15.2
+ },
+ "test_short": {
+  "n": 16,
+  "exp_R": 0.989,
+  "win_%": 56.2
+ },
  "factor_lift": {
-  "price near range low": {
-   "present": {
-    "n": 929,
-    "mean_R": -0.188,
-    "win_%": 40.3,
-    "se": 0.034
-   },
-   "absent": {
-    "n": 15,
-    "mean_R": -0.301,
-    "win_%": 33.3,
-    "se": 0.241
-   }
-  },
   "failed breakdown / liquidity sweep": {
-   "present": {
-    "n": 494,
-    "mean_R": -0.158,
-    "win_%": 40.7,
-    "se": 0.047
+   "train": {
+    "with": {
+     "n": 149,
+     "exp_R": -0.023,
+     "win_%": 30.9
+    },
+    "without": {
+     "n": 377,
+     "exp_R": -0.051,
+     "win_%": 38.7
+    }
    },
-   "absent": {
-    "n": 450,
-    "mean_R": -0.225,
-    "win_%": 39.6,
-    "se": 0.047
+   "test": {
+    "with": {
+     "n": 85,
+     "exp_R": 0.016,
+     "win_%": 38.8
+    },
+    "without": {
+     "n": 267,
+     "exp_R": -0.313,
+     "win_%": 31.8
+    }
    }
   },
   "higher low forming": {
-   "present": {
-    "n": 418,
-    "mean_R": -0.237,
-    "win_%": 39.2,
-    "se": 0.049
+   "train": {
+    "with": {
+     "n": 289,
+     "exp_R": 0.002,
+     "win_%": 41.5
+    },
+    "without": {
+     "n": 237,
+     "exp_R": -0.098,
+     "win_%": 30.4
+    }
    },
-   "absent": {
-    "n": 526,
-    "mean_R": -0.153,
-    "win_%": 40.9,
-    "se": 0.046
-   }
-  },
-  "selling volume fading": {
-   "present": {
-    "n": 761,
-    "mean_R": -0.2,
-    "win_%": 40.3,
-    "se": 0.037
-   },
-   "absent": {
-    "n": 183,
-    "mean_R": -0.148,
-    "win_%": 39.3,
-    "se": 0.078
-   }
-  },
-  "volatility compression": {
-   "present": {
-    "n": 449,
-    "mean_R": -0.239,
-    "win_%": 38.1,
-    "se": 0.047
-   },
-   "absent": {
-    "n": 495,
-    "mean_R": -0.146,
-    "win_%": 42.0,
-    "se": 0.048
+   "test": {
+    "with": {
+     "n": 205,
+     "exp_R": -0.249,
+     "win_%": 34.6
+    },
+    "without": {
+     "n": 147,
+     "exp_R": -0.212,
+     "win_%": 32.0
+    }
    }
   },
   "momentum turning up": {
-   "present": {
-    "n": 591,
-    "mean_R": -0.203,
-    "win_%": 39.3,
-    "se": 0.042
+   "train": {
+    "with": {
+     "n": 203,
+     "exp_R": -0.044,
+     "win_%": 40.9
+    },
+    "without": {
+     "n": 323,
+     "exp_R": -0.042,
+     "win_%": 33.7
+    }
    },
-   "absent": {
-    "n": 353,
-    "mean_R": -0.168,
-    "win_%": 41.6,
-    "se": 0.056
+   "test": {
+    "with": {
+     "n": 143,
+     "exp_R": -0.203,
+     "win_%": 37.1
+    },
+    "without": {
+     "n": 209,
+     "exp_R": -0.254,
+     "win_%": 31.1
+    }
+   }
+  },
+  "price near range low": {
+   "train": {
+    "with": {
+     "n": 249,
+     "exp_R": 0.067,
+     "win_%": 35.3
+    },
+    "without": {
+     "n": 277,
+     "exp_R": -0.142,
+     "win_%": 37.5
+    }
+   },
+   "test": {
+    "with": {
+     "n": 156,
+     "exp_R": -0.156,
+     "win_%": 32.1
+    },
+    "without": {
+     "n": 196,
+     "exp_R": -0.295,
+     "win_%": 34.7
+    }
+   }
+  },
+  "selling volume fading": {
+   "train": {
+    "with": {
+     "n": 350,
+     "exp_R": -0.004,
+     "win_%": 37.4
+    },
+    "without": {
+     "n": 176,
+     "exp_R": -0.121,
+     "win_%": 34.7
+    }
+   },
+   "test": {
+    "with": {
+     "n": 251,
+     "exp_R": -0.241,
+     "win_%": 34.7
+    },
+    "without": {
+     "n": 101,
+     "exp_R": -0.214,
+     "win_%": 30.7
+    }
+   }
+  },
+  "volatility compression": {
+   "train": {
+    "with": {
+     "n": 3,
+     "exp_R": -1.182,
+     "win_%": 0.0
+    },
+    "without": {
+     "n": 523,
+     "exp_R": -0.036,
+     "win_%": 36.7
+    }
+   },
+   "test": {
+    "with": {
+     "n": 3,
+     "exp_R": -0.804,
+     "win_%": 0.0
+    },
+    "without": {
+     "n": 349,
+     "exp_R": -0.228,
+     "win_%": 33.8
+    }
    }
   }
  },
- "score_buckets": {
-  "60-64": {
-   "n": 556,
-   "mean_R": -0.166,
-   "win_%": 40.5,
-   "se": 0.044
-  },
-  "65-79": {
-   "n": 355,
-   "mean_R": -0.23,
-   "win_%": 39.4,
-   "se": 0.054
-  },
-  "80+": {
-   "n": 33,
-   "mean_R": -0.152,
-   "win_%": 42.4,
-   "se": 0.184
-  }
- }
+ "verdict": "NO RELIABLE EDGE FOUND on unseen data"
 }

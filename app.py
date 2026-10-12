@@ -1,6 +1,6 @@
 import json, os, io, datetime as dt, requests, pandas as pd, streamlit as st
 import streamlit.components.v1 as components
-import config, history, stats
+import config, history, stats, decision
 
 st.set_page_config(page_title="BTC Tool", page_icon="📈", layout="wide")
 RAW = "https://raw.githubusercontent.com/badmanx075-oss/btc-tool/main/"   # live data written by the 5-minute scanner
@@ -13,6 +13,7 @@ def load(name, kind="json"):
         except Exception: txt = None
     if txt is None and os.path.exists(name): txt = open(name).read()
     if txt is None: return None
+    if kind == "text": return txt
     try: return json.loads(txt) if kind == "json" else pd.read_csv(io.StringIO(txt))
     except Exception: return None
 
@@ -65,7 +66,7 @@ elif T: head.caption(f"📨 Telegram: ❌ problem. {T.get('last_error') or 'bot 
 else: head.caption("📨 Telegram: no status yet (upload the latest worker.py and run the scan once)")
 if S.get("paused"): st.warning("⏸ PAUSED: no new trades or alerts will start. Open trades are still managed. Send /resume on Telegram to restart.")
 st.caption("⚠️ Informational and statistical only. Virtual money, no real orders. Backtests show NO proven edge yet.")
-tH_, tA, tW, tTH, tL, tHl, tS, tO, tB, tG = st.tabs(["🏠 Home", "📋 Analysis", "💰 Wallet", "📒 Trade History", "🧠 Learning", "🩺 Health", "⚙️ Settings", "📡 Old signals", "📊 Backtests", "📘 Guide"])
+tH_, tDD, tA, tW, tTH, tL, tHl, tS, tO, tB, tG = st.tabs(["🏠 Home", "🧭 Decision Desk", "📋 Analysis", "💰 Wallet", "📒 Trade History", "🧠 Learning", "🩺 Health", "⚙️ Settings", "📡 Old signals", "📊 Backtests", "📘 Guide"])
 
 def position_card(t):
     px = lp or t["entry"]; ur = (px - t["entry"]) * t["side"] / t["risk"]; usd = pl_usd(t, px) + t.get("realized_usd", 0); m = t.get("mgmt")
@@ -104,6 +105,60 @@ with tH_:
     lg = load("market_log.csv", "csv")
     if lg is not None and len(lg) > 5:
         lg = lg.tail(288).set_index("ts"); x, y = st.columns(2); x.caption("BTC price (last ~24h)"); x.line_chart(lg["price"]); y.caption("Open interest USD (last ~24h)"); y.line_chart(lg["oi_usd"])
+
+with tDD:
+    D = S.get("desk") or {}; V7 = load("backtest_v7_results.json")
+    if not A: st.info("Decision Desk appears after the next scan (needs the latest worker.py).")
+    else:
+        top = st.columns(4); top[0].metric("Price", f"${A['price']:,.0f}"); top[1].metric("Regime", A["regime"]); top[2].metric("Stage", A["stage"].split(":")[0]); top[3].metric("Timeframes", ((D.get("mtf") or {}).get("alignment") or "n/a").split(" (")[0])
+        st.markdown(f"### {A['status']}"); st.caption(A["stage"] + "  |  Informational and probabilistic. Never a guaranteed prediction.")
+        Qs = decision.build(A, M, D, POS[0] if POS else None, V7)
+        with st.expander("❓ Before entry: is there a trade? (questions 1 to 16)", expanded=True):
+            for n_, q_, a_ in Qs[:16]: st.markdown(f"**{n_}. {q_}**  \n{a_}")
+        with st.expander("📊 After entry: hold or book? (questions 17 to 27)", expanded=bool(POS)):
+            for n_, q_, a_ in Qs[16:]: st.markdown(f"**{n_}. {q_}**  \n{a_}")
+        Lv = D.get("levels")
+        if Lv:
+            st.subheader("🧱 Key levels around price")
+            rows_ = [dict(Level=f"${r['price']:,.0f}", Side="▲ resistance", Why=", ".join(r["names"]), Strength=r["strength"], Points=f"{r['dist_pts']:+,.0f}", Percent=f"{r['dist_pct']:+.2f}%", ATR_1h=f"{r['dist_atr1h']:+.1f}") for r in reversed(Lv["resistance"])]
+            rows_.append(dict(Level=f"${Lv['price']:,.0f}", Side="● PRICE NOW", Why="", Strength="", Points="", Percent="", ATR_1h=""))
+            rows_ += [dict(Level=f"${r['price']:,.0f}", Side="▼ support", Why=", ".join(r["names"]), Strength=r["strength"], Points=f"{r['dist_pts']:+,.0f}", Percent=f"{r['dist_pct']:+.2f}%", ATR_1h=f"{r['dist_atr1h']:+.1f}") for r in Lv["support"]]
+            st.dataframe(pd.DataFrame(rows_), hide_index=True, use_container_width=True)
+            if Lv.get("vwap"): st.caption(f"Today's VWAP ${Lv['vwap']['vwap']:,.0f}: price is {Lv['vwap']['dev_atr']:+.1f} ATR from it ({Lv['vwap']['note']}). Several reasons at one price (strong) means price has reacted there before. Not a guarantee.")
+        Mv = D.get("moves")
+        if Mv:
+            st.subheader("📏 Point-move classes (adapt to current volatility)")
+            st.table(pd.DataFrame([{"Move": f"{r['points']:,} pts", "% of price": f"{r['pct']}%", "x 4H ATR": r["atr4h_multiple"], "Size class": r["size_class"], **({"Up in 24h": f"{r['up_24h'] * 100:.0f}%", "Down in 24h": f"{r['dn_24h'] * 100:.0f}%", "Up in 72h": f"{r['up_72h'] * 100:.0f}%", "Down in 72h": f"{r['dn_72h'] * 100:.0f}%"} if "up_24h" in r else {})} for r in Mv["rows"]]))
+            if Mv.get("typical_24h_points"): t_ = Mv["typical_24h_points"]; st.caption(f"Volatility now: {Mv['bucket_name']} (history sample {Mv['sample']} hours). Typical 24h travel (50/75/90/95th percentile): up {t_['up']} pts, down {t_['dn']} pts. {Mv['note']}")
+            else: st.caption("Run the research workflow once to add the history-based odds. " + Mv["note"])
+        c1, c2 = st.columns(2)
+        with c1:
+            Mt = D.get("mtf")
+            if Mt: st.subheader("🕐 Multi-timeframe"); st.table(pd.DataFrame([{"Timeframe": r["tf"], "Role": r["role"], "Direction": r["direction"], "Trend strength": r["strength"]} for r in Mt["rows"]])); st.caption("Alignment: " + Mt["alignment"])
+            Rv = D.get("reversal")
+            if Rv:
+                st.subheader("🔄 Reversal evidence"); st.progress(min(Rv["score"] / 100, 1.0), text=f"{Rv['note']} (score {Rv['score']}/100)")
+                for s_ in Rv["signs"]: st.markdown("• " + s_)
+                for s_ in Rv["against"]: st.markdown("✅ " + s_)
+        with c2:
+            Dv = D.get("derivs")
+            if Dv:
+                st.subheader("📡 Derivatives and order flow"); k_ = st.columns(3); k_[0].metric("Crowding", Dv["crowding"]); k_[1].metric("OI 4h", "n/a" if Dv["oi_change_4h"] is None else f"{Dv['oi_change_4h']:+.2f}%"); k_[2].metric("Taker delta", "n/a" if Dv["taker_delta"] is None else f"{Dv['taker_delta']:+.2f}")
+                for s_ in Dv["items"]: st.markdown("• " + s_)
+        SL_ = S.get("stage_log") or []
+        if SL_:
+            st.subheader("🪜 Stage history (the model can move backwards)"); st.dataframe(pd.DataFrame([{"Time (IST)": history.ist(x["ts"]), "Stage": x["stage"], "Status": x["status"], "Regime": x["regime"], "Price": round(x["price"])} for x in reversed(SL_[-15:])]), hide_index=True, use_container_width=True)
+        Lz = A.get("levels")
+        with st.expander("🧮 Profit-booking planner (choose your own percentages)"):
+            if not Lz: st.write("No active setup, so there are no targets to plan with.")
+            else:
+                st.caption("Test different splits. The system does not assume you booked anything: you decide. The % are yours to customise (the spec says do not hard-code them).")
+                p1 = st.slider("Book at Target 1 (%)", 0, 100, 30); p2 = st.slider("Book at Target 2 (%)", 0, 100 - p1, min(30, 100 - p1)); p3 = st.slider("Book at Target 3 (%)", 0, 100 - p1 - p2, min(20, 100 - p1 - p2)); run_ = 100 - p1 - p2 - p3
+                g1, g2, g3 = st.columns(3); en_ = g1.number_input("Entry $", value=float(A["price"]), key="pl_en"); q_ = g2.number_input("Quantity BTC", value=0.01, step=0.001, format="%.4f", key="pl_q"); fx_ = g3.number_input("₹ per $1", value=float(P.get("fx", 88.0)), key="pl_fx")
+                sd = 1 if A["direction"] != "SHORT" else -1; ex_ = Lz["extended"]; plan_ = [("Target 1", Lz["t1"], p1), ("Target 2", Lz["t2"], p2), ("Target 3", Lz["t3"], p3), (f"Runner (trail, shown at extended {ex_:,.0f})", ex_, run_)]
+                rws = [{"Stage": n_, "Price": f"${p_:,.0f}", "Closes": f"{pc}%", "Points": f"{(p_ - en_) * sd:+,.0f}", "Profit ₹": inr((p_ - en_) * sd * q_ * pc / 100 * fx_)} for n_, p_, pc in plan_]
+                st.table(pd.DataFrame(rws)); tot = sum((p_ - en_) * sd * q_ * pc / 100 * fx_ for _, p_, pc in plan_); loss = (en_ - Lz["preferred_sl"]) * sd * q_ * fx_
+                st.write(f"If everything goes to plan: **{inr(tot)}**. If the stop {Lz['preferred_sl']:,.0f} is hit first: **{inr(-abs(loss))}**. The runner is only reached if the trade keeps going; trailing stops protect it.")
 
 with tA:
     if not A: st.info("Analysis appears after the next scan (needs the latest worker.py).")
@@ -262,6 +317,19 @@ with tB:
     if ms: q = ms["Q"]["24"]; st.subheader("Typical 24h move by volatility (history)"); st.table(pd.DataFrame([{"Volatility": n, "Median up %": q[k]["up"][0], "Median down %": q[k]["dn"][0], "90th pct up %": q[k]["up"][2], "90th pct down %": q[k]["dn"][2]} for k, n in (("0", "calm"), ("1", "normal"), ("2", "wild"))]))
     st.info("R = result in units of risk. +0.10R means earning 10% of the amount risked per trade on average. Errors this large mean it cannot be told apart from zero yet.")
 
+    V7_ = load("backtest_v7_results.json")
+    if V7_ and not V7_.get("error"):
+        st.subheader("🧪 V7 full scorecard (live strategy, spec section 33)"); st.caption(V7_["note"]); st.info(f"{V7_['trades']} past entries | verdict: {V7_['verdict']}")
+        o_, f_ = V7_["overall"], V7_["fresh_oos"]; q_ = st.columns(6); q_[0].metric("Win rate", f"{o_['win_pct']}%"); q_[1].metric("Avg R", o_["avg_R"]); q_[2].metric("Profit factor", o_["profit_factor"]); q_[3].metric("Max drawdown", f"{o_['max_drawdown_R']}R"); q_[4].metric("Unseen-trade avg R", f_.get("avg_R", "n/a"), f"± {f_.get('se', '')}"); q_[5].metric("False-signal rate", f"{V7_['stops']['false_signal_rate_pct']}%")
+        st.markdown("**Target hit rates (reached BEFORE the stop) and time taken**"); st.table(pd.DataFrame([{"Target": v["label"], "Hit before stop %": v["hit_before_stop_pct"], "Unseen trades %": v["hit_fresh_pct"], "Median hours": v["median_hours"]} for v in V7_["targets"].values()]))
+        s_ = V7_["stops"]; e_ = V7_["excursions"]; st.write(f"Stopped before +1R: **{s_['stop_before_1R_pct']}%** | stop touched at all: {s_['stop_touched_pct']}% (median {s_['median_hours_to_stop']} h) | no result in 120 h: {s_['expired_no_result_pct']}% | best excursion (50/75/90th pct): {e_['mfe_R_p50_p75_p90']} R | worst: {e_['mae_R_p50_p75_p90']} R | typical risk {e_['median_risk_points']:,} pts")
+        st.markdown("**How often price travelled N points after entry**"); st.table(pd.DataFrame([{"Move": f"{k} pts", "Before stop %": v["reached_before_stop_pct"], "At any time %": v["reached_any_time_pct"]} for k, v in e_["points"].items()]))
+        st.markdown("**Four ways to trade the same entries**"); st.table(pd.DataFrame([{"Method": k, "Avg R (all)": v["all"].get("avg_R"), "Win %": v["all"].get("win_pct"), "Max DD R": v["all"].get("max_drawdown_R"), "Unseen avg R": v["fresh"].get("avg_R")} for k, v in V7_["four_ways"].items()]))
+        st.markdown("**Early vs late entry (fixed 4R)**"); st.table(pd.DataFrame([{"Entry": k, "Avg R": v.get("avg_R"), "Win %": v.get("win_pct"), "Profit factor": v.get("profit_factor")} for k, v in V7_["entry_delay"].items()]))
+        for ttl, key in (("By side", "by_side"), ("By volatility", "by_volatility"), ("By trend strength", "by_trend_strength"), ("By year", "by_year")):
+            st.markdown(f"**{ttl}**"); st.table(pd.DataFrame(V7_[key]).T[["n", "avg_R", "win_pct", "profit_factor", "max_drawdown_R"]])
+    else: st.info("Run the 'research' workflow once to build the V7 scorecard (it also builds the move statistics).")
+
 with tG:
     st.markdown("""
 **How the wallet works (every ~5 minutes)**
@@ -277,3 +345,4 @@ with tG:
 
 **Honest status:** the machine (scanner, alerts, wallet, advisor, dashboard) works. A reliably profitable signal is **not proven**. Treat everything as practice.
 """)
+    with st.expander("📐 Design document: architecture, data sources, methodology (spec section 38, A to V)"): st.markdown(load("DESIGN.md", "text") or "DESIGN.md not found in the repo yet.")

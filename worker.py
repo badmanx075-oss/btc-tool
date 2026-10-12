@@ -2,7 +2,7 @@
 import os, json, time, subprocess, requests, datetime as dt
 from zoneinfo import ZoneInfo
 import engine as E
-import paper, learn, config, wallet, analysis, history, stats
+import paper, learn, config, wallet, analysis, history, stats, flow, desk
 import pandas as pd
 import faulthandler; faulthandler.dump_traceback_later(330, exit=True)  # if stuck >5.5 min: print where, then exit
 
@@ -171,11 +171,13 @@ def scan_cycle():
         json.dump(S, open("state.json", "w"), indent=1)
         return
     S["last_price"] = px = float(m5.c.iloc[-1])
-    record(px, fr, oi)
+    record(px, fr, oi); flow.record(now)
+    try: m30 = E.candles("30m")
+    except Exception: m30 = None
     for t in S["trades"].values():
         if t["status"] != "CLOSED": track(t, m5)
     r = E.scan(m15, h4, h1)
-    S["market"] = dict(price=px, regime=r["regime"], signal=r["signal"], side=r["side"], score=r["score"], scores=r["scores"], atr1h=r["atr1h"], atr4h=r["atr4h"], reversal=r["reversal"], tf=E.tf_view({"5m": m5, "15m": m15, "1H": h1, "4H": h4}), funding=fr, oi=oi,
+    S["market"] = dict(price=px, regime=r["regime"], signal=r["signal"], side=r["side"], score=r["score"], scores=r["scores"], atr1h=r["atr1h"], atr4h=r["atr4h"], reversal=r["reversal"], tf=E.tf_view({"5m": m5, "15m": m15, **({"30m": m30} if m30 is not None else {}), "1H": h1, "4H": h4}), funding=fr, oi=oi,
                        pro=r["pro"], con=r["con"], ts=now.isoformat(timespec="seconds"))
     if r["reversal"] != S.get("rev_last", "none"):
         S["rev_last"] = r["reversal"]
@@ -194,11 +196,22 @@ def scan_cycle():
              f"Entry Zone: {P(t['zone'][0])} – {P(t['zone'][1])}\nInvalidation/SL: {P(t['sl'])}\nT1 {P(t['t1'])} | T2 {P(t['t2'])} | T3 {P(t['t3'])}\nExtended: {P(t['ext'])}+\n"
              f"Confirmation: {'above' if r['side']=='LONG' else 'below'} {P(t['confirm'])}\nMove to T1–T3: {mv[0]:,.0f} to {mv[1]:,.0f} pts ({t['move_class']} vs 4H ATR)\n"
              f"Setup Score: {r['score']}/100 | False-signal risk: {r['risk']}\nFor: {', '.join(r['pro'])}\nAgainst: {', '.join(r['con']) or '-'}{DISC}", tid, cat="signals")
+    mstats = lg = None
     try:   # full snapshot (spec 31): scores, stage, zones, expected move, checklist
-        stats = json.load(open("move_stats.json")) if os.path.exists("move_stats.json") else None
+        mstats = json.load(open("move_stats.json")) if os.path.exists("move_stats.json") else None
         lg = pd.read_csv("market_log.csv") if os.path.exists("market_log.csv") else None
-        S["analysis"] = analysis.snapshot(h1, fr, oi, lg, stats, r["regime"], r["scores"], any((S.get("paper") or {}).get("pos", {}).values()))
+        S["analysis"] = analysis.snapshot(h1, fr, oi, lg, mstats, r["regime"], r["scores"], any((S.get("paper") or {}).get("pos", {}).values()))
     except Exception as e: print("analysis error", e)
+    try:   # Decision Desk data (key levels, point-move classes, derivatives, reversal evidence, multi-timeframe) + stage history (spec 28)
+        fl = pd.read_csv("flow_log.csv") if os.path.exists("flow_log.csv") else None
+        frames = {"5m": m5, "15m": m15, "1H": h1, "4H": h4}
+        if m30 is not None: frames["30m"] = m30
+        S["desk"] = desk.build(frames, fr, oi, lg, fl, mstats, r["regime"])
+        A_ = S.get("analysis")
+        if A_:
+            sl = S.setdefault("stage_log", [])
+            if not sl or sl[-1]["stage"] != A_["stage"]: sl.append(dict(ts=now.isoformat(timespec="seconds"), stage=A_["stage"], status=A_["status"], regime=A_["regime"], price=px)); del sl[:-300]
+    except Exception as e: print("desk error", e)
     try: paper.run(S, send, now, scan=r)
     except Exception as e: print("paper error", e)
     loc = now.astimezone(TZ); key = loc.strftime("%Y-%m-%d"); CF = dict(config.load()["schedule"])
@@ -226,6 +239,7 @@ def publish():  # push state to GitHub right away so the dashboard shows new tra
         if os.path.exists("config.json"): run("git", "add", "config.json")
         if os.path.exists("market_log.csv"): run("git", "add", "market_log.csv")
         if os.path.exists("trade_history.json"): run("git", "add", "trade_history.json")
+        if os.path.exists("flow_log.csv"): run("git", "add", "flow_log.csv")
         if run("git", "diff", "--cached", "--quiet").returncode: run("git", "commit", "-m", "state"); run("git", "pull", "--rebase"); run("git", "push")
     except Exception as e: print("publish error", e)
 
