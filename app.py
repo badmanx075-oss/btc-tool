@@ -184,7 +184,9 @@ with tA:
             st.table(pd.DataFrame([["Expected", mv(E_["expected"])], ["Strong", mv(E_["strong"])], ["Extended", mv(E_["extended"])]], columns=["Move size (points, direction lean)", "Range"]))
             st.table(pd.DataFrame([{"Move": f"{k} pts", "Up within 24h": f"{v[0] * 100:.1f}%", "Down within 24h": f"{v[1] * 100:.1f}%"} for k, v in E_["odds"].items()])); st.caption(f"Based on {E_['sample']} similar hours. Estimates, not promises.")
         else: st.info("Run the 'research' workflow once to add history-based expected moves and point-move odds.")
-        if A.get("checklist"): st.subheader("False-signal checklist"); [st.markdown(f"{'⚠️' if f else '✅'} {t_}") for t_, f in A["checklist"]]
+        if A.get("checklist"): st.subheader("False-signal checklist")
+        if A.get("checklist"):
+            for t_, f in A["checklist"]: st.markdown(f"{'⚠️' if f else '✅'} {t_}")
         r_ = A["range"]; st.subheader("Range and breakout"); st.write(f"Range high ${r_['high']:,.0f} | mid ${r_['mid']:,.0f} | low ${r_['low']:,.0f} | price at {r_['position_pct']:.0f}% of range | **{A['breakout']}**")
 
 with tW:
@@ -335,6 +337,26 @@ with tB:
     else: st.info("Run the 'research' workflow once to build the V7 scorecard (it also builds the move statistics).")
 
 with tG:
+    with st.expander("🧭 How to read this tool and take a decision (start here)", expanded=True):
+        st.markdown("""
+**Daily routine (2 minutes)**
+1. **Home**: price, regime, and any open position. An open position shows a status (🟢 hold, 🟡 protect profit, 🟠 book profit, 🔴 reversal risk) and the reasons.
+2. **🧭 Decision Desk**, questions 1 to 3: what is the market doing, is there an opportunity, long or short or NO TRADE. If the answer is **NO TRADE, stop here**. Doing nothing is a valid decision.
+3. If there is a setup, read questions 4 to 16: is it early or already late, what supports it, what contradicts it, entry zone, stop, targets, risk/reward, and how often similar moves happened.
+
+**Take the trade only if most of these are true**
+- Setup is **early** (not "late: avoid chasing") and price is inside or near the early entry zone.
+- Evidence **for** clearly outweighs evidence **against**, and false-signal risk is not High.
+- Risk/reward to Target 1 is **1.5 or better**, and the stop is at a level that really means the idea failed.
+- Timeframes mostly agree (Multi-timeframe table), and no strong **reversal evidence** against you.
+- You can afford the loss: the Wallet tab's size calculator shows quantity for 1% risk. Never risk more than you planned.
+
+**After entry (questions 17 to 27)**: follow the status, not your feelings. Protect profit when the status turns yellow, consider booking when it turns orange, think about exiting when it turns red. Never move the stop **away** from price.
+
+**Review weekly (Trade History tab)**: win rate, average R, drawdown. With fewer than 30 closed trades it is noise: do not change rules because of a few trades.
+
+**Honest limits**: backtests show **no proven edge** yet. Treat everything as practice with virtual money until months of paper results say otherwise. These are probabilities, not predictions.
+""")
     st.markdown("""
 **How the wallet works (every ~5 minutes)**
 1. The scanner reads the market and checks two strategies: *Trend Pullback* (backtested, weak edge) and *Early Signal* (experimental).
