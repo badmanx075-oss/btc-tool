@@ -68,7 +68,7 @@ def from_paper(t, closed):
         id=t["id"], source="PAPER", strategy=t.get("strategy", ""), label=t.get("label", ""), side=_side(t.get("side")),
         opened=t.get("created"), opened_ist=ist(t.get("created")), entry=t.get("entry"), stop=t.get("sl0") or t.get("sl"), targets=tgt,
         qty_btc=t.get("qty"), margin_inr=t.get("margin_inr"), leverage=t.get("leverage"), risk_inr=t.get("risk_inr"),
-        why=t.get("why", ""), context=t.get("ctx", {}), status="CLOSED" if closed else "OPEN",
+        why=t.get("why", ""), context=t.get("ctx", {}), entry_context=t.get("entry_ctx"), grade=t.get("grade"), status="CLOSED" if closed else "OPEN",
         outcome=t.get("outcome", ""), closed=t.get("closed"), closed_ist=ist(t.get("closed")), exit=t.get("exit"), R=t.get("R"),
         pnl_inr=t.get("pnl_inr"), fees_usd=t.get("fees_usd"), hold_h=t.get("hold_h"), best_R=t.get("mfe_R"), worst_R=t.get("mae_R"),
         exits=t.get("exits", []), lesson=t.get("lesson", ""), auto_feedback=a.get("verdict", ""),

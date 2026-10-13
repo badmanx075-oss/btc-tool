@@ -2,7 +2,7 @@
 import os, json, time, subprocess, requests, datetime as dt
 from zoneinfo import ZoneInfo
 import engine as E
-import paper, learn, config, wallet, analysis, history, stats, flow, desk
+import paper, learn, config, wallet, analysis, history, stats, flow, desk, review as rvw, notify
 import pandas as pd
 import faulthandler; faulthandler.dump_traceback_later(330, exit=True)  # if stuck >5.5 min: print where, then exit
 
@@ -37,7 +37,24 @@ def send(text, tid=None, cat=None, buttons=None):
                 [{"text": "🟢 PROFIT", "callback_data": f"win|{tid}"}, {"text": "🔴 LOSS", "callback_data": f"loss|{tid}"}]]
         if URL.startswith("http"): rows.append([{"text": "🔎 CHECK THIS TRADE", "url": f"{URL}?trade={tid}"}])
         kw["reply_markup"] = {"inline_keyboard": rows}
-    tg("sendMessage", **kw)
+    r = tg("sendMessage", **kw); lg = S.setdefault("telegram", {}).setdefault("log", [])       # delivery log: last 30 sends (shown in dashboard Health)
+    lg.append(dict(ts=dt.datetime.now(dt.timezone.utc).isoformat(timespec="seconds"), cat=cat or "-", ok=bool(r and r.get("ok")), text=text[:70].replace("\n", " "))); del lg[:-30]
+
+def send_file(S_, now_, caption="Review pack"):
+    """Builds the review pack and sends it to Telegram as two files (full JSON + short readable .md)."""
+    pk = rvw.pack(S_, now_); json.dump(pk, open("review_pack.json", "w"), indent=1, default=str); open("review_pack.md", "w").write(rvw.pack_md(pk))
+    ok = True
+    for fn in ("review_pack.md", "review_pack.json"):
+        try:
+            with open(fn, "rb") as fh: r = requests.post(API + "sendDocument", data=dict(chat_id=CHAT, caption=HEADER + caption if fn.endswith("md") else fn), files=dict(document=fh), timeout=60)
+            ok = ok and r.ok
+            if not r.ok: S_.setdefault("telegram", {})["api_error"] = f"sendDocument: {r.status_code} {r.text[:100]}"
+        except requests.RequestException as e: ok = False; S_.setdefault("telegram", {})["api_error"] = f"sendDocument: network {type(e).__name__}"
+    return ok
+
+def settings_kb():
+    on = config.load()["alerts"]; btns = [{"text": ("✅ " if on.get(k, True) else "❌ ") + lab, "callback_data": "tgl|" + k} for k, lab in notify.CATS]
+    return {"inline_keyboard": [btns[i:i + 2] for i in range(0, len(btns), 2)]}
 
 S = json.load(open("state.json")) if os.path.exists("state.json") else {"trades": {}, "offset": 0, "n": {}, "sent": {}}
 now = dt.datetime.now(dt.timezone.utc)
@@ -58,9 +75,9 @@ def review(t):
 HELP = ("📖 COMMANDS\n/status  wallet + position + radar\n/wallet /ledger /trades  money, every rupee movement, trade list\n/history [n]  last n trades (permanent record)\n/timeline ID  full story of one trade\n"
         "/stats  win rate, avg R, drawdown, streaks (+ honest verdict)\n/today  today's summary\n/analysis  market analysis\n/active  open early-signal alerts\n/review ID  review an alert\n"
         "/note ID text  add your remark | /myexit ID price  your own exit\n/pause  stop NEW trades and alerts (open trades keep being managed) | /resume\n"
-        "/config /set name value /notify name on|off  settings\n/lessons /approve N /revert N  what the tool learned\n/weekly  weekly report\n/demo  test the pipeline\n/ping  is the bot alive\n/resetwallet confirm")
+        "/config /set name value /notify name on|off  settings\n/lessons /approve N /revert N  what the tool learned\n/weekly  weekly report\n/export  review pack (file) to send to Claude | /readiness  kitna data bacha\n/settings  notification ON/OFF buttons | /deliveries  last sends\n/demo  test the pipeline\n/ping  is the bot alive\n/resetwallet confirm")
 MENU = [("status", "Wallet, position, radar"), ("history", "Last trades"), ("timeline", "One trade in detail"), ("stats", "Performance"), ("today", "Today's summary"), ("wallet", "Wallet"), ("analysis", "Market analysis"),
-        ("pause", "Pause new trades"), ("resume", "Resume trades"), ("help", "All commands"), ("ping", "Is the bot alive")]
+        ("export", "Review pack file"), ("readiness", "Data readiness"), ("settings", "Notification buttons"), ("pause", "Pause new trades"), ("resume", "Resume trades"), ("help", "All commands"), ("ping", "Is the bot alive")]
 
 def today_text():
     P_ = S.get("paper") or {}; d = (now + dt.timedelta(hours=5, minutes=30)).strftime("%Y-%m-%d")
@@ -81,6 +98,10 @@ def handle_updates(timeout=0):
         ST["last_cmd_ts"] = stamp()
         if cb:
             ST["last_cmd"] = "button"; act, tid = cb["data"].split("|")
+            if act == "tgl":
+                cur = config.load()["alerts"].get(tid, True); config.set_notify(tid, "off" if cur else "on")
+                tg("answerCallbackQuery", callback_query_id=cb["id"], text=f"{tid}: {'OFF' if cur else 'ON'}")
+                tg("editMessageReplyMarkup", chat_id=CHAT, message_id=src.get("message_id"), reply_markup=settings_kb()); continue
             if act in ("fbgood", "fbbad"):
                 rep = paper.user_event(S, act, tid, now); tg("answerCallbackQuery", callback_query_id=cb["id"], text=rep[:180]); send(rep); continue
             t = S["trades"].get(tid)
@@ -100,6 +121,10 @@ def handle_updates(timeout=0):
         elif c == "/lessons": send(learn.lessons_text(S.get("paper") or {}))
         elif c == "/approve" and len(txt) > 1: send(learn.approve(S.setdefault("paper", {}), txt[1]))
         elif c == "/revert" and len(txt) > 1: send(learn.revert(S.setdefault("paper", {}), txt[1]))
+        elif c == "/export": send("📦 Review pack bana raha hu…"); send_file(S, now) or send("Export bhejne mein dikkat aayi. Dashboard ke Review tab se download karo.")
+        elif c == "/readiness": send(rvw.readiness(S)["message"] + f"\nShadow (near-miss/filter) trades finished: {rvw.readiness(S)['shadow_finished']}")
+        elif c == "/settings": tg("sendMessage", chat_id=CHAT, text=HEADER + "🔔 NOTIFICATION SETTINGS\nButton dabao: ON/OFF badal jayega.", reply_markup=settings_kb())
+        elif c == "/deliveries": send("📬 Last sends:\n" + "\n".join(f"{x['ts'][11:16]} {'✅' if x['ok'] else '❌'} [{x['cat']}] {x['text']}" for x in (ST.get("log") or [])[-10:]))
         elif c in ("/help", "/start"): send(HELP)
         elif c == "/history": send(stats.history_text(history.load()["records"].values(), int(txt[1]) if len(txt) > 1 and txt[1].isdigit() else 5))
         elif c == "/timeline" and len(txt) > 1: rec = history.load()["records"].get(txt[1]); send(stats.timeline_text(rec) if rec else "Trade ID nahi mila. /history se ID dekho.")
@@ -214,6 +239,8 @@ def scan_cycle():
     except Exception as e: print("desk error", e)
     try: paper.run(S, send, now, scan=r)
     except Exception as e: print("paper error", e)
+    try: notify.setup_alerts(S, send, now); notify.milestone_alert(S, send, send_file, now)
+    except Exception as e: print("notify error", e)
     loc = now.astimezone(TZ); key = loc.strftime("%Y-%m-%d"); CF = dict(config.load()["schedule"])
     for name, hr in (("morning", CF["morning_hour"]), ("evening", CF["evening_hour"])):
         if loc.hour == hr and S["sent"].get(name) != key:

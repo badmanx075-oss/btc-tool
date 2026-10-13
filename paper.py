@@ -1,7 +1,7 @@
 """Paper trading engine: virtual wallet with ledger, strategy registry, staged exits, remarks + feedback. NO real orders are ever placed.
 Rules live in config.json (settings), strategies.py (entries) and lifecycle.py (exits)."""
 import datetime as dt, requests
-import engine as E, backtest_v4 as W4, learn, config, wallet, lifecycle, advisor, strategies as ST
+import engine as E, backtest_v4 as W4, learn, config, wallet, lifecycle, advisor, review, strategies as ST
 from config import inr
 
 FX_DEFAULT = 88.0
@@ -141,13 +141,13 @@ def open_position(P, C, name, sg, now, h15, fxr, send):
     t = dict(id=tid, strategy=name, label=sc.get("label", name), side=k, entry=e, sl0=sg["sl"], sl=sg["sl"], risk=sg["risk"], mode=sg["mode"], tp=sg.get("tp"), t1=sg.get("t1"), t2=sg.get("t2"), t3=sg.get("t3"),
              partial=sc.get("partial_pct", 50) / 100, qty=qty, qty_btc=qty, notional_usd=round(notional, 2), margin_inr=round(margin, 2), margin_released=0.0, rem_wallet=1.0, leverage=lev, fx=fxr,
              risk_inr=round(qty * sg["risk"] * fxr, 2), fees_usd=fee_usd, realized_usd=0.0, stage=0, remaining=1.0, mfe_R=0.0, mae_R=0.0, exits=[], events=[], created=iso(now),
-             last_ts=float(h15.ts.iloc[-1]), expiry_h=sc["expiry_hours"], cfg=config.snapshot(C, name), ctx=sg["ctx"], why=sg["why"], capped=bool(capped))
+             last_ts=float(h15.ts.iloc[-1]), expiry_h=sc["expiry_hours"], cfg=config.snapshot(C, name), ctx=sg["ctx"], entry_ctx=sg.get("entry_ctx"), grade=review.grade(name, sg["ctx"]), why=sg["why"], capped=bool(capped))
     ev(t, now, "OPENED", e, f"qty {qty} BTC, margin {inr(margin)}"); wallet.lock(P, now, tid, margin, fee_usd * fxr); P["pos"][name] = t; P["last_entry"][name] = now.timestamp() * 1000
     order(P, now, tid, "BUY" if k == 1 else "SELL", qty, e, "entry (market, paper fill)"); jlog(P, now, "OPENED", f"{tid} {side} {qty} BTC at ${e:,.0f} (margin {inr(margin)})"); Wl = P["wallet"]
     plan = (f"Stop-loss ${t['sl']:,.0f} | Target ${t['tp']:,.0f} ({sc.get('target_r')}R)" if sg["mode"] == "fixed" else
             f"Stop-loss ${t['sl']:,.0f} | T1 ${t['t1']:,.0f} ({sc['partial_pct']}% booked, stop to entry) | T2 ${t['t2']:,.0f} (rest)")
     if C["alerts"].get("paper_open"):
-        send(f"📝 PAPER ORDER PLACED (virtual)  🕒 {config.ist(now, C)} IST\n{t['label']}\nOrder ID: {tid}\nAction: {'BUY' if k == 1 else 'SELL'} ({side}) BTCUSDT Perpetual\nQty: {qty} BTC @ ${e:,.0f}\n"
+        send(f"📝 PAPER ORDER PLACED (virtual)  🕒 {config.ist(now, C)} IST\n{t['label']} | Grade {t['grade']}\nOrder ID: {tid}\nAction: {'BUY' if k == 1 else 'SELL'} ({side}) BTCUSDT Perpetual\nQty: {qty} BTC @ ${e:,.0f}\n"
              f"Position value ${notional:,.0f} ({inr(notional * fxr)}) | margin locked {inr(margin)} ({lev}x) | entry fee {inr(fee_usd * fxr)}\n{plan}\n"
              f"Risk {inr(t['risk_inr'])} ({sc['risk_pct']}% of equity)" + (" | size capped by free balance" if capped else "") + f"\n💬 Kyun liya: {t['why']}\n"
              f"💰 Wallet: free {inr(Wl['cash'])} | in trades {inr(Wl['margin'])} | equity {inr(Wl['cash'] + Wl['margin'])}")
@@ -193,6 +193,8 @@ def run(S, send, now, scan=None):
         if t: manage(P, C, t, h15, px, now, send)
     for name, t in list(P["pos"].items()):
         if t and C["alerts"].get("advice"): advise(P, C, t, hr, px, now, send)
+    try: review.near_miss_step(S, P, scan, C["strategies"].get("early_signal", {}), h15, now, fee)
+    except Exception as e: print("near-miss error", e)
     for name, sc in C["strategies"].items():
         if S.get("paused") or not sc.get("enabled") or P["pos"].get(name) or name not in ST.SIGNALS: continue
         if now.timestamp() * 1000 - P["last_entry"].get(name, 0) < sc.get("cooldown_hours", 1) * 3.6e6: continue
@@ -205,5 +207,7 @@ def run(S, send, now, scan=None):
             sh.update(id=f"SHADOW-{name[:2].upper()}-{now.strftime('%Y%m%d%H%M')}", strategy=name, filter=blk["text"], ctx=sg["ctx"], exits=[], last_ts=float(h15.ts.iloc[-1]), created=iso(now), expiry_h=sc["expiry_hours"])
             P["shadow"].append(sh); jlog(P, now, "FILTERED", f"{name} signal skipped by filter #{blk['id']}")
             send(f"🧠 Signal skipped by learned filter #{blk['id']}: {blk['text']}\nIt is tracked as a shadow trade to check whether the filter really helps."); continue
+        try: sg["entry_ctx"] = review.entry_ctx(S, now)
+        except Exception as e: print("ctx error", e)
         jlog(P, now, "SIGNAL", f"{name} {'LONG' if sg['side'] == 1 else 'SHORT'} signal at ${sg['entry']:,.0f}")
         if not open_position(P, C, name, sg, now, h15, fx(P), send): P["last_entry"][name] = now.timestamp() * 1000 - max(sc.get("cooldown_hours", 1) - 1, 0) * 3.6e6

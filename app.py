@@ -1,6 +1,6 @@
 import json, os, io, datetime as dt, requests, pandas as pd, streamlit as st
 import streamlit.components.v1 as components
-import config, history, stats, decision
+import config, history, stats, decision, review
 
 st.set_page_config(page_title="BTC Tool", page_icon="📈", layout="wide")
 RAW = "https://raw.githubusercontent.com/badmanx075-oss/btc-tool/main/"   # live data written by the 5-minute scanner
@@ -66,7 +66,7 @@ elif T: head.caption(f"📨 Telegram: ❌ problem. {T.get('last_error') or 'bot 
 else: head.caption("📨 Telegram: no status yet (upload the latest worker.py and run the scan once)")
 if S.get("paused"): st.warning("⏸ PAUSED: no new trades or alerts will start. Open trades are still managed. Send /resume on Telegram to restart.")
 st.caption("⚠️ Informational and statistical only. Virtual money, no real orders. Backtests show NO proven edge yet.")
-tH_, tDD, tA, tW, tTH, tL, tHl, tS, tO, tB, tG = st.tabs(["🏠 Home", "🧭 Decision Desk", "📋 Analysis", "💰 Wallet", "📒 Trade History", "🧠 Learning", "🩺 Health", "⚙️ Settings", "📡 Old signals", "📊 Backtests", "📘 Guide"])
+tH_, tDD, tA, tW, tTH, tRV, tL, tHl, tS, tO, tB, tG = st.tabs(["🏠 Home", "🧭 Decision Desk", "📋 Analysis", "💰 Wallet", "📒 Trade History", "📦 Review", "🧠 Learning", "🩺 Health", "⚙️ Settings", "📡 Old signals", "📊 Backtests", "📘 Guide"])
 
 def position_card(t):
     px = lp or t["entry"]; ur = (px - t["entry"]) * t["side"] / t["risk"]; usd = pl_usd(t, px) + t.get("realized_usd", 0); m = t.get("mgmt")
@@ -254,6 +254,24 @@ with tTH:
             with st.expander("Everything stored for this trade (raw)"): st.json(r.get("raw", r))
     st.caption(f"Record file last updated: {history.ist((HF or {}).get('updated')) or 'not created yet (it is created on the next scan)'}")
 
+with tRV:
+    st.caption("Tool ko chalne do. Jab 30+ trades band ho jayein, neeche se review pack download karo aur mujhe (Claude ko) bhejo. Main uske hisaab se rules tune karunga.")
+    _rec = list(((load("trade_history.json") or {}).get("records") or {}).values())
+    try: PK = review.pack(S, records=_rec)
+    except Exception as e: PK = None; st.error(f"Review pack error: {e}")
+    if PK:
+        rd = PK["readiness"]; st.progress(min(rd["closed"] / rd["target"], 1.0), text=f"{rd['closed']}/{rd['target']} paper trades band (strong review: {rd['strong_target']})"); (st.success if rd["ready"] else st.info)(rd["message"])
+        c1, c2, c3 = st.columns(3); o = PK["overall"]; c1.metric("Closed trades", o.get("n", 0)); c2.metric("Win rate", f"{o.get('win_pct', 0)}%" if o.get("n") else "-"); c3.metric("Average R", o.get("mean_R", "-"))
+        sh = PK["shadows"]; st.markdown(f"**Shadow trades (bina risk ke extra data):** near-miss {sh['near_miss']['finished']}/{sh['near_miss']['tracked']} poore, filter-blocked {sh['filter_blocked']['finished']}/{sh['filter_blocked']['tracked']} poore.")
+        d1, d2 = st.columns(2)
+        d1.download_button("⬇️ Review pack (JSON, poora)", json.dumps(PK, indent=1, default=str).encode(), "review_pack.json", "application/json")
+        d2.download_button("⬇️ Short summary (.md, chat mein paste karne ke liye)", review.pack_md(PK).encode(), "review_pack.md", "text/markdown")
+        st.caption("Telegram par bhi: /export bhejo to dono files aa jayengi. 30 trades hone par bot khud bhej dega.")
+        for nm, g in PK["calibration"].items():
+            if g: 
+                with st.expander("Calibration: " + nm.replace("by_", "by ")): st.dataframe(pd.DataFrame(g).T[["n", "win_pct", "mean_R", "net_inr", "small_sample"]], use_container_width=True)
+        with st.expander("Review pack ka text preview"): st.code(review.pack_md(PK))
+
 with tL:
     st.info("The tool records every trade, studies its losses, and proposes filters. It does NOT rewrite its rules after each loss: with a ~33% win rate most losses are normal. A filter starts only after you approve it in Telegram (/approve N) and switches itself off if the trades it blocks do as well as the ones it allows.")
     L_ = P.get("lessons") or {}; cl = [t for t in CL if t.get("lesson")]
@@ -282,6 +300,9 @@ with tHl:
               ["Learning module", "lessons" in P, "ready" if "lessons" in P else "not started", "Upload learn.py"]]
     bad = [r for r in rows_h if not r[1]]; (st.success("All checks green.") if not bad else st.warning(f"{len(bad)} check(s) need attention."))
     st.table(pd.DataFrame([["✅" if r[1] else "❌", r[0], r[2], "" if r[1] else r[3]] for r in rows_h], columns=["", "Check", "Detail", "If red, do this"]))
+    _lg = T.get("log") or []
+    if _lg:
+        with st.expander(f"📬 Telegram delivery log (last {len(_lg)} sends)"): st.dataframe(pd.DataFrame([dict(time_utc=x["ts"][5:16], ok="✅" if x["ok"] else "❌", category=x["cat"], message=x["text"]) for x in _lg[::-1]]), hide_index=True, use_container_width=True)
     if T.get("foreign_chat"): st.error(f"A message reached the bot from a chat ending {T['foreign_chat']}, but your TG_CHAT_ID secret ends {T.get('chat_mask', '?')}. The bot ignores other chats. Fix the TG_CHAT_ID secret.")
     if T.get("poll_error"): st.error(f"Telegram polling problem: {T['poll_error']}")
 

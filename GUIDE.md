@@ -63,3 +63,12 @@ New data recorded every scan: `flow_log.csv` (taker buy/sell balance, liquidatio
 Run **Actions -> research -> Run workflow** (days 2000) once more: it now also builds `backtest_v7_results.json` (target hit rates before the stop, hours to target, stop/false-signal rate, MFE/MAE, how often 500...10,000 points were travelled, early vs late, four ways to trade, splits). The Backtests tab shows it. `DESIGN.md` (also inside the Guide tab) is the architecture and methodology document (sections A to V of the specification).
 
 Files for this upgrade: `levels.py`, `moves.py`, `reversal.py`, `derivs.py`, `flow.py`, `desk.py`, `decision.py`, `backtest_v7.py`, `DESIGN.md` (new) and `worker.py`, `app.py`, `.github/workflows/scan.yml`, `.github/workflows/research.yml`, `GUIDE.md` (changed).
+
+## Continuous testing + review pack (new)
+- Tool khud 24x7 paper-trade karta rehta hai. Aapko kuch chalana nahi hai.
+- Har trade ke saath entry ke waqt ka poora snapshot (grade, scores, session, MTF, crowding, regime) save hota hai.
+- Weak (score 50-64) early signals "near-miss" shadow trades ban jaate hain: bina risk ke extra data, taaki pata chale min_score sahi hai ya nahi.
+- Dashboard ka **📦 Review** tab: progress bar (N/30 trades), calibration tables, aur download buttons (JSON + short .md).
+- Telegram: `/export` (dono files), `/readiness`, `/settings` (ON/OFF buttons), `/deliveries` (last sends). 10/20/30/50/75/100... trades par milestone alert; 30+ par pack khud aa jata hai.
+- Naye alerts: "Setup ban raha hai (3/4)", "Stage badla", "B/C-grade near-miss". Cooldown se repeat nahi hote.
+- Jab 30+ trades ho jayein: pack ki file mujhe bhejo, main rules tune karunga.
