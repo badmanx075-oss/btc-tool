@@ -1263,6 +1263,53 @@
     }
    ],
    "user": {}
+  },
+  "BTC-SHORT-20261013-001": {
+   "id": "BTC-SHORT-20261013-001",
+   "side": "SHORT",
+   "signal": "EARLY SHORT SETUP",
+   "regime": "RANGE",
+   "score": 85,
+   "pro": [
+    "price near range high",
+    "failed breakout / sweep of highs",
+    "buying volume fading",
+    "volatility compression",
+    "momentum turning down"
+   ],
+   "con": [
+    "no lower high yet"
+   ],
+   "entry": 83557.5,
+   "zone": [
+    83533.91,
+    83628.27
+   ],
+   "sl": 83982.36,
+   "sl0": 83982.36,
+   "t1": 82920.20999999999,
+   "t2": 82282.92,
+   "t3": 81433.2,
+   "ext": 80158.62,
+   "confirm": 83213.4,
+   "move_class": "LARGE",
+   "risk": "Low",
+   "created": "2026-10-13T06:05:43+00:00",
+   "last_ts": 1791871500000.0,
+   "mfe": 0,
+   "mae": 0,
+   "status": "EARLY SETUP",
+   "outcome": "",
+   "events": [
+    {
+     "id": "BTC-SHORT-20261013-001-1",
+     "type": "EARLY SHORT SETUP",
+     "ts": "2026-10-13T06:05:43+00:00",
+     "price": 83557.5,
+     "note": ""
+    }
+   ],
+   "user": {}
   }
  },
  "offset": 928780554,
@@ -1274,39 +1321,40 @@
   "20261006": 3,
   "20261007": 2,
   "20261009": 4,
-  "20261012": 1
+  "20261012": 1,
+  "20261013": 1
  },
  "sent": {
   "evening": "2026-10-12",
   "morning": "2026-10-13",
   "weekly": "2026-10-11"
  },
- "last_price": 83644.3,
+ "last_price": 83557.5,
  "market": {
-  "price": 83644.3,
+  "price": 83557.5,
   "regime": "RANGE",
-  "signal": "NO TRADE",
+  "signal": "EARLY SHORT SETUP",
   "side": "SHORT",
-  "score": 45,
+  "score": 85,
   "scores": {
-   "LONG": 25,
-   "SHORT": 45
+   "LONG": 40,
+   "SHORT": 85
   },
-  "atr1h": 583.6357142857117,
+  "atr1h": 556.6285714285696,
   "atr4h": 842.1571428571406,
   "reversal": "none",
   "tf": {
    "5m": {
-    "er": 0.3,
-    "label": "UP"
+    "er": 0.18,
+    "label": "FLAT"
    },
    "15m": {
-    "er": 0.25,
+    "er": 0.28,
     "label": "UP"
    },
    "30m": {
-    "er": 0.21,
-    "label": "UP"
+    "er": 0.19,
+    "label": "FLAT"
    },
    "1H": {
     "er": 0.03,
@@ -1317,19 +1365,19 @@
     "label": "FLAT"
    }
   },
-  "funding": 5.62722680821e-05,
-  "oi": 2460704866.8750067,
+  "funding": 5.74171734149e-05,
+  "oi": 2463641214.3968873,
   "pro": [
    "price near range high",
+   "failed breakout / sweep of highs",
    "buying volume fading",
-   "volatility compression"
+   "volatility compression",
+   "momentum turning down"
   ],
   "con": [
-   "no sweep of prior highs",
-   "no lower high yet",
-   "momentum not turning"
+   "no lower high yet"
   ],
-  "ts": "2026-10-13T05:52:07+00:00"
+  "ts": "2026-10-13T06:05:43+00:00"
  },
  "paper": {
   "closed": [
@@ -2013,9 +2061,9 @@
   ],
   "n": {
    "trend_pullback": 1,
-   "early_signal": 4
+   "early_signal": 5
   },
-  "balance": 19790.25,
+  "balance": 19780.63,
   "start": 20000.0,
   "peak": 20000,
   "max_dd_pct": 1.09,
@@ -2115,6 +2163,14 @@
     "qty_btc": 0.0016,
     "price": 82182.8,
     "note": "exit: STOP-LOSS"
+   },
+   {
+    "ts": "2026-10-13T06:05:43+00:00",
+    "order_id": "ES-SHORT-20261013-005",
+    "action": "SELL",
+    "qty_btc": 0.0024,
+    "price": 83557.5,
+    "note": "entry (market, paper fill)"
    }
   ],
   "filters": [],
@@ -2133,8 +2189,8 @@
    }
   },
   "radar": {
-   "ts": "2026-10-13T05:52:07+00:00",
-   "price": 83644.2,
+   "ts": "2026-10-13T06:05:43+00:00",
+   "price": 83557.6,
    "LONG": [
     [
      "4H trend up",
@@ -2143,8 +2199,8 @@
     ],
     [
      "Pullback from recent extreme",
-     true,
-     "1.7 ATR, needs 1.5 or more"
+     false,
+     "1.2 ATR, needs 1.5 or more"
     ],
     [
      "Pullback not broken",
@@ -2166,7 +2222,7 @@
     [
      "Pullback from recent extreme",
      true,
-     "4.4 ATR, needs 1.5 or more"
+     "4.6 ATR, needs 1.5 or more"
     ],
     [
      "Pullback not broken",
@@ -2180,14 +2236,79 @@
     ]
    ]
   },
-  "fx": 96.964336,
+  "fx": 95.90693,
   "pos": {
    "trend_pullback": null,
-   "early_signal": null
+   "early_signal": {
+    "id": "ES-SHORT-20261013-005",
+    "strategy": "early_signal",
+    "label": "Early Signal (experimental)",
+    "side": -1,
+    "entry": 83557.5,
+    "sl0": 83982.36,
+    "sl": 83982.36,
+    "risk": 424.8600000000006,
+    "mode": "staged",
+    "tp": 82282.92,
+    "t1": 82920.20999999999,
+    "t2": 82282.92,
+    "t3": 81433.2,
+    "partial": 0.5,
+    "qty": 0.0024,
+    "qty_btc": 0.0024,
+    "notional_usd": 200.54,
+    "margin_inr": 6410.99,
+    "margin_released": 0.0,
+    "rem_wallet": 1.0,
+    "leverage": 3,
+    "fx": 95.90693,
+    "risk_inr": 97.79,
+    "fees_usd": 0.100269,
+    "realized_usd": 0.0,
+    "stage": 0,
+    "remaining": 1.0,
+    "mfe_R": 0.0,
+    "mae_R": 0.0,
+    "exits": [],
+    "events": [
+     {
+      "ts": "2026-10-13T06:05:43+00:00",
+      "type": "OPENED",
+      "price": 83557.5,
+      "note": "qty 0.0024 BTC, margin \u20b96,411"
+     }
+    ],
+    "created": "2026-10-13T06:05:43+00:00",
+    "last_ts": 1791871200000.0,
+    "expiry_h": 72,
+    "cfg": {
+     "enabled": true,
+     "label": "Early Signal (experimental)",
+     "risk_pct": 0.5,
+     "min_score": 65,
+     "partial_pct": 50,
+     "expiry_hours": 72,
+     "cooldown_hours": 1,
+     "leverage": 3,
+     "fee_per_side": 0.0005
+    },
+    "ctx": {
+     "score": 85,
+     "regime": "RANGE",
+     "side_n": -1,
+     "side": "SHORT",
+     "hour": 6,
+     "wd": 1,
+     "funding": 5.74171734149e-05,
+     "atr_pct": 0.698
+    },
+    "why": "Bhaav range ke upar (resistance) ke paas tha aur ye cheezein ek saath mili: bhaav range ke upar (resistance ke paas) hai; upar nikalne ki koshish fail hui aur bhaav wapas neeche aaya; kharidne wala volume ghat raha hai; volatility sikud rahi hai (badi move se pehle ki shaanti); momentum neeche mudne laga hai. Setup score 85/100 (kam se kam 65 chahiye). Kamzor pehlu: lower-high abhi nahi bana. Ye 'early' signal hai (palatne se pehle pakadne ki koshish), isliye risk kam rakha aur aadha profit T1 par book hota hai. Iska pichla backtest record negative tha, to ise experiment samjho.",
+    "capped": false
+   }
   },
   "last_entry": {
    "trend_pullback": 1791594000000.0,
-   "early_signal": 1791835118170.716
+   "early_signal": 1791871543301.884
   },
   "journal": [
    {
@@ -2294,12 +2415,22 @@
     "ts": "2026-10-12T23:08:18+00:00",
     "kind": "CLOSED",
     "text": "ES-LONG-20261012-004 STOP-LOSS -1.13R -\u20b9111"
+   },
+   {
+    "ts": "2026-10-13T06:05:43+00:00",
+    "kind": "SIGNAL",
+    "text": "early_signal SHORT signal at $83,558"
+   },
+   {
+    "ts": "2026-10-13T06:05:43+00:00",
+    "kind": "OPENED",
+    "text": "ES-SHORT-20261013-005 SHORT 0.0024 BTC at $83,558 (margin \u20b96,411)"
    }
   ],
   "wallet": {
    "start": 20000.0,
-   "cash": 19790.25,
-   "margin": 0.0,
+   "cash": 13369.64,
+   "margin": 6410.99,
    "touched": true,
    "ledger": [
     {
@@ -2621,6 +2752,26 @@
      "margin": 0.0,
      "equity": 19790.25,
      "note": "Exit fee"
+    },
+    {
+     "ts": "2026-10-13T06:05:43+00:00",
+     "type": "MARGIN_LOCK",
+     "trade_id": "ES-SHORT-20261013-005",
+     "amount": -6410.99,
+     "cash": 13379.26,
+     "margin": 6410.99,
+     "equity": 19790.25,
+     "note": "Margin locked for open trade"
+    },
+    {
+     "ts": "2026-10-13T06:05:43+00:00",
+     "type": "FEE_ENTRY",
+     "trade_id": "ES-SHORT-20261013-005",
+     "amount": -9.62,
+     "cash": 13369.64,
+     "margin": 6410.99,
+     "equity": 19780.63,
+     "note": "Entry fee"
     }
    ]
   }
@@ -2632,45 +2783,45 @@
   "bot": "btcstochbot",
   "poll_error": "",
   "last_error": "",
-  "last_send_ok": "2026-10-13T02:37:54+00:00",
+  "last_send_ok": "2026-10-13T06:05:49+00:00",
   "last_run": "2026-10-13T05:55:43+00:00",
   "last_cmd_ts": "2026-10-12T23:08:20+00:00",
   "last_cmd": "/analysis"
  },
  "analysis": {
-  "price": 83644.3,
+  "price": 83557.6,
   "regime": "RANGE",
   "stage": "Stage 1: accumulation/distribution developing",
   "status": "NO TRADE",
   "direction": "NONE",
   "scores": {
    "structure": 0,
-   "volume": 54.68659193614915,
+   "volume": 59.70867058470278,
    "momentum": 100.0,
-   "order_flow": 26.2625,
-   "liquidity": 47.50729661870207,
+   "order_flow": 29.7075,
+   "liquidity": 49.56822381867338,
    "htf": 52.29816584401161,
-   "accumulation": 25,
-   "distribution": 45,
-   "volatility_pct": 92.0,
+   "accumulation": 40,
+   "distribution": 85,
+   "volatility_pct": 93.5,
    "large_move_potential": 64,
-   "continuation": 68.99491926005358,
-   "exhaustion_risk": 18.07537077868837,
+   "continuation": 70.66894547623814,
+   "exhaustion_risk": 25.398691290637277,
    "setup": 0.0
   },
   "levels": null,
   "expected_move": {
    "expected": [
-    1149.272682,
-    2141.29408
+    1148.0814240000002,
+    2139.0745600000005
    ],
    "strong": [
-    2141.29408,
-    3487.96731
+    2139.0745600000005,
+    3484.3519200000005
    ],
    "extended": [
-    3487.96731,
-    4565.305894
+    3484.3519200000005,
+    4560.573808000001
    ],
    "side": "up",
    "sample": 16027,
@@ -2680,12 +2831,12 @@
      0.783
     ],
     "1000": [
-     0.553,
+     0.552,
      0.584
     ],
     "2000": [
      0.277,
-     0.302
+     0.301
     ],
     "5000": [
      0.036,
@@ -2703,41 +2854,41 @@
    "high": 84348.2,
    "low": 80961.3,
    "mid": 82654.75,
-   "position_pct": 79.21698308187442
+   "position_pct": 76.65712008030965
   },
   "breakout": "none",
   "notes": {
-   "order_flow": "book imbalance -0.95, OI -0.82% (4h)",
-   "atr": 560.4357142857126,
-   "funding": 5.62722680821e-05,
-   "oi": 2460704866.8750067
+   "order_flow": "book imbalance -0.81, OI -1.04% (4h)",
+   "atr": 583.6357142857117,
+   "funding": 5.74171734149e-05,
+   "oi": 2463641214.3968873
   }
  },
  "desk": {
-  "price": 83644.3,
-  "atr1h": 560.4357142857126,
+  "price": 83557.6,
+  "atr1h": 583.6357142857117,
   "atr4h": 807.2857142857112,
   "derivs": {
    "crowding": "balanced",
    "quadrant": "short_covering",
-   "oi_change_4h": -0.82,
-   "oi_change_24h": -1.39,
-   "price_change_4h": 1.38,
-   "taker_delta": 0.131,
+   "oi_change_4h": -1.04,
+   "oi_change_24h": -1.18,
+   "price_change_4h": 1.16,
+   "taker_delta": 0.195,
    "liquidations": {
     "long_usd": 315.0,
     "short_usd": 3321565.0
    },
-   "bias": 0.69,
+   "bias": 0.88,
    "items": [
-    "Funding 0.0056% per 8h is normal: no obvious crowding",
+    "Funding 0.0057% per 8h is normal: no obvious crowding",
     "Price up but open interest down: the rise is short-covering, not new buying (weaker, can fade)",
-    "Taker flow (last ~1h of samples): buyers (+0.13)",
+    "Taker flow (last ~1h of samples): buyers (+0.19)",
     "Recent liquidations: longs $0.0M, shorts $3.3M (forced closing can extend or end a move)"
    ]
   },
   "levels": {
-   "price": 83644.3,
+   "price": 83557.6,
    "resistance": [
     {
      "price": 83944.0,
@@ -2747,9 +2898,9 @@
      ],
      "count": 2,
      "strength": "medium",
-     "dist_pts": 299.7,
-     "dist_pct": 0.36,
-     "dist_atr1h": 0.53,
+     "dist_pts": 386.4,
+     "dist_pct": 0.46,
+     "dist_atr1h": 0.66,
      "side": "resistance"
     },
     {
@@ -2759,9 +2910,9 @@
      ],
      "count": 1,
      "strength": "light",
-     "dist_pts": 533.2,
-     "dist_pct": 0.64,
-     "dist_atr1h": 0.95,
+     "dist_pts": 619.9,
+     "dist_pct": 0.74,
+     "dist_atr1h": 1.06,
      "side": "resistance"
     },
     {
@@ -2772,9 +2923,9 @@
      ],
      "count": 2,
      "strength": "strong",
-     "dist_pts": 703.9,
-     "dist_pct": 0.84,
-     "dist_atr1h": 1.26,
+     "dist_pts": 790.6,
+     "dist_pct": 0.95,
+     "dist_atr1h": 1.35,
      "side": "resistance"
     },
     {
@@ -2784,9 +2935,9 @@
      ],
      "count": 1,
      "strength": "light",
-     "dist_pts": 855.7,
-     "dist_pct": 1.02,
-     "dist_atr1h": 1.53,
+     "dist_pts": 942.4,
+     "dist_pct": 1.13,
+     "dist_atr1h": 1.61,
      "side": "resistance"
     }
    ],
@@ -2798,13 +2949,13 @@
      ],
      "count": 1,
      "strength": "light",
-     "dist_pts": -144.3,
-     "dist_pct": -0.17,
-     "dist_atr1h": -0.26,
+     "dist_pts": -57.6,
+     "dist_pct": -0.07,
+     "dist_atr1h": -0.1,
      "side": "support"
     },
     {
-     "price": 83132.2,
+     "price": 83130.1,
      "names": [
       "Round number",
       "Swing high",
@@ -2813,9 +2964,9 @@
      ],
      "count": 7,
      "strength": "strong",
-     "dist_pts": -512.1,
-     "dist_pct": -0.61,
-     "dist_atr1h": -0.91,
+     "dist_pts": -427.5,
+     "dist_pct": -0.51,
+     "dist_atr1h": -0.73,
      "side": "support"
     },
     {
@@ -2825,28 +2976,28 @@
      ],
      "count": 3,
      "strength": "strong",
-     "dist_pts": -797.5,
-     "dist_pct": -0.95,
-     "dist_atr1h": -1.42,
+     "dist_pts": -710.8,
+     "dist_pct": -0.85,
+     "dist_atr1h": -1.22,
      "side": "support"
     },
     {
-     "price": 82531.0,
+     "price": 82538.7,
      "names": [
       "Half-round number",
       "Today's VWAP"
      ],
      "count": 2,
      "strength": "medium",
-     "dist_pts": -1113.3,
-     "dist_pct": -1.33,
-     "dist_atr1h": -1.99,
+     "dist_pts": -1018.9,
+     "dist_pct": -1.22,
+     "dist_atr1h": -1.75,
      "side": "support"
     }
    ],
    "vwap": {
-    "vwap": 82562.0,
-    "dev_atr": 1.93,
+    "vwap": 82577.4,
+    "dev_atr": 1.68,
     "note": "near VWAP (not stretched)"
    },
    "nearest_resistance": {
@@ -2857,9 +3008,9 @@
     ],
     "count": 2,
     "strength": "medium",
-    "dist_pts": 299.7,
-    "dist_pct": 0.36,
-    "dist_atr1h": 0.53,
+    "dist_pts": 386.4,
+    "dist_pct": 0.46,
+    "dist_atr1h": 0.66,
     "side": "resistance"
    },
    "nearest_support": {
@@ -2869,9 +3020,9 @@
     ],
     "count": 1,
     "strength": "light",
-    "dist_pts": -144.3,
-    "dist_pct": -0.17,
-    "dist_atr1h": -0.26,
+    "dist_pts": -57.6,
+    "dist_pct": -0.07,
+    "dist_atr1h": -0.1,
     "side": "support"
    }
   },
@@ -2896,8 +3047,8 @@
      "pct": 1.2,
      "atr4h_multiple": 1.24,
      "size_class": "MEDIUM",
-     "atr1h_multiple": 1.8,
-     "up_24h": 0.553,
+     "atr1h_multiple": 1.7,
+     "up_24h": 0.552,
      "dn_24h": 0.584,
      "up_72h": 0.741,
      "dn_72h": 0.755
@@ -2907,9 +3058,9 @@
      "pct": 2.39,
      "atr4h_multiple": 2.48,
      "size_class": "LARGE",
-     "atr1h_multiple": 3.6,
+     "atr1h_multiple": 3.4,
      "up_24h": 0.277,
-     "dn_24h": 0.302,
+     "dn_24h": 0.301,
      "up_72h": 0.518,
      "dn_72h": 0.545
     },
@@ -2918,7 +3069,7 @@
      "pct": 5.98,
      "atr4h_multiple": 6.19,
      "size_class": "VERY LARGE / EXTENDED",
-     "atr1h_multiple": 8.9,
+     "atr1h_multiple": 8.6,
      "up_24h": 0.036,
      "dn_24h": 0.042,
      "up_72h": 0.151,
@@ -2926,10 +3077,10 @@
     },
     {
      "points": 10000,
-     "pct": 11.96,
+     "pct": 11.97,
      "atr4h_multiple": 12.39,
      "size_class": "VERY LARGE / EXTENDED",
-     "atr1h_multiple": 17.8,
+     "atr1h_multiple": 17.1,
      "up_24h": 0.002,
      "dn_24h": 0.005,
      "up_72h": 0.021,
@@ -2938,16 +3089,16 @@
    ],
    "typical_24h_points": {
     "up": [
-     1149,
-     2141,
-     3488,
-     4565
+     1148,
+     2139,
+     3484,
+     4561
     ],
     "dn": [
-     1239,
-     2253,
-     3644,
-     4682
+     1237,
+     2250,
+     3641,
+     4677
     ]
    },
    "note": "Class is relative to the 4H ATR (SMALL <1x, MEDIUM 1-2x, LARGE 2-4x, VERY LARGE >4x). Probabilities are history, not forecasts."
@@ -2980,20 +3131,20 @@
     {
      "tf": "30m",
      "role": "Setup context",
-     "direction": "UP",
-     "strength": 0.21
+     "direction": "FLAT",
+     "strength": 0.19
     },
     {
      "tf": "15m",
      "role": "Setup",
      "direction": "UP",
-     "strength": 0.25
+     "strength": 0.28
     },
     {
      "tf": "5m",
      "role": "Entry refinement",
-     "direction": "UP",
-     "strength": 0.3
+     "direction": "FLAT",
+     "strength": 0.18
     }
    ],
    "alignment": "MIXED (timeframes disagree: lower confidence)"
