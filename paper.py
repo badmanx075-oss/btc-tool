@@ -1,7 +1,7 @@
 """Paper trading engine: virtual wallet with ledger, strategy registry, staged exits, remarks + feedback. NO real orders are ever placed.
 Rules live in config.json (settings), strategies.py (entries) and lifecycle.py (exits)."""
 import datetime as dt, requests
-import engine as E, backtest_v4 as W4, learn, config, wallet, lifecycle, advisor, review, strategies as ST
+import timing as TM, confirm as CF, engine as E, backtest_v4 as W4, learn, config, wallet, lifecycle, advisor, review, strategies as ST
 from config import inr
 
 FX_DEFAULT = 88.0
@@ -136,12 +136,12 @@ def open_position(P, C, name, sg, now, h15, fxr, send):
     qty = (Wl["cash"] + Wl["margin"]) * sc["risk_pct"] / 100 / (sg["risk"] * fxr); cap = Wl["cash"] * 0.99 / (e * fxr * (1 / lev + fee)); capped = qty > cap; qty = min(qty, cap)
     step = C["wallet"].get("qty_step", 0.0001); qty = round(int(qty / step) * step, 6)
     if qty < step: jlog(P, now, "SKIPPED", f"{name} {'LONG' if k == 1 else 'SHORT'} signal skipped: not enough free balance"); return False
-    P["n"][name] = P["n"].get(name, 0) + 1; side = "LONG" if k == 1 else "SHORT"; tid = f"{'TP' if name == 'trend_pullback' else 'ES'}-{side}-{now.strftime('%Y%m%d')}-{P['n'][name]:03d}"
+    P["n"][name] = P["n"].get(name, 0) + 1; side = "LONG" if k == 1 else "SHORT"; tid = f"{ {'trend_pullback': 'TP', 'session_breakout': 'SB'}.get(name, 'ES') }-{side}-{now.strftime('%Y%m%d')}-{P['n'][name]:03d}"
     notional = qty * e; margin = notional * fxr / lev; fee_usd = fee * notional
     t = dict(id=tid, strategy=name, label=sc.get("label", name), side=k, entry=e, sl0=sg["sl"], sl=sg["sl"], risk=sg["risk"], mode=sg["mode"], tp=sg.get("tp"), t1=sg.get("t1"), t2=sg.get("t2"), t3=sg.get("t3"),
              partial=sc.get("partial_pct", 50) / 100, qty=qty, qty_btc=qty, notional_usd=round(notional, 2), margin_inr=round(margin, 2), margin_released=0.0, rem_wallet=1.0, leverage=lev, fx=fxr,
              risk_inr=round(qty * sg["risk"] * fxr, 2), fees_usd=fee_usd, realized_usd=0.0, stage=0, remaining=1.0, mfe_R=0.0, mae_R=0.0, exits=[], events=[], created=iso(now),
-             last_ts=float(h15.ts.iloc[-1]), expiry_h=sc["expiry_hours"], cfg=config.snapshot(C, name), ctx=sg["ctx"], entry_ctx=sg.get("entry_ctx"), grade=review.grade(name, sg["ctx"]), why=sg["why"], capped=bool(capped))
+             last_ts=float(h15.ts.iloc[-1]), expiry_h=sc["expiry_hours"], cfg=config.snapshot(C, name), ctx=sg["ctx"], entry_ctx=sg.get("entry_ctx"), confirm_lvl=sg.get("confirm"), grade=review.grade(name, sg["ctx"]), why=sg["why"], capped=bool(capped))
     ev(t, now, "OPENED", e, f"qty {qty} BTC, margin {inr(margin)}"); wallet.lock(P, now, tid, margin, fee_usd * fxr); P["pos"][name] = t; P["last_entry"][name] = now.timestamp() * 1000
     order(P, now, tid, "BUY" if k == 1 else "SELL", qty, e, "entry (market, paper fill)"); jlog(P, now, "OPENED", f"{tid} {side} {qty} BTC at ${e:,.0f} (margin {inr(margin)})"); Wl = P["wallet"]
     plan = (f"Stop-loss ${t['sl']:,.0f} | Target ${t['tp']:,.0f} ({sc.get('target_r')}R)" if sg["mode"] == "fixed" else
@@ -161,6 +161,18 @@ def shadow_step(sh, h15, now, fee):  # a signal skipped by a learned filter is s
         sh["exits"].append(("EXPIRED", float(h15.c.iloc[-1]), sh["remaining"])); sh["remaining"] = 0
     if len(h15) > 1: sh["last_ts"] = max(sh["last_ts"], float(h15.ts.iloc[-2]))
     if sh["remaining"] <= 1e-9: sh["R"] = round(float(lifecycle.trade_R(sh["exits"], sh["entry"], sh["side"], sh["risk"], fee)), 3)
+
+def daily_loss_hit(P, C, now, send):
+    """Stops NEW entries for the rest of the (IST) day once realised loss today reaches risk.max_daily_loss_pct of starting capital."""
+    lim = C.get("risk", {}).get("max_daily_loss_pct", 0)
+    if not lim: return False
+    day = lambda d: (d + dt.timedelta(hours=5, minutes=30)).strftime("%Y-%m-%d"); today = day(now); start = (P.get("wallet") or {}).get("start") or 20000
+    pnl = sum(t.get("pnl_inr", 0) for t in P.get("closed", []) if t.get("closed") and day(dt.datetime.fromisoformat(t["closed"])) == today)
+    if pnl <= -lim / 100 * start:
+        if P.get("loss_guard_day") != today:
+            P["loss_guard_day"] = today; send(f"🛑 DAILY LOSS LIMIT\nAaj ka realised loss {inr(pnl)} (limit {lim}% = {inr(lim / 100 * start)}). Aaj naye trades nahi khulenge. Khule trades chalte rahenge. Kal subah (IST) se normal.", cat="paper_close")
+        return True
+    return False
 
 def run(S, send, now, scan=None):
     C = config.load(); P = S.setdefault("paper", {})
@@ -193,13 +205,18 @@ def run(S, send, now, scan=None):
         if t: manage(P, C, t, h15, px, now, send)
     for name, t in list(P["pos"].items()):
         if t and C["alerts"].get("advice"): advise(P, C, t, hr, px, now, send)
+        if t:
+            try: CF.step(S, P, C, t, px, now, send, ev, config.ist)
+            except Exception as ex: print("confirm error", ex)
     try: review.near_miss_step(S, P, scan, C["strategies"].get("early_signal", {}), h15, now, fee)
     except Exception as e: print("near-miss error", e)
+    tcls = TM.cls_of(TM.load(), now.hour); loss_hit = daily_loss_hit(P, C, now, send)
     for name, sc in C["strategies"].items():
+        if loss_hit or (tcls == "LOW" and C["timing"].get("skip_low_activity")): break
         if S.get("paused") or not sc.get("enabled") or P["pos"].get(name) or name not in ST.SIGNALS: continue
         if now.timestamp() * 1000 - P["last_entry"].get(name, 0) < sc.get("cooldown_hours", 1) * 3.6e6: continue
         if len(positions(P)) >= C["wallet"]["max_open_positions"]: continue
-        sg = ST.SIGNALS[name](dict(h1=h1, i=i, S=S, scan=scan, now=now), sc)
+        sg = ST.SIGNALS[name](dict(h1=h1, i=i, S=S, scan=scan, now=now, tcls=tcls), sc)
         if not sg: continue
         P["last_entry"][name] = now.timestamp() * 1000; blk = learn.blocked_by(P, sg["ctx"], name)
         if blk:

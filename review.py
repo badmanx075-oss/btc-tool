@@ -21,6 +21,7 @@ def session(hour_utc):
 
 def grade(strategy, ctx):
     """A = strongest, B = good, C = weak. Only a label for later analysis."""
+    if strategy == "session_breakout": return "A" if (ctx or {}).get("vol_ratio", 0) >= 2 and (ctx or {}).get("tcls") == "HIGH" else "B"
     if strategy == "trend_pullback": return "A" if (ctx or {}).get("er4", 0) >= 0.45 else "B"
     s = (ctx or {}).get("score", 0)
     return "A" if s >= 80 else "B" if s >= 65 else "C"
@@ -34,7 +35,7 @@ def entry_ctx(S, now):
                 regime=M.get("regime") or A.get("regime"), stage=A.get("stage"), stage_status=A.get("status"), direction=A.get("direction"),
                 scores={k: round(float(v), 1) for k, v in (A.get("scores") or {}).items() if isinstance(v, (int, float))}, false_signal_risk=A.get("false_signal_risk"),
                 range=A.get("range"), expected_move=_small((A.get("expected_move") or {}).get("expected")), mtf=_small([(r["tf"], r["direction"], r["strength"]) for r in (D.get("mtf") or {}).get("rows", [])]),
-                crowding=d.get("crowding"), oi_quadrant=d.get("quadrant"), taker_delta=d.get("taker_delta"), liquidations=d.get("liquidations"), funding=M.get("funding"),
+                hour_class=(S.get("timing") or {}).get("cls"), hour_activity=(S.get("timing") or {}).get("activity"), crowding=d.get("crowding"), oi_quadrant=d.get("quadrant"), taker_delta=d.get("taker_delta"), liquidations=d.get("liquidations"), funding=M.get("funding"),
                 radar={s: sum(c[1] for c in rad.get(s, [])) for s in ("LONG", "SHORT")} if rad else None, reversal=M.get("reversal"))
 
 
@@ -83,7 +84,8 @@ def calibration(rows):
         by_grade=_groups(rows, lambda r: grade(r.get("strategy"), (r.get("raw") or {}).get("ctx"))),
         by_score_bucket=_groups([r for r in rows if sc(r) is not None], lambda r: _bucket_score(sc(r))),
         by_session=_groups(rows, lambda r: ctxof(r).get("session") or (session(r["raw"]["ctx"]["hour"]) if ((r.get("raw") or {}).get("ctx") or {}).get("hour") is not None else "n/a")), by_regime=_groups(rows, lambda r: ((r.get("raw") or {}).get("ctx") or {}).get("regime") or ctxof(r).get("regime") or "n/a"),
-        by_outcome=_groups(rows, lambda r: r.get("outcome")), by_hold=_groups(rows, lambda r: "<6h" if (r.get("hold_h") or 0) < 6 else "6-24h" if r["hold_h"] < 24 else "1-3d" if r["hold_h"] < 72 else "3d+"))
+        by_hour_class=_groups(rows, lambda r: ctxof(r).get("hour_class") or ((r.get("raw") or {}).get("ctx") or {}).get("tcls") or "n/a"),
+        by_hour_utc=_groups(rows, lambda r: "%02d" % ((r.get("raw") or {}).get("ctx") or {}).get("hour") if ((r.get("raw") or {}).get("ctx") or {}).get("hour") is not None else "n/a"), by_outcome=_groups(rows, lambda r: r.get("outcome")), by_hold=_groups(rows, lambda r: "<6h" if (r.get("hold_h") or 0) < 6 else "6-24h" if r["hold_h"] < 24 else "1-3d" if r["hold_h"] < 72 else "3d+"))
 
 
 def shadow_summary(P):

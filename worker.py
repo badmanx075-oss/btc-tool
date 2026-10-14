@@ -2,7 +2,7 @@
 import os, json, time, subprocess, requests, datetime as dt
 from zoneinfo import ZoneInfo
 import engine as E
-import paper, learn, config, wallet, analysis, history, stats, flow, desk, review as rvw, notify
+import paper, learn, config, wallet, analysis, history, stats, flow, desk, review as rvw, notify, timing
 import pandas as pd
 import faulthandler; faulthandler.dump_traceback_later(330, exit=True)  # if stuck >5.5 min: print where, then exit
 
@@ -75,9 +75,9 @@ def review(t):
 HELP = ("📖 COMMANDS\n/status  wallet + position + radar\n/wallet /ledger /trades  money, every rupee movement, trade list\n/history [n]  last n trades (permanent record)\n/timeline ID  full story of one trade\n"
         "/stats  win rate, avg R, drawdown, streaks (+ honest verdict)\n/today  today's summary\n/analysis  market analysis\n/active  open early-signal alerts\n/review ID  review an alert\n"
         "/note ID text  add your remark | /myexit ID price  your own exit\n/pause  stop NEW trades and alerts (open trades keep being managed) | /resume\n"
-        "/config /set name value /notify name on|off  settings\n/lessons /approve N /revert N  what the tool learned\n/weekly  weekly report\n/export  review pack (file) to send to Claude | /readiness  kitna data bacha\n/settings  notification ON/OFF buttons | /deliveries  last sends\n/demo  test the pipeline\n/ping  is the bot alive\n/resetwallet confirm")
+        "/config /set name value /notify name on|off  settings\n/lessons /approve N /revert N  what the tool learned\n/weekly  weekly report\n/timing  kis samay kitni move hoti hai | /export  review pack (file) to send to Claude | /readiness  kitna data bacha\n/settings  notification ON/OFF buttons | /deliveries  last sends\n/demo  test the pipeline\n/ping  is the bot alive\n/resetwallet confirm")
 MENU = [("status", "Wallet, position, radar"), ("history", "Last trades"), ("timeline", "One trade in detail"), ("stats", "Performance"), ("today", "Today's summary"), ("wallet", "Wallet"), ("analysis", "Market analysis"),
-        ("export", "Review pack file"), ("readiness", "Data readiness"), ("settings", "Notification buttons"), ("pause", "Pause new trades"), ("resume", "Resume trades"), ("help", "All commands"), ("ping", "Is the bot alive")]
+        ("timing", "Active time windows"), ("export", "Review pack file"), ("readiness", "Data readiness"), ("settings", "Notification buttons"), ("pause", "Pause new trades"), ("resume", "Resume trades"), ("help", "All commands"), ("ping", "Is the bot alive")]
 
 def today_text():
     P_ = S.get("paper") or {}; d = (now + dt.timedelta(hours=5, minutes=30)).strftime("%Y-%m-%d")
@@ -122,9 +122,10 @@ def handle_updates(timeout=0):
         elif c == "/approve" and len(txt) > 1: send(learn.approve(S.setdefault("paper", {}), txt[1]))
         elif c == "/revert" and len(txt) > 1: send(learn.revert(S.setdefault("paper", {}), txt[1]))
         elif c == "/export": send("📦 Review pack bana raha hu…"); send_file(S, now) or send("Export bhejne mein dikkat aayi. Dashboard ke Review tab se download karo.")
-        elif c == "/readiness": send(rvw.readiness(S)["message"] + f"\nShadow (near-miss/filter) trades finished: {rvw.readiness(S)['shadow_finished']}")
-        elif c == "/settings": tg("sendMessage", chat_id=CHAT, text=HEADER + "🔔 NOTIFICATION SETTINGS\nButton dabao: ON/OFF badal jayega.", reply_markup=settings_kb())
+        elif c in ("/readiness", "/ready"): send(rvw.readiness(S)["message"] + f"\nShadow (near-miss/filter) trades finished: {rvw.readiness(S)['shadow_finished']}")
+        elif c in ("/settings", "/setting"): tg("sendMessage", chat_id=CHAT, text=HEADER + "🔔 NOTIFICATION SETTINGS\nButton dabao: ON/OFF badal jayega.", reply_markup=settings_kb())
         elif c == "/deliveries": send("📬 Last sends:\n" + "\n".join(f"{x['ts'][11:16]} {'✅' if x['ok'] else '❌'} [{x['cat']}] {x['text']}" for x in (ST.get("log") or [])[-10:]))
+        elif c == "/timing": send(timing.text(S.get("timing") or timing.now_context(timing.load(), now)))
         elif c in ("/help", "/start"): send(HELP)
         elif c == "/history": send(stats.history_text(history.load()["records"].values(), int(txt[1]) if len(txt) > 1 and txt[1].isdigit() else 5))
         elif c == "/timeline" and len(txt) > 1: rec = history.load()["records"].get(txt[1]); send(stats.timeline_text(rec) if rec else "Trade ID nahi mila. /history se ID dekho.")
@@ -197,6 +198,8 @@ def scan_cycle():
         return
     S["last_price"] = px = float(m5.c.iloc[-1])
     record(px, fr, oi); flow.record(now)
+    try: S["timing"] = timing.now_context(timing.ensure(now), now)        # when does BTC usually move? (rebuilt every ~3 days from 1 year of 1H data)
+    except Exception as e: print("timing error", e)
     try: m30 = E.candles("30m")
     except Exception: m30 = None
     for t in S["trades"].values():
@@ -266,6 +269,7 @@ def publish():  # push state to GitHub right away so the dashboard shows new tra
         if os.path.exists("config.json"): run("git", "add", "config.json")
         if os.path.exists("market_log.csv"): run("git", "add", "market_log.csv")
         if os.path.exists("trade_history.json"): run("git", "add", "trade_history.json")
+        if os.path.exists("time_stats.json"): run("git", "add", "time_stats.json")
         if os.path.exists("flow_log.csv"): run("git", "add", "flow_log.csv")
         if run("git", "diff", "--cached", "--quiet").returncode: run("git", "commit", "-m", "state"); run("git", "pull", "--rebase"); run("git", "push")
     except Exception as e: print("publish error", e)

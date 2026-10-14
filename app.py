@@ -1,6 +1,6 @@
 import json, os, io, datetime as dt, requests, pandas as pd, streamlit as st
 import streamlit.components.v1 as components
-import config, history, stats, decision, review
+import config, history, stats, decision, review, timing
 
 st.set_page_config(page_title="BTC Tool", page_icon="📈", layout="wide")
 RAW = "https://raw.githubusercontent.com/badmanx075-oss/btc-tool/main/"   # live data written by the 5-minute scanner
@@ -66,13 +66,18 @@ elif T: head.caption(f"📨 Telegram: ❌ problem. {T.get('last_error') or 'bot 
 else: head.caption("📨 Telegram: no status yet (upload the latest worker.py and run the scan once)")
 if S.get("paused"): st.warning("⏸ PAUSED: no new trades or alerts will start. Open trades are still managed. Send /resume on Telegram to restart.")
 st.caption("⚠️ Informational and statistical only. Virtual money, no real orders. Backtests show NO proven edge yet.")
-tH_, tDD, tA, tW, tTH, tRV, tL, tHl, tS, tO, tB, tG = st.tabs(["🏠 Home", "🧭 Decision Desk", "📋 Analysis", "💰 Wallet", "📒 Trade History", "📦 Review", "🧠 Learning", "🩺 Health", "⚙️ Settings", "📡 Old signals", "📊 Backtests", "📘 Guide"])
+tH_, tDD, tA, tW, tTH, tRV, tTM, tL, tHl, tS, tO, tB, tG = st.tabs(["🏠 Home", "🧭 Decision Desk", "📋 Analysis", "💰 Wallet", "📒 Trade History", "📦 Review", "🕒 Time", "🧠 Learning", "🩺 Health", "⚙️ Settings", "📡 Old signals", "📊 Backtests", "📘 Guide"])
 
 def position_card(t):
     px = lp or t["entry"]; ur = (px - t["entry"]) * t["side"] / t["risk"]; usd = pl_usd(t, px) + t.get("realized_usd", 0); m = t.get("mgmt")
     hrs = (now - dt.datetime.fromisoformat(t["created"])).total_seconds() / 3600; tgt = t.get("tp") or t.get("t2")
     st.markdown(f"### {t['label']}: {side_txt(t['side'])} {t['qty']} BTC"); st.caption(f"{t['id']} | stage {t['stage']} | open {hrs:.0f} h of {t['expiry_h']} h | leverage {t.get('leverage')}x")
     if m: st.markdown(f"**{m['status']}**  (stage: {m['stage']}, exhaustion {m['exhaustion']}/100)")
+    ci = t.get("confirm_info")
+    if ci:
+        (st.success if ci["state"] == "CONFIRMED" else st.warning if ci["state"] == "LOST" else st.info)(f"{'✅ CONFIRMED' if ci['state'] == 'CONFIRMED' else '⚠️ CONFIRMATION KAMZOR' if ci['state'] == 'LOST' else '⏳ Confirmation ka intezaar'}: {ci['score']}/{ci['total']} checks")
+        with st.expander("Confirmation checks"):
+            for c_ in ci["checks"]: st.markdown(f"{'✅' if c_[1] else '❌'} {c_[0]}: {c_[2]}")
     st.progress(float(min(max((px - t["sl"]) / (tgt - t["sl"]), 0), 1)), text=f"Stop ${t['sl']:,.0f}  ←  now ${px:,.0f}  →  Target ${tgt:,.0f}")
     st.table(pd.DataFrame([{"Entry": round(t["entry"]), "Now": round(px), "Open P/L": inr(usd * t.get("fx", 88)), "R": f"{ur:+.2f}", "Stop": round(t["sl"]), "Target": round(tgt), "Margin": inr(t["margin_inr"]), "Booked": ", ".join(e["kind"] for e in t.get("exits", [])) or "-"}]))
     if t.get("why"): st.info("💬 **Kyun liya:** " + t["why"])
@@ -272,6 +277,29 @@ with tRV:
                 with st.expander("Calibration: " + nm.replace("by_", "by ")): st.dataframe(pd.DataFrame(g).T[["n", "win_pct", "mean_R", "net_inr", "small_sample"]], use_container_width=True)
         with st.expander("Review pack ka text preview"): st.code(review.pack_md(PK))
 
+with tTM:
+    TS = load("time_stats.json"); TC = S.get("timing")
+    st.caption("BTC kis samay (IST) zyada hilta hai, kitne points, upar aur neeche alag. Pichle 1 saal ki 1H candles se bana. Samay ka pattern bharosemand hai, direction ka nahi.")
+    if TC:
+        c1, c2, c3, c4 = st.columns(4); c1.metric("Abhi (IST)", TC["ist"], f"{TC['session']} session"); c2.metric("Activity", TC["cls"], f"{TC['activity']}% of average")
+        c3.metric("Typical range / ghanta", f"{TC['avg_range']:,.0f} pts", f"up {TC['avg_up']:,.0f} | down {TC['avg_down']:,.0f}"); c4.metric("500+ pts ki sambhavna", f"{TC['p_range_500'] * 100:.0f}%", f"1000+: {TC['p_range_1000'] * 100:.0f}%")
+        if TC.get("next_high"): n_ = TC["next_high"]; st.info(f"⏰ Agla HIGH window: {n_['ist']} IST ({n_['in_min']} min baad). Typical range {n_['avg_range']:,.0f} pts (upar {n_['avg_up']:,.0f} / neeche {n_['avg_down']:,.0f}).")
+    if TS:
+        hh = pd.DataFrame(TS["hours"]); hh["ghanta (IST)"] = hh["ist"]
+        st.subheader("Ghante ke hisaab se move (points)"); st.bar_chart(hh.set_index("ghanta (IST)")[["avg_up", "avg_down"]])
+        show_ = hh[["ist", "cls", "session", "avg_range", "avg_up", "avg_down", "p_range_500", "p_range_1000", "pct_green", "significant_bias", "n"]].rename(columns={"ist": "IST", "cls": "activity", "avg_range": "avg range", "avg_up": "avg up", "avg_down": "avg down", "p_range_500": "P(range>=500)", "p_range_1000": "P(>=1000)", "pct_green": "% green", "significant_bias": "direction bias?"})
+        st.dataframe(show_, hide_index=True, use_container_width=True)
+        a_, b_ = st.columns(2); a_.subheader("Sessions"); a_.dataframe(pd.DataFrame(TS["sessions"]), hide_index=True); b_.subheader("Weekday (daily range)"); b_.dataframe(pd.DataFrame(TS["weekdays"]), hide_index=True)
+        if TS.get("recent"):
+            with st.expander("Pichle 60 din vs poori history (activity %)"): st.dataframe(pd.DataFrame({"IST": [r["ist"] for r in TS["hours"]], "poori history": [r["activity"] for r in TS["hours"]], "pichle 60 din": [r["activity"] for r in TS["recent"]]}), hide_index=True)
+        st.caption(f"Data: {TS['days']} din ({TS['first']} se), {TS['rows']} candles. Last build {TS['built'][:16]} UTC. {TS['note']}")
+    else: st.info("Time stats abhi bani nahi. Naya worker pehli baar chalte hi ~1 minute mein bana lega (history download hoti hai).")
+    try:
+        _p = review.pack(S, records=list(((load("trade_history.json") or {}).get("records") or {}).values()))["calibration"]
+        for k_, t_ in (("by_hour_class", "Tool ke apne trades: activity class ke hisaab se"), ("by_hour_utc", "Tool ke apne trades: ghante (UTC) ke hisaab se")):
+            if _p.get(k_): st.markdown(f"**{t_}**"); st.dataframe(pd.DataFrame(_p[k_]).T[["n", "win_pct", "mean_R", "net_inr"]], use_container_width=True)
+    except Exception: pass
+
 with tL:
     st.info("The tool records every trade, studies its losses, and proposes filters. It does NOT rewrite its rules after each loss: with a ~33% win rate most losses are normal. A filter starts only after you approve it in Telegram (/approve N) and switches itself off if the trades it blocks do as well as the ones it allows.")
     L_ = P.get("lessons") or {}; cl = [t for t in CL if t.get("lesson")]
@@ -308,7 +336,7 @@ with tHl:
 
 with tS:
     st.caption("Current settings (read from config.json). Change from Telegram: /config, /set naam value, /notify naam on|off. Or edit config.json on GitHub.")
-    for sec in ("wallet", "schedule"): st.markdown(f"**{sec}**"); st.table(pd.DataFrame([CFG[sec]]))
+    for sec in ("wallet", "schedule", "timing", "risk"): st.markdown(f"**{sec}**"); st.table(pd.DataFrame([CFG[sec]]))
     st.markdown("**alerts**"); st.table(pd.DataFrame([{k: "on" if v else "off" for k, v in CFG["alerts"].items()}]))
     for s_, v in CFG["strategies"].items(): st.markdown(f"**strategy: {s_}**"); st.table(pd.DataFrame([v]))
     st.info("Backtested rule: trend_pullback stop 3×ATR, target 4R, expiry 120h. Changing these makes new trades differ from what was tested.")
@@ -356,6 +384,12 @@ with tB:
         for ttl, key in (("By side", "by_side"), ("By volatility", "by_volatility"), ("By trend strength", "by_trend_strength"), ("By year", "by_year")):
             st.markdown(f"**{ttl}**"); st.table(pd.DataFrame(V7_[key]).T[["n", "avg_R", "win_pct", "profit_factor", "max_drawdown_R"]])
     else: st.info("Run the 'research' workflow once to build the V7 scorecard (it also builds the move statistics).")
+
+    V8 = load("backtest_v8_results.json")
+    if V8:
+        st.markdown(f"**Session Breakout (V8): {V8['verdict']}** (time classes pehle aadhe data se seekhe, test baaki aadhe par)")
+        st.dataframe(pd.DataFrame({k: {"trades": v["test"].get("n"), "win %": v["test"].get("win_pct"), "avg R": v["test"].get("mean_R"), "lower 95%": v["test"].get("lo95"), "long avg R": v["long"].get("mean_R"), "short avg R": v["short"].get("mean_R")} for k, v in V8["variants"].items()}).T)
+    else: st.caption("Session Breakout (V8) ka backtest abhi nahi chala: GitHub Actions > research > Run workflow.")
 
 with tG:
     with st.expander("🧭 How to read this tool and take a decision (start here)", expanded=True):

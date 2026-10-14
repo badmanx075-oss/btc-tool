@@ -37,6 +37,29 @@ def early_signal(env, sc):
     ctx = dict(score=r["score"], regime=r["regime"], side_n=k, side=r["side"], hour=now.hour, wd=now.weekday(), funding=float(M.get("funding", 0)), atr_pct=round(a, 3))
     why = (f"Bhaav range ke {'neeche (support)' if k == 1 else 'upar (resistance)'} ke paas tha aur ye cheezein ek saath mili: " + "; ".join(hin(r["pro"])) + f". Setup score {r['score']}/100 (kam se kam {sc['min_score']} chahiye). "
            + ("Kamzor pehlu: " + "; ".join(hin(r["con"][:2])) + ". " if r["con"] else "") + "Ye 'early' signal hai (palatne se pehle pakadne ki koshish), isliye risk kam rakha aur aadha profit T1 par book hota hai. Iska pichla backtest record negative tha, to ise experiment samjho.")
-    return dict(side=k, entry=e, sl=float(r["sl"]), t1=float(r["t1"]), t2=float(r["t2"]), t3=float(r["t3"]), tp=float(r["t2"]), risk=risk, mode="staged", ctx=ctx, why=why)
+    return dict(side=k, entry=e, sl=float(r["sl"]), t1=float(r["t1"]), t2=float(r["t2"]), t3=float(r["t3"]), tp=float(r["t2"]), confirm=float(r["confirm"]), risk=risk, mode="staged", ctx=ctx, why=why)
 
-SIGNALS = {"trend_pullback": trend_pullback, "early_signal": early_signal}
+def session_breakout(env, sc):
+    """Breakout of a tight 6h box, only inside an active time window, with volume + 4H trend not against it. Fixed target (2R). Experimental."""
+    h1, i, now = env["h1"], env["i"], env["now"]; n = int(sc.get("box_hours", 6))
+    if i < 60 or env.get("tcls") == "LOW": return None
+    ts = float(h1.ts.iloc[i]) / 1000
+    if now.timestamp() - (ts + 3600) > 1800: return None                      # candle closed >30 min ago: too late to enter
+    a = float(h1.atr.iloc[i]); c, o, hi, lo = h1.c.values, h1.o.values, h1.h.values, h1.l.values
+    bh, bl = float(hi[i - n:i].max()), float(lo[i - n:i].min())
+    if not (a == a) or (bh - bl) > 2.5 * a: return None                       # box must be tight (compression)
+    vr = float(h1.v.iloc[i] / max(h1.v.iloc[i - 24:i].mean(), 1e-9)); rngc = max(hi[i] - lo[i], 1e-9)
+    for k in (1, -1):
+        brk = (c[i] > bh + 0.1 * a) if k == 1 else (c[i] < bl - 0.1 * a)
+        strong = ((c[i] - lo[i]) / rngc >= 0.7) if k == 1 else ((hi[i] - c[i]) / rngc >= 0.7)
+        if not (brk and strong and vr >= sc.get("vol_mult", 1.3) and float(h1.dir4.iloc[i]) * k >= 0): continue
+        e = float(c[i]); stop = (bl - 0.2 * a) if k == 1 else (bh + 0.2 * a); risk = min(max(abs(e - stop), sc.get("stop_min_atr", 1.0) * a), sc.get("stop_max_atr", 2.5) * a)
+        ctx = dict(side_n=k, side="LONG" if k == 1 else "SHORT", hour=now.hour, wd=now.weekday(), atr_pct=round(a / e * 100, 3), vol_ratio=round(vr, 2), box_atr=round((bh - bl) / a, 2), tcls=env.get("tcls"),
+                   regime=(env["S"].get("market") or {}).get("regime"), funding=float((env["S"].get("market") or {}).get("funding", 0)))
+        why = (f"Pichle {n} ghante bhaav ek tang box mein ({ctx['box_atr']:.1f} ATR) ghoom raha tha. Ab 1H candle ne box ke {'upar' if k == 1 else 'neeche'} mazboot band di, volume normal ka {vr:.1f} guna tha, "
+               f"aur bade (4H) trend ne iska virodh nahi kiya. {'Active samay' if env.get('tcls') == 'HIGH' else 'Theek-thaak samay'} mein breakout hone se follow-through ki sambhavna behtar hoti hai. Isliye {'BUY' if k == 1 else 'SELL'} liya. "
+               f"Stop box ke doosri taraf, target {sc.get('target_r', 2)}R. Ye experimental hai: backtest se pehle isse sabit nahi maana jaata.")
+        return dict(side=k, entry=e, sl=e - k * risk, tp=e + k * sc.get("target_r", 2.0) * risk, confirm=e + k * 0.5 * a, risk=risk, mode="fixed", ctx=ctx, why=why)
+    return None
+
+SIGNALS = {"trend_pullback": trend_pullback, "early_signal": early_signal, "session_breakout": session_breakout}

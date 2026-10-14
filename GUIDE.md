@@ -72,3 +72,17 @@ Files for this upgrade: `levels.py`, `moves.py`, `reversal.py`, `derivs.py`, `fl
 - Telegram: `/export` (dono files), `/readiness`, `/settings` (ON/OFF buttons), `/deliveries` (last sends). 10/20/30/50/75/100... trades par milestone alert; 30+ par pack khud aa jata hai.
 - Naye alerts: "Setup ban raha hai (3/4)", "Stage badla", "B/C-grade near-miss". Cooldown se repeat nahi hote.
 - Jab 30+ trades ho jayein: pack ki file mujhe bhejo, main rules tune karunga.
+
+## Trade confirmation (new)
+- Trade khulne ke baad tool dekhta hai ki market sach mein follow-through de raha hai ya nahi (6 checks: confirm level, +0.5R, momentum, 15m/1H direction, order flow, reversal flags).
+- 4/6 pass (aur bhaav aage chala ho) => Telegram "✅ TRADE CONFIRM HUA" + dashboard par green banner. Baad mein 2/6 ya kam => "⚠️ CONFIRMATION KAMZOR".
+- Sirf jaankari hai: trade ka stop/target nahi badalta. Alerts `/settings` mein "Trade confirm" button se on/off.
+- Commands: `/settings` (ya `/setting`), `/readiness` (ya `/ready`). Bot sirf scan-run ke dauraan jawab deta hai (GitHub cron kabhi 10-30 min late hota hai).
+
+## Time Intelligence + Session Breakout + Daily loss guard (new)
+- **🕒 Time tab / `/timing`**: pichle 1 saal ki 1H candles se: kis ghante (IST) kitni range, upar kitne points, neeche kitne points, 500+/1000+ points ki sambhavna, sessions, weekday. Worker khud ~3 din mein rebuild karta hai (time_stats.json). Pehli baar ~1 minute lagta hai.
+- **Active window alert**: HIGH-activity ghanta shuru hone se ~30 min pehle Telegram alert (typical points ke saath). `/settings` mein "Active window" button se band kar sakte ho.
+- **Time-aware decision**: har trade ke saath us ghante ki class (HIGH/MEDIUM/LOW) save hoti hai; Review/Time tab mein dikhta hai ki tool ke apne trades kis ghante mein jeete/haare. `timing.skip_low_activity` (default off) on karoge to LOW ghante mein naye trades nahi khulenge (`/set skip_low_activity on`). Ye sirf tab on karo jab data dikhaye ki LOW ghante mein loss zyada hai.
+- **Session Breakout strategy** (experimental, risk 0.3%): 6 ghante ki tang box ka breakout + strong candle + volume 1.3x+ + 4H trend virodh mein nahi + LOW ghanta nahi. Stop box ke doosri taraf, target 2R, 24h expiry. Confirmation tracker isse bhi chalta hai. Backtest: research workflow chalao (V8): time classes pehle aadhe data se, test baaki aadhe par.
+- **Daily loss guard**: aaj ka realised loss 3% (`risk.max_daily_loss_pct`) tak pahunche to naye trades band, kal tak. Khule trades chalte rahte hain.
+- Direction ke baare mein: har ghante ka up/down bias zyadatar noise hota hai, isliye tool use "significant" tabhi kehta hai jab bahut saaf ho.

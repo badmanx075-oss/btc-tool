@@ -1,10 +1,10 @@
 """Extra Telegram notifications: setup forming, stage change, milestones. Every alert is de-duplicated (cooldown per key)
 and can be switched on/off from /settings. Alerts never open or close a trade."""
 import datetime as dt
-import review
+import review, config
 
 COOLDOWN_H = dict(radar=4, stage=1)
-CATS = [("paper_open", "Trade khula"), ("paper_close", "Trade band"), ("advice", "Position advice"), ("setup", "Setup ban raha hai"), ("stage_alerts", "Stage change"),
+CATS = [("paper_open", "Trade khula"), ("paper_close", "Trade band"), ("advice", "Position advice"), ("setup", "Setup ban raha hai"), ("timing", "Active window"), ("confirm", "Trade confirm"), ("stage_alerts", "Stage change"),
         ("signals", "Early signals"), ("reversal", "Reversal"), ("learning", "Learning"), ("milestone", "Milestone"), ("morning", "Subah"), ("evening", "Shaam"), ("weekly", "Weekly")]
 
 
@@ -22,6 +22,9 @@ def setup_alerts(S, send, now):
         if n == 3 and not (P.get("pos") or {}).get("trend_pullback") and _due(S, "radar-" + side, COOLDOWN_H["radar"], now):
             miss = [c for c in rows if not c[1]]
             send(f"👀 SETUP BAN RAHA HAI ({'BUY' if side == 'LONG' else 'SELL'}) 3/4\nBTC ${px:,.0f}\nBaaki ek shart: {miss[0][0]} ({miss[0][2]}).\nPoori ho gayi to paper trade khud khulega. Abhi kuch karna nahi hai, bas nazar rakho.", cat="setup")
+    T = S.get("timing") or {}; nh = T.get("next_high")
+    if config.load()["timing"].get("window_alerts") and nh and 0 < nh["in_min"] <= 30 and _due(S, f"win-{nh['hr']}", 20, now):
+        send(f"⏰ ACTIVE WINDOW SHURU HONE WALI HAI ({nh['in_min']} min baad)\nSamay: {nh['ist']} IST. History mein is ghante ki typical range {nh['avg_range']:,.0f} pts (upar {nh['avg_up']:,.0f} / neeche {nh['avg_down']:,.0f} pts).\nAbhi: {T.get('ist')} ({T.get('cls')} activity). Tool is window mein breakout setups par zyada nazar rakhta hai.", cat="timing")
     sl = S.get("stage_log") or []
     if len(sl) >= 2 and sl[-1]["ts"] != (S.get("alert_sent") or {}).get("stage_ts"):
         S.setdefault("alert_sent", {})["stage_ts"] = sl[-1]["ts"]
