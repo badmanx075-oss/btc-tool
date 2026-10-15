@@ -115,6 +115,8 @@ def live_extras(S):
     if q: ex.append(dict(name="OI + price", dir={"long_buildup": 1, "short_covering": 1, "short_buildup": -1, "long_liquidation": -1}.get(q, 0), why=f"Open interest/price: {q.replace('_', ' ')}"))
     cr = d.get("crowding")
     if cr and cr != "balanced": ex.append(dict(name="Crowding", dir=-1 if "long" in str(cr) else 1 if "short" in str(cr) else 0, why=f"Market {cr}: bheed ke ulte side ka risk"))
+    of = (S.get("orderflow") or {}).get("now") or {}
+    if of.get("state") and of["state"] != "NO DATA": ex.append(dict(name="Aggression (60 min)", dir=1 if "BUY" in of["state"] else -1 if "SELL" in of["state"] else 0, why=f"{of['state']} (delta {of['ratio'] * 100:+.0f}%, bade orders {of['big_share'] * 100:.0f}%)"))
     rows = {r["tf"]: r["direction"] for r in (D.get("mtf") or {}).get("rows", [])}
     if rows:
         ups, dns = sum(v == "UP" for v in rows.values()), sum(v == "DOWN" for v in rows.values()); ex.append(dict(name="Multi-timeframe", dir=1 if ups >= 4 else -1 if dns >= 4 else 0, why=f"{ups} timeframe UP, {dns} DOWN (5m..4H)"))

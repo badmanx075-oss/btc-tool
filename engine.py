@@ -6,7 +6,7 @@ B = "https://www.okx.com/api/v5/"; INST = "BTC-USDT-SWAP"
 def _get(p, **q):
     r = requests.get(B + p, params=q, timeout=15); r.raise_for_status(); return r.json()["data"]
 
-BY = "https://api.bybit.com/v5/market/"; IV = {"5m": "5", "15m": "15", "1H": "60", "4H": "240"}
+BY = "https://api.bybit.com/v5/market/"; IV = {"5m": "5", "15m": "15", "30m": "30", "1H": "60", "4H": "240", "1D": "D"}
 
 def candles(bar, limit=300):
     try:  # primary: OKX

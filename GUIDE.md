@@ -95,3 +95,11 @@ Files for this upgrade: `levels.py`, `moves.py`, `reversal.py`, `derivs.py`, `fl
 - **Confluence strategy** (experimental, risk 0.4%): 4+ tareeke ek taraf, doosri taraf 1 se zyada nahi, net score 35+. Stop aakhri swing ke paar, target 2R.
 - Optional gate: `/set min_methods_agree 3` => koi bhi strategy tabhi trade legi jab kam se kam 3 tareeke saath hon (default 0 = off).
 - Backtest V9 (research workflow): koi parameter fit nahi, 3 fixed strictness levels, har half, har saal, long/short alag.
+
+## Price-action chart, timeframe-wise S/R, aggressive buy/sell (new)
+- **📈 Chart tab**: candlestick chart (5m/15m/1H/4H), EMA20/50, swing points, candle patterns (▲ bullish / ▼ bearish, sirf support/resistance ke paas wale), support/resistance lines, kai-timeframe confluence zones (shaded), tool ki apni entry (neela) / stop (laal) / target (hara) lines, purane trades ke markers, volume, aur daayen taraf har price par buy (hara) vs sell (laal) volume.
+- **Support/Resistance timeframe-wise** (5m, 15m, 1H, 4H, 1D): nazdeeki 2 support + 2 resistance, kitni baar bhaav palta (touches), doori. Jahan kai timeframe milte hain wo "confluence zone" sabse mazboot. Telegram: `/levels`.
+- **Aggressive buy/sell**: taker (market order) side se pata chalta hai kaun dabaav daal raha hai. State: AGGRESSIVE BUYING/SELLING, MILD, ya NORMAL. Kaun se price zones par buying/selling zyada hui (4h) aur sabse zyada trading wala price. Telegram: `/flow`; aggressive hone par alert (2 ghante cooldown, `/settings` mein "Order flow" button).
+- Order-flow data scanner khud jama karta hai (orderflow_profile.json, pichle 36 ghante); poori tasveer ~1 ghante baad aati hai. Coverage % dikhata hai ki kitne trades pakde gaye.
+- Order-flow ki halat har trade ke saath entry ke waqt save hoti hai (review pack mein `by_aggression`), aur multi-method "live second opinion" mein bhi dikhti hai.
+- Chart ke liye `requirements.txt` mein `plotly` hona zaroori hai: file upload karke Streamlit app ko Reboot karo.

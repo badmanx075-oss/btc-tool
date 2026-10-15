@@ -4,7 +4,7 @@ import datetime as dt
 import review, config
 
 COOLDOWN_H = dict(radar=4, stage=1)
-CATS = [("paper_open", "Trade khula"), ("paper_close", "Trade band"), ("advice", "Position advice"), ("setup", "Setup ban raha hai"), ("timing", "Active window"), ("confirm", "Trade confirm"), ("stage_alerts", "Stage change"),
+CATS = [("paper_open", "Trade khula"), ("paper_close", "Trade band"), ("advice", "Position advice"), ("setup", "Setup ban raha hai"), ("flow", "Order flow"), ("timing", "Active window"), ("confirm", "Trade confirm"), ("stage_alerts", "Stage change"),
         ("signals", "Early signals"), ("reversal", "Reversal"), ("learning", "Learning"), ("milestone", "Milestone"), ("morning", "Subah"), ("evening", "Shaam"), ("weekly", "Weekly")]
 
 
@@ -22,6 +22,9 @@ def setup_alerts(S, send, now):
         if n == 3 and not (P.get("pos") or {}).get("trend_pullback") and _due(S, "radar-" + side, COOLDOWN_H["radar"], now):
             miss = [c for c in rows if not c[1]]
             send(f"👀 SETUP BAN RAHA HAI ({'BUY' if side == 'LONG' else 'SELL'}) 3/4\nBTC ${px:,.0f}\nBaaki ek shart: {miss[0][0]} ({miss[0][2]}).\nPoori ho gayi to paper trade khud khulega. Abhi kuch karna nahi hai, bas nazar rakho.", cat="setup")
+    OFA = S.get("orderflow") or {}; st_ = (OFA.get("now") or {}).get("state", "")
+    if st_.startswith("AGGRESSIVE") and OFA.get("history_h", 0) >= 1 and _due(S, "flow-" + st_, 2, now):
+        send(f"{'🟢🔥' if 'BUY' in st_ else '🔴🔥'} {st_} (pichle 60 min)\n" + __import__("orderflow").text(OFA) + "\nMatlab: market order wale (taker) ek taraf zyada dabaav daal rahe hain. Ye jaankari hai, trade ka signal nahi.", cat="flow")
     R = P.get("methods") or {}
     if R.get("verdict") in ("LONG", "SHORT") and not any((P.get("pos") or {}).values()) and _due(S, "methods-" + R["verdict"], 3, now):
         send("🧩 TAREEKE EK SAATH AAYE\n" + __import__("methods").text(R) + "\nAbhi trade tabhi khulega jab 'confluence' strategy ki baaki shartein (candle abhi band hui ho) poori hon. Nazar rakho.", cat="setup")

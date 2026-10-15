@@ -1,6 +1,9 @@
 import json, os, io, datetime as dt, requests, pandas as pd, streamlit as st
 import streamlit.components.v1 as components
-import config, history, stats, decision, review, timing
+import config, history, stats, decision, review, timing, sr as SRM, orderflow as OFM
+try:
+    import chart as CH, engine as ENG
+except Exception as _e: CH = None; _CH_ERR = str(_e)
 
 st.set_page_config(page_title="BTC Tool", page_icon="📈", layout="wide")
 RAW = "https://raw.githubusercontent.com/badmanx075-oss/btc-tool/main/"   # live data written by the 5-minute scanner
@@ -66,7 +69,7 @@ elif T: head.caption(f"📨 Telegram: ❌ problem. {T.get('last_error') or 'bot 
 else: head.caption("📨 Telegram: no status yet (upload the latest worker.py and run the scan once)")
 if S.get("paused"): st.warning("⏸ PAUSED: no new trades or alerts will start. Open trades are still managed. Send /resume on Telegram to restart.")
 st.caption("⚠️ Informational and statistical only. Virtual money, no real orders. Backtests show NO proven edge yet.")
-tH_, tDD, tA, tW, tTH, tRV, tTM, tL, tHl, tS, tO, tB, tG = st.tabs(["🏠 Home", "🧭 Decision Desk", "📋 Analysis", "💰 Wallet", "📒 Trade History", "📦 Review", "🕒 Time", "🧠 Learning", "🩺 Health", "⚙️ Settings", "📡 Old signals", "📊 Backtests", "📘 Guide"])
+tH_, tCH, tDD, tA, tW, tTH, tRV, tTM, tL, tHl, tS, tO, tB, tG = st.tabs(["🏠 Home", "📈 Chart", "🧭 Decision Desk", "📋 Analysis", "💰 Wallet", "📒 Trade History", "📦 Review", "🕒 Time", "🧠 Learning", "🩺 Health", "⚙️ Settings", "📡 Old signals", "📊 Backtests", "📘 Guide"])
 
 def position_card(t):
     px = lp or t["entry"]; ur = (px - t["entry"]) * t["side"] / t["risk"]; usd = pl_usd(t, px) + t.get("realized_usd", 0); m = t.get("mgmt")
@@ -266,6 +269,48 @@ with tTH:
             if r.get("timeline"): st.write("**Timeline**"); st.dataframe(pd.DataFrame(r["timeline"]).rename(columns={"time_ist": "Time (IST)", "type": "Event", "price": "Price", "note": "Note"}), hide_index=True, use_container_width=True)
             with st.expander("Everything stored for this trade (raw)"): st.json(r.get("raw", r))
     st.caption(f"Record file last updated: {history.ist((HF or {}).get('updated')) or 'not created yet (it is created on the next scan)'}")
+
+with tCH:
+    st.caption("Price action chart: candles, EMA20/50, swing points, candle patterns (▲ bullish / ▼ bearish, sirf support/resistance ke paas wale), support/resistance, trade ki entry/stop/target, aur daayen taraf har price par buy (hara) vs sell (laal) volume.")
+    if CH is None: st.error("Chart ke liye 'plotly' chahiye. GitHub par requirements.txt upload karo (usme plotly likha hai), phir app Reboot karo. Detail: " + _CH_ERR)
+    else:
+        @st.cache_data(ttl=60)
+        def candles_for(tf):
+            try: return ENG.candles(tf, 300), "live"
+            except Exception: pass
+            cd = load("chart_data.json")
+            if cd and cd.get(tf): return pd.DataFrame(cd[tf], columns=["ts", "o", "h", "l", "c", "v"]), "saved " + str(cd.get("built", ""))[:16] + " UTC"
+            return None, "no data"
+        c1, c2, c3 = st.columns([3, 2, 2]); tf = c1.radio("Timeframe", ["5m", "15m", "1H", "4H"], index=2, horizontal=True); nb = c2.selectbox("Candles", [60, 100, 150, 220], index=1); pw = c3.selectbox("Order-flow window", ["4 ghante", "24 ghante", "off"])
+        o1, o2, o3 = st.columns(3); sp = o1.checkbox("Candle patterns", True); ss = o2.checkbox("Sirf mazboot patterns", True); sw = o3.checkbox("Swing points", True)
+        dfc, srcn = candles_for(tf)
+        if dfc is None or len(dfc) < 100: st.warning("Candle data nahi mil raha (exchange block ya data nahi). Thodi der baad Refresh karo.")
+        else:
+            px_ = float(dfc.c.iloc[-1]); lv_ = SRM.levels_for(dfc, px_); zones_ = ((S.get("sr") or {}).get("zones")) or []
+            OP = load("orderflow_profile.json"); prof_ = OFM.profile_rows(OP, dt.datetime.now(dt.timezone.utc), 240 if pw.startswith("4") else 1440) if (OP and pw != "off") else None
+            closed_ = [r for r in ((load("trade_history.json") or {}).get("records") or {}).values() if r.get("source") == "PAPER" and r.get("entry")][-12:]
+            fig_ = CH.make_figure(dfc, tf, lv_, zones_, POS, closed_, prof_, bars=nb, show_patterns=sp, show_swings=sw, strong_only=ss, height=620)
+            st.plotly_chart(fig_, use_container_width=True, config=dict(displayModeBar=False, scrollZoom=False)); st.caption(f"Candle data: {srcn} | time IST | blue = entry, red dashed = stop, green dashed = target, shaded = kai timeframe ke saath wali zone")
+        OFA = S.get("orderflow")
+        if OFA and OFA.get("now"):
+            st.subheader("🌊 Kahan aggressive buying / selling ho rahi hai")
+            nw_ = OFA["now"]; (st.success if "BUY" in nw_["state"] and "AGGRESSIVE" in nw_["state"] else st.error if "SELL" in nw_["state"] and "AGGRESSIVE" in nw_["state"] else st.info)(f"Abhi (60 min): **{nw_['state']}** | buy {nw_['buy']:,.0f} BTC vs sell {nw_['sell']:,.0f} BTC | delta {nw_['ratio'] * 100:+.0f}% | bade orders {nw_['big_share'] * 100:.0f}%")
+            q1, q2, q3 = st.columns(3); q1.metric("4 ghante", OFA["h4"]["state"].title(), f"delta {OFA['h4']['ratio'] * 100:+.0f}%"); q2.metric("24 ghante", OFA["h24"]["state"].title(), f"delta {OFA['h24']['ratio'] * 100:+.0f}%"); q3.metric("Data jama", f"{OFA['history_h']} ghante", f"coverage {OFA.get('coverage_pct', '?')}%")
+            za, zb = st.columns(2)
+            za.markdown("**🟢 Buying ka dabaav wale price zones (4h, delta +40% se zyada = aggressive)**"); za.dataframe(pd.DataFrame([{"zone": f"${z['lo']:,.0f}-{z['hi']:,.0f}", "volume BTC": z["vol"], "delta %": round(z["ratio"] * 100), "bade orders %": round(z["big_share"] * 100)} for z in OFA["buy_zones"]]) if OFA["buy_zones"] else pd.DataFrame({"info": ["koi saaf zone nahi"]}), hide_index=True)
+            zb.markdown("**🔴 Selling ka dabaav wale price zones (4h, delta -40% se kam = aggressive)**"); zb.dataframe(pd.DataFrame([{"zone": f"${z['lo']:,.0f}-{z['hi']:,.0f}", "volume BTC": z["vol"], "delta %": round(z["ratio"] * 100), "bade orders %": round(z["big_share"] * 100)} for z in OFA["sell_zones"]]) if OFA["sell_zones"] else pd.DataFrame({"info": ["koi saaf zone nahi"]}), hide_index=True)
+            if OFA.get("poc"): st.caption(f"📍 Sabse zyada trading: ${OFA['poc']['lo']:,.0f}-{OFA['poc']['hi']:,.0f} ({OFA['poc']['vol']:,.0f} BTC). Aggressive = taker (market order) bahut zyada, bade orders (2+ BTC) ya volume normal se 1.5x. Delta = (buy-sell)/total.")
+        else: st.info("Order-flow data abhi jama ho raha hai (naya worker chalne ke ~1 ghante baad poori tasveer aati hai).")
+        SRD = S.get("sr")
+        if SRD and SRD.get("tf"):
+            st.subheader("📐 Timeframe ke hisaab se Support / Resistance")
+            rows_ = []
+            for tf_ in SRM.TFS:
+                v_ = SRD["tf"].get(tf_)
+                if v_: rows_.append({"Timeframe": tf_, "Support (paas wala pehle)": " | ".join(f"${x['price']:,.0f} ({x['touches']}x, {x['dist_pct']:+.1f}%)" for x in v_["supports"]) or "-", "Resistance": " | ".join(f"${x['price']:,.0f} ({x['touches']}x, {x['dist_pct']:+.1f}%)" for x in v_["resistances"]) or "-"})
+            st.dataframe(pd.DataFrame(rows_), hide_index=True, use_container_width=True)
+            if SRD.get("zones"): st.markdown("**🎯 Confluence zones (kai timeframe ek jagah, sabse mazboot):**\n\n" + "\n\n".join(f"{'🟢' if z['kind'] == 'support' else '🔴'} {z['kind']} **${z['lo']:,.0f}-{z['hi']:,.0f}** ({' + '.join(z['tfs'])}, score {z['score']})" for z in SRD["zones"][:5]))
+            st.caption("touches = kitni baar bhaav is level se palta. Zyada touches + zyada timeframe = mazboot level. Bade timeframe (4H, 1D) ke level chhote timeframe se zyada maane jaate hain.")
 
 with tRV:
     st.caption("Tool ko chalne do. Jab 30+ trades band ho jayein, neeche se review pack download karo aur mujhe (Claude ko) bhejo. Main uske hisaab se rules tune karunga.")
