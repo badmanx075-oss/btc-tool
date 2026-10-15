@@ -1349,10 +1349,10 @@
    "move_class": "LARGE",
    "risk": "Low",
    "created": "2026-10-13T08:52:49+00:00",
-   "last_ts": 1792032600000.0,
+   "last_ts": 1792032900000.0,
    "mfe": 3373.199999999997,
    "mae": 575.1000000000058,
-   "status": "EXHAUSTION WATCH",
+   "status": "CLOSED",
    "outcome": "T3 REACHED",
    "events": [
     {
@@ -1410,6 +1410,13 @@
      "ts": "2026-10-15T02:50:22+00:00",
      "price": 81542.90857142859,
      "note": ""
+    },
+    {
+     "id": "BTC-SHORT-20261013-002-9",
+     "type": "PROTECTED EXIT",
+     "ts": "2026-10-15T03:14:48+00:00",
+     "price": 81542.90857142859,
+     "note": ""
     }
    ],
    "user": {}
@@ -1432,35 +1439,35 @@
   "morning": "2026-10-15",
   "weekly": "2026-10-11"
  },
- "last_price": 81220.3,
+ "last_price": 81271.9,
  "market": {
-  "price": 81220.3,
+  "price": 81271.9,
   "regime": "RANGE",
   "signal": "NO TRADE",
-  "side": "SHORT",
-  "score": 30,
+  "side": "LONG",
+  "score": 20,
   "scores": {
    "LONG": 20,
-   "SHORT": 30
+   "SHORT": 15
   },
-  "atr1h": 543.5999999999996,
+  "atr1h": 516.7714285714299,
   "atr4h": 1105.1785714285725,
   "reversal": "none",
   "tf": {
    "5m": {
-    "er": 0.13,
+    "er": 0.05,
     "label": "FLAT"
    },
    "15m": {
-    "er": 0.12,
+    "er": 0.05,
     "label": "FLAT"
    },
    "30m": {
-    "er": 0.47,
+    "er": 0.4,
     "label": "DOWN"
    },
    "1H": {
-    "er": 0.33,
+    "er": 0.38,
     "label": "DOWN"
    },
    "4H": {
@@ -1468,19 +1475,19 @@
     "label": "FLAT"
    }
   },
-  "funding": 3.95121026882e-05,
-  "oi": 2486477192.0688105,
+  "funding": 3.21280790266e-05,
+  "oi": 2484788716.077591,
   "pro": [
-   "lower high forming",
-   "momentum turning down"
+   "price near range low"
   ],
   "con": [
-   "price not at range edge (mid-range risk)",
-   "no sweep of prior highs",
-   "buying volume not fading",
-   "no compression"
+   "no sweep of prior lows",
+   "no higher low yet",
+   "selling volume not fading",
+   "no compression",
+   "momentum not turning"
   ],
-  "ts": "2026-10-15T02:50:22+00:00"
+  "ts": "2026-10-15T03:14:48+00:00"
  },
  "paper": {
   "closed": [
@@ -3246,8 +3253,8 @@
    }
   },
   "radar": {
-   "ts": "2026-10-15T02:50:22+00:00",
-   "price": 81206.5,
+   "ts": "2026-10-15T03:14:48+00:00",
+   "price": 81258.1,
    "LONG": [
     [
      "4H trend up",
@@ -3278,8 +3285,8 @@
     ],
     [
      "Pullback from recent extreme",
-     false,
-     "0.5 ATR, needs 1.5 or more"
+     true,
+     "2.4 ATR, needs 1.5 or more"
     ],
     [
      "Pullback not broken",
@@ -4061,29 +4068,11 @@
   "bot": "btcstochbot",
   "poll_error": "",
   "last_error": "",
-  "last_send_ok": "2026-10-15T02:50:27+00:00",
+  "last_send_ok": "2026-10-15T03:14:53+00:00",
   "last_run": "2026-10-15T02:54:00+00:00",
   "last_cmd_ts": "2026-10-14T09:38:55+00:00",
   "last_cmd": "/status",
   "log": [
-   {
-    "ts": "2026-10-14T13:30:35+00:00",
-    "cat": "signals",
-    "ok": true,
-    "text": "\u26a0\ufe0f PROFIT EXHAUSTION WATCH Trade ID: BTC-SHORT-20261013-002 Price: $82"
-   },
-   {
-    "ts": "2026-10-14T13:30:36+00:00",
-    "cat": "-",
-    "ok": true,
-    "text": "\ud83c\udfaf T1 HIT (ES-SHORT-20261013-006)  \ud83d\udd52 14 Oct 19:00 IST 50% booked at $82"
-   },
-   {
-    "ts": "2026-10-14T13:30:37+00:00",
-    "cat": "advice",
-    "ok": true,
-    "text": "\ud83d\udcca POSITION UPDATE ES-SHORT-20261013-006 Stage: MOMENTUM STRONG Status:"
-   },
    {
     "ts": "2026-10-14T13:30:37+00:00",
     "cat": "timing",
@@ -4245,64 +4234,82 @@
     "cat": "morning",
     "ok": true,
     "text": "\ud83c\udf05 GOOD MORNING BTC Perpetual Brief Price: $81,220 Regime: RANGE Signal"
+   },
+   {
+    "ts": "2026-10-15T03:14:52+00:00",
+    "cat": "signals",
+    "ok": true,
+    "text": "\ud83d\udd12 PROTECTED STOP HIT Trade ID: BTC-SHORT-20261013-002 Price: $81,272 S"
+   },
+   {
+    "ts": "2026-10-15T03:14:53+00:00",
+    "cat": "setup",
+    "ok": true,
+    "text": "\ud83d\udc40 SETUP BAN RAHA HAI (SELL) 3/4 BTC $81,272 Baaki ek shart: 4H trend d"
+   },
+   {
+    "ts": "2026-10-15T03:14:53+00:00",
+    "cat": "stage_alerts",
+    "ok": true,
+    "text": "\ud83d\udd00 STAGE BADLA Stage 4-5: trade active  \u2192  Stage 2: early setup Status:"
    }
   ]
  },
  "analysis": {
-  "price": 81220.3,
+  "price": 81258.2,
   "regime": "RANGE",
-  "stage": "Stage 4-5: trade active",
-  "status": "TRADE ACTIVE (see Home)",
+  "stage": "Stage 2: early setup",
+  "status": "EARLY SHORT SETUP (experimental)",
   "direction": "SHORT",
   "scores": {
    "structure": 0,
-   "volume": 30.429473163659054,
-   "momentum": 45.70579029733915,
-   "order_flow": 12.89,
-   "liquidity": 73.78961692862484,
+   "volume": 26.81720456295267,
+   "momentum": 35.29065489330405,
+   "order_flow": 26.564999999999998,
+   "liquidity": 71.57652685798399,
    "htf": 45.6775786393562,
    "accumulation": 20,
-   "distribution": 30,
-   "volatility_pct": 83.0,
+   "distribution": 15,
+   "volatility_pct": 86.5,
    "large_move_potential": 63,
-   "continuation": 59.39571929988187,
-   "exhaustion_risk": 54.734231475811725,
-   "setup": 68.50356302033278
+   "continuation": 64.07152063479569,
+   "exhaustion_risk": 34.24101667893022,
+   "setup": 68.60751432893277
   },
   "levels": {
    "early_zone": [
-    81167.81071428572,
-    81377.76785714286
+    81203.84,
+    81421.28
    ],
-   "confirmation": 81318.8,
+   "confirmation": 80168.0,
    "retest_zone": [
-    81266.31071428572,
-    81476.26785714286
+    80113.64,
+    80331.08
    ],
-   "late_above": 80793.90714285715,
-   "hard_invalidation": 82706.85714285713,
-   "preferred_sl": 82706.85714285713,
-   "emergency_sl": 82794.97857142857,
-   "t1": 80019.863966,
-   "t2": 79036.286133,
-   "t3": 77686.40474700001,
-   "extended": 76692.26827500001,
-   "rr_t1": 0.81,
+   "late_above": 79624.4,
+   "hard_invalidation": 82280.04000000001,
+   "preferred_sl": 82280.04000000001,
+   "emergency_sl": 82889.0,
+   "t1": 80057.203804,
+   "t2": 79073.167002,
+   "t3": 77722.655718,
+   "extended": 76728.05535,
+   "rr_t1": 1.18,
    "targets_from": "history quantiles",
    "entry_state": "inside EARLY entry zone"
   },
   "expected_move": {
    "expected": [
-    1200.436034,
-    2184.013867
+    1200.9961959999998,
+    2185.032998
    ],
    "strong": [
-    2184.013867,
-    3533.895253
+    2185.032998,
+    3535.544282
    ],
    "extended": [
-    3533.895253,
-    4528.031725
+    3535.544282,
+    4530.14465
    ],
    "side": "dn",
    "sample": 16006,
@@ -4317,7 +4324,7 @@
     ],
     "2000": [
      0.265,
-     0.288
+     0.289
     ],
     "5000": [
      0.033,
@@ -4332,7 +4339,7 @@
   "checklist": [
    [
     "Volume not supporting the move",
-    true
+    false
    ],
    [
     "Market structure not supporting",
@@ -4348,11 +4355,11 @@
    ],
    [
     "Momentum not improving",
-    true
+    false
    ],
    [
     "Price rejecting the direction (wick)",
-    false
+    true
    ],
    [
     "Possible liquidity trap (sweep and reverse)",
@@ -4371,46 +4378,46 @@
     false
    ]
   ],
-  "false_signal_risk": "Medium",
+  "false_signal_risk": "Low",
   "range": {
    "high": 84348.2,
-   "low": 80961.3,
-   "mid": 82654.75,
-   "position_pct": 7.647110927396748
+   "low": 80168.0,
+   "mid": 82258.1,
+   "position_pct": 26.080091861633363
   },
   "breakout": "none",
   "notes": {
-   "order_flow": "book imbalance -0.48, OI +2.63% (4h)",
-   "atr": 524.8928571428571,
-   "funding": 3.95121026882e-05,
-   "oi": 2486477192.0688105
+   "order_flow": "book imbalance +0.06, OI +2.74% (4h)",
+   "atr": 543.5999999999996,
+   "funding": 3.21280790266e-05,
+   "oi": 2484788716.077591
   }
  },
  "desk": {
-  "price": 81220.3,
-  "atr1h": 524.8928571428571,
+  "price": 81258.2,
+  "atr1h": 543.5999999999996,
   "atr4h": 1029.6642857142858,
   "derivs": {
    "crowding": "balanced",
    "quadrant": "new_shorts",
-   "oi_change_4h": 2.63,
-   "oi_change_24h": -0.16,
-   "price_change_4h": -2.61,
-   "taker_delta": -0.34,
+   "oi_change_4h": 2.74,
+   "oi_change_24h": -0.27,
+   "price_change_4h": -2.39,
+   "taker_delta": -0.277,
    "liquidations": {
     "long_usd": 1601820.0,
-    "short_usd": 366205.0
+    "short_usd": 795843.0
    },
-   "bias": -2.0,
+   "bias": -1.83,
    "items": [
-    "Funding 0.0040% per 8h is normal: no obvious crowding",
+    "Funding 0.0032% per 8h is normal: no obvious crowding",
     "Price down and open interest up: new shorts are entering, selling pressure has fresh participation",
-    "Taker flow (last ~1h of samples): sellers (-0.34)",
-    "Recent liquidations: longs $1.6M, shorts $0.4M (forced closing can extend or end a move)"
+    "Taker flow (last ~1h of samples): sellers (-0.28)",
+    "Recent liquidations: longs $1.6M, shorts $0.8M (forced closing can extend or end a move)"
    ]
   },
   "levels": {
-   "price": 81220.3,
+   "price": 81258.2,
    "resistance": [
     {
      "price": 81451.0,
@@ -4421,9 +4428,9 @@
      ],
      "count": 3,
      "strength": "strong",
-     "dist_pts": 230.7,
-     "dist_pct": 0.28,
-     "dist_atr1h": 0.44,
+     "dist_pts": 192.8,
+     "dist_pct": 0.24,
+     "dist_atr1h": 0.35,
      "side": "resistance"
     },
     {
@@ -4434,9 +4441,9 @@
      ],
      "count": 2,
      "strength": "medium",
-     "dist_pts": 421.1,
-     "dist_pct": 0.52,
-     "dist_atr1h": 0.8,
+     "dist_pts": 383.2,
+     "dist_pct": 0.47,
+     "dist_atr1h": 0.7,
      "side": "resistance"
     },
     {
@@ -4447,9 +4454,9 @@
      ],
      "count": 2,
      "strength": "medium",
-     "dist_pts": 727.8,
-     "dist_pct": 0.9,
-     "dist_atr1h": 1.39,
+     "dist_pts": 689.9,
+     "dist_pct": 0.85,
+     "dist_atr1h": 1.27,
      "side": "resistance"
     },
     {
@@ -4459,23 +4466,23 @@
      ],
      "count": 1,
      "strength": "light",
-     "dist_pts": 1029.7,
-     "dist_pct": 1.27,
-     "dist_atr1h": 1.96,
+     "dist_pts": 991.8,
+     "dist_pct": 1.22,
+     "dist_atr1h": 1.82,
      "side": "resistance"
     }
    ],
    "support": [
     {
-     "price": 81181.5,
+     "price": 81248.2,
      "names": [
       "Today's VWAP"
      ],
      "count": 1,
      "strength": "light",
-     "dist_pts": -38.8,
-     "dist_pct": -0.05,
-     "dist_atr1h": -0.07,
+     "dist_pts": -10.0,
+     "dist_pct": -0.01,
+     "dist_atr1h": -0.02,
      "side": "support"
     },
     {
@@ -4486,9 +4493,9 @@
      ],
      "count": 2,
      "strength": "medium",
-     "dist_pts": -239.7,
-     "dist_pct": -0.3,
-     "dist_atr1h": -0.46,
+     "dist_pts": -277.6,
+     "dist_pct": -0.34,
+     "dist_atr1h": -0.51,
      "side": "support"
     },
     {
@@ -4498,9 +4505,9 @@
      ],
      "count": 1,
      "strength": "light",
-     "dist_pts": -720.3,
-     "dist_pct": -0.89,
-     "dist_atr1h": -1.37,
+     "dist_pts": -758.2,
+     "dist_pct": -0.93,
+     "dist_atr1h": -1.39,
      "side": "support"
     },
     {
@@ -4511,15 +4518,15 @@
      ],
      "count": 2,
      "strength": "strong",
-     "dist_pts": -1052.3,
-     "dist_pct": -1.3,
-     "dist_atr1h": -2.0,
+     "dist_pts": -1090.2,
+     "dist_pct": -1.34,
+     "dist_atr1h": -2.01,
      "side": "support"
     }
    ],
    "vwap": {
-    "vwap": 81181.5,
-    "dev_atr": 0.07,
+    "vwap": 81248.2,
+    "dev_atr": 0.02,
     "note": "near VWAP (not stretched)"
    },
    "nearest_resistance": {
@@ -4531,21 +4538,21 @@
     ],
     "count": 3,
     "strength": "strong",
-    "dist_pts": 230.7,
-    "dist_pct": 0.28,
-    "dist_atr1h": 0.44,
+    "dist_pts": 192.8,
+    "dist_pct": 0.24,
+    "dist_atr1h": 0.35,
     "side": "resistance"
    },
    "nearest_support": {
-    "price": 81181.5,
+    "price": 81248.2,
     "names": [
      "Today's VWAP"
     ],
     "count": 1,
     "strength": "light",
-    "dist_pts": -38.8,
-    "dist_pct": -0.05,
-    "dist_atr1h": -0.07,
+    "dist_pts": -10.0,
+    "dist_pct": -0.01,
+    "dist_atr1h": -0.02,
     "side": "support"
    }
   },
@@ -4559,7 +4566,7 @@
      "pct": 0.62,
      "atr4h_multiple": 0.49,
      "size_class": "SMALL",
-     "atr1h_multiple": 1.0,
+     "atr1h_multiple": 0.9,
      "up_24h": 0.76,
      "dn_24h": 0.777,
      "up_72h": 0.866,
@@ -4570,7 +4577,7 @@
      "pct": 1.23,
      "atr4h_multiple": 0.97,
      "size_class": "SMALL",
-     "atr1h_multiple": 1.9,
+     "atr1h_multiple": 1.8,
      "up_24h": 0.54,
      "dn_24h": 0.572,
      "up_72h": 0.733,
@@ -4581,18 +4588,18 @@
      "pct": 2.46,
      "atr4h_multiple": 1.94,
      "size_class": "MEDIUM",
-     "atr1h_multiple": 3.8,
+     "atr1h_multiple": 3.7,
      "up_24h": 0.265,
-     "dn_24h": 0.288,
+     "dn_24h": 0.289,
      "up_72h": 0.506,
-     "dn_72h": 0.533
+     "dn_72h": 0.534
     },
     {
      "points": 5000,
-     "pct": 6.16,
+     "pct": 6.15,
      "atr4h_multiple": 4.86,
      "size_class": "VERY LARGE / EXTENDED",
-     "atr1h_multiple": 9.5,
+     "atr1h_multiple": 9.2,
      "up_24h": 0.033,
      "dn_24h": 0.039,
      "up_72h": 0.142,
@@ -4603,7 +4610,7 @@
      "pct": 12.31,
      "atr4h_multiple": 9.71,
      "size_class": "VERY LARGE / EXTENDED",
-     "atr1h_multiple": 19.1,
+     "atr1h_multiple": 18.4,
      "up_24h": 0.002,
      "dn_24h": 0.004,
      "up_72h": 0.019,
@@ -4612,16 +4619,16 @@
    ],
    "typical_24h_points": {
     "up": [
-     1114,
-     2078,
-     3384,
-     4433
+     1115,
+     2079,
+     3386,
+     4435
     ],
     "dn": [
-     1200,
-     2184,
-     3534,
-     4528
+     1201,
+     2185,
+     3536,
+     4530
     ]
    },
    "note": "Class is relative to the 4H ATR (SMALL <1x, MEDIUM 1-2x, LARGE 2-4x, VERY LARGE >4x). Probabilities are history, not forecasts."
@@ -4631,7 +4638,7 @@
    "status": "none",
    "score": 20,
    "signs": [
-    "The last push happened on fading volume"
+    "High volume with a long rejection wick at the extreme (buyers/sellers absorbed)"
    ],
    "against": [
     "Trend structure (swing points) is still intact"
@@ -4651,25 +4658,25 @@
      "tf": "1H",
      "role": "Structure and key levels",
      "direction": "DOWN",
-     "strength": 0.33
+     "strength": 0.38
     },
     {
      "tf": "30m",
      "role": "Setup context",
      "direction": "DOWN",
-     "strength": 0.47
+     "strength": 0.4
     },
     {
      "tf": "15m",
      "role": "Setup",
      "direction": "FLAT",
-     "strength": 0.12
+     "strength": 0.05
     },
     {
      "tf": "5m",
      "role": "Entry refinement",
      "direction": "FLAT",
-     "strength": 0.13
+     "strength": 0.05
     }
    ],
    "alignment": "MIXED (timeframes disagree: lower confidence)"
@@ -4843,12 +4850,19 @@
    "status": "TRADE ACTIVE (see Home)",
    "regime": "RANGE",
    "price": 81769.6
+  },
+  {
+   "ts": "2026-10-15T03:14:48+00:00",
+   "stage": "Stage 2: early setup",
+   "status": "EARLY SHORT SETUP (experimental)",
+   "regime": "RANGE",
+   "price": 81271.9
   }
  ],
  "alert_sent": {
-  "stage_ts": "2026-10-15T01:50:57+00:00",
+  "stage_ts": "2026-10-15T03:14:48+00:00",
   "stage-Stage 4-5: trade active>Stage 1: accumulation/distribution developing": "2026-10-13T08:29:59+00:00",
-  "radar-SHORT": "2026-10-14T06:04:51+00:00",
+  "radar-SHORT": "2026-10-15T03:14:48+00:00",
   "stage-Stage 1: accumulation/distribution developing>Stage 4-5: trade active": "2026-10-13T09:06:46+00:00",
   "radar-LONG": "2026-10-14T22:04:48+00:00",
   "win-13": "2026-10-14T12:56:11+00:00",
@@ -4856,7 +4870,7 @@
   "win-15": "2026-10-14T14:38:07+00:00",
   "win-16": "2026-10-14T15:45:48+00:00",
   "win-17": "2026-10-14T16:54:49+00:00",
-  "stage-Stage 4-5: trade active>Stage 2: early setup": "2026-10-14T23:25:13+00:00",
+  "stage-Stage 4-5: trade active>Stage 2: early setup": "2026-10-15T03:14:48+00:00",
   "win-18": "2026-10-14T17:55:04+00:00",
   "stage-Stage 2: early setup>Stage 4-5: trade active": "2026-10-15T01:50:57+00:00",
   "win-22": "2026-10-14T21:35:34+00:00",
@@ -4866,15 +4880,15 @@
  },
  "milestones": [],
  "timing": {
-  "hr": 2,
-  "ist": "07:30-08:30",
-  "cls": "MEDIUM",
-  "activity": 96,
-  "avg_range": 482.8,
-  "avg_up": 234.4,
-  "avg_down": 248.4,
-  "p_range_500": 0.36,
-  "p_range_1000": 0.065,
+  "hr": 3,
+  "ist": "08:30-09:30",
+  "cls": "LOW",
+  "activity": 85,
+  "avg_range": 430.9,
+  "avg_up": 218.9,
+  "avg_down": 212.0,
+  "p_range_500": 0.275,
+  "p_range_1000": 0.057,
   "session": "Asia",
   "next_high": null,
   "top": [
