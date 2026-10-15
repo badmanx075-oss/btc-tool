@@ -22,6 +22,9 @@ def setup_alerts(S, send, now):
         if n == 3 and not (P.get("pos") or {}).get("trend_pullback") and _due(S, "radar-" + side, COOLDOWN_H["radar"], now):
             miss = [c for c in rows if not c[1]]
             send(f"👀 SETUP BAN RAHA HAI ({'BUY' if side == 'LONG' else 'SELL'}) 3/4\nBTC ${px:,.0f}\nBaaki ek shart: {miss[0][0]} ({miss[0][2]}).\nPoori ho gayi to paper trade khud khulega. Abhi kuch karna nahi hai, bas nazar rakho.", cat="setup")
+    R = P.get("methods") or {}
+    if R.get("verdict") in ("LONG", "SHORT") and not any((P.get("pos") or {}).values()) and _due(S, "methods-" + R["verdict"], 3, now):
+        send("🧩 TAREEKE EK SAATH AAYE\n" + __import__("methods").text(R) + "\nAbhi trade tabhi khulega jab 'confluence' strategy ki baaki shartein (candle abhi band hui ho) poori hon. Nazar rakho.", cat="setup")
     T = S.get("timing") or {}; nh = T.get("next_high")
     if config.load()["timing"].get("window_alerts") and nh and 0 < nh["in_min"] <= 30 and _due(S, f"win-{nh['hr']}", 20, now):
         send(f"⏰ ACTIVE WINDOW SHURU HONE WALI HAI ({nh['in_min']} min baad)\nSamay: {nh['ist']} IST. History mein is ghante ki typical range {nh['avg_range']:,.0f} pts (upar {nh['avg_up']:,.0f} / neeche {nh['avg_down']:,.0f} pts).\nAbhi: {T.get('ist')} ({T.get('cls')} activity). Tool is window mein breakout setups par zyada nazar rakhta hai.", cat="timing")

@@ -81,6 +81,7 @@ def position_card(t):
     st.progress(float(min(max((px - t["sl"]) / (tgt - t["sl"]), 0), 1)), text=f"Stop ${t['sl']:,.0f}  ←  now ${px:,.0f}  →  Target ${tgt:,.0f}")
     st.table(pd.DataFrame([{"Entry": round(t["entry"]), "Now": round(px), "Open P/L": inr(usd * t.get("fx", 88)), "R": f"{ur:+.2f}", "Stop": round(t["sl"]), "Target": round(tgt), "Margin": inr(t["margin_inr"]), "Booked": ", ".join(e["kind"] for e in t.get("exits", [])) or "-"}]))
     if t.get("why"): st.info("💬 **Kyun liya:** " + t["why"])
+    if (t.get("entry_ctx") or {}).get("methods_text"): st.caption("🧩 Doosri raay (entry ke waqt): " + t["entry_ctx"]["methods_text"])
     if m:
         for r_ in m["reasons"]: st.markdown("• " + r_)
         st.markdown(m["hold_vs_book"]); st.markdown("🔧 " + m["stop_advice"] + "  (salah hai, paper rule nahi badalta)"); st.caption(f"Agla decision zone ${m['next_zone']:,.0f}")
@@ -95,6 +96,13 @@ with tH_:
     st.subheader("Live positions")
     for t in POS: position_card(t); st.divider()
     if not POS: st.write("No open position.")
+    MR = P.get("methods")
+    if MR and MR.get("votes"):
+        st.subheader("🧩 Multi-method analysis (7 tareeke)")
+        (st.success if MR["verdict"] != "WAIT" else st.info)(f"Consensus: **{MR['verdict']}**  |  net {MR['net']:+.0f}  |  LONG {MR['long']} - SHORT {MR['short']} - neutral {MR['total'] - MR['long'] - MR['short']}")
+        st.dataframe(pd.DataFrame([{"": "🟢" if v["dir"] == 1 else "🔴" if v["dir"] == -1 else "⚪", "Method": v["name"], "Vote": {1: "LONG", -1: "SHORT", 0: "neutral"}[v["dir"]], "Strength": v["strength"], "Kyun": v["why"]} for v in MR["votes"]]), hide_index=True, use_container_width=True)
+        if MR.get("extras"): st.caption("Live second opinion: " + " | ".join(f"{'🟢' if x['dir'] == 1 else '🔴' if x['dir'] == -1 else '⚪'} {x['name']}: {x['why']}" for x in MR["extras"]))
+        st.caption("Har trade ke saath ye 'doosri raay' bhi save hoti hai. Confluence strategy tabhi trade leti hai jab 4+ tareeke ek taraf hon.")
     RD = P.get("radar")
     if RD and not POS:
         st.subheader("Setup radar: how close is a trade?"); x, y = st.columns(2)
@@ -336,7 +344,8 @@ with tHl:
 
 with tS:
     st.caption("Current settings (read from config.json). Change from Telegram: /config, /set naam value, /notify naam on|off. Or edit config.json on GitHub.")
-    for sec in ("wallet", "schedule", "timing", "risk"): st.markdown(f"**{sec}**"); st.table(pd.DataFrame([CFG[sec]]))
+    for sec in ("wallet", "schedule", "timing", "risk"):
+        if isinstance(CFG.get(sec), dict): st.markdown(f"**{sec}**"); st.table(pd.DataFrame([CFG[sec]]))
     st.markdown("**alerts**"); st.table(pd.DataFrame([{k: "on" if v else "off" for k, v in CFG["alerts"].items()}]))
     for s_, v in CFG["strategies"].items(): st.markdown(f"**strategy: {s_}**"); st.table(pd.DataFrame([v]))
     st.info("Backtested rule: trend_pullback stop 3×ATR, target 4R, expiry 120h. Changing these makes new trades differ from what was tested.")
@@ -385,6 +394,11 @@ with tB:
             st.markdown(f"**{ttl}**"); st.table(pd.DataFrame(V7_[key]).T[["n", "avg_R", "win_pct", "profit_factor", "max_drawdown_R"]])
     else: st.info("Run the 'research' workflow once to build the V7 scorecard (it also builds the move statistics).")
 
+    V9 = load("backtest_v9_results.json")
+    if V9:
+        st.markdown(f"**Multi-method Confluence (V9): {V9['verdict']}** (koi parameter fit nahi kiya; 3 fixed strictness levels)")
+        st.dataframe(pd.DataFrame({k: {"trades": v["all"].get("n"), "win %": v["all"].get("win_pct"), "avg R": v["all"].get("mean_R"), "lower 95%": v["all"].get("lo95"), "1st half R": v["first_half"].get("mean_R"), "2nd half R": v["second_half"].get("mean_R"), "long R": v["long"].get("mean_R"), "short R": v["short"].get("mean_R")} for k, v in V9["variants"].items()}).T)
+    else: st.caption("Confluence (V9) ka backtest abhi nahi chala: GitHub Actions > research > Run workflow.")
     V8 = load("backtest_v8_results.json")
     if V8:
         st.markdown(f"**Session Breakout (V8): {V8['verdict']}** (time classes pehle aadhe data se seekhe, test baaki aadhe par)")

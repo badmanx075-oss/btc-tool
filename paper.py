@@ -1,7 +1,7 @@
 """Paper trading engine: virtual wallet with ledger, strategy registry, staged exits, remarks + feedback. NO real orders are ever placed.
 Rules live in config.json (settings), strategies.py (entries) and lifecycle.py (exits)."""
 import datetime as dt, requests
-import timing as TM, confirm as CF, engine as E, backtest_v4 as W4, learn, config, wallet, lifecycle, advisor, review, strategies as ST
+import methods as MT, timing as TM, confirm as CF, engine as E, backtest_v4 as W4, learn, config, wallet, lifecycle, advisor, review, strategies as ST
 from config import inr
 
 FX_DEFAULT = 88.0
@@ -136,7 +136,7 @@ def open_position(P, C, name, sg, now, h15, fxr, send):
     qty = (Wl["cash"] + Wl["margin"]) * sc["risk_pct"] / 100 / (sg["risk"] * fxr); cap = Wl["cash"] * 0.99 / (e * fxr * (1 / lev + fee)); capped = qty > cap; qty = min(qty, cap)
     step = C["wallet"].get("qty_step", 0.0001); qty = round(int(qty / step) * step, 6)
     if qty < step: jlog(P, now, "SKIPPED", f"{name} {'LONG' if k == 1 else 'SHORT'} signal skipped: not enough free balance"); return False
-    P["n"][name] = P["n"].get(name, 0) + 1; side = "LONG" if k == 1 else "SHORT"; tid = f"{ {'trend_pullback': 'TP', 'session_breakout': 'SB'}.get(name, 'ES') }-{side}-{now.strftime('%Y%m%d')}-{P['n'][name]:03d}"
+    P["n"][name] = P["n"].get(name, 0) + 1; side = "LONG" if k == 1 else "SHORT"; tid = f"{ {'trend_pullback': 'TP', 'session_breakout': 'SB', 'confluence': 'CF'}.get(name, 'ES') }-{side}-{now.strftime('%Y%m%d')}-{P['n'][name]:03d}"
     notional = qty * e; margin = notional * fxr / lev; fee_usd = fee * notional
     t = dict(id=tid, strategy=name, label=sc.get("label", name), side=k, entry=e, sl0=sg["sl"], sl=sg["sl"], risk=sg["risk"], mode=sg["mode"], tp=sg.get("tp"), t1=sg.get("t1"), t2=sg.get("t2"), t3=sg.get("t3"),
              partial=sc.get("partial_pct", 50) / 100, qty=qty, qty_btc=qty, notional_usd=round(notional, 2), margin_inr=round(margin, 2), margin_released=0.0, rem_wallet=1.0, leverage=lev, fx=fxr,
@@ -149,7 +149,7 @@ def open_position(P, C, name, sg, now, h15, fxr, send):
     if C["alerts"].get("paper_open"):
         send(f"📝 PAPER ORDER PLACED (virtual)  🕒 {config.ist(now, C)} IST\n{t['label']} | Grade {t['grade']}\nOrder ID: {tid}\nAction: {'BUY' if k == 1 else 'SELL'} ({side}) BTCUSDT Perpetual\nQty: {qty} BTC @ ${e:,.0f}\n"
              f"Position value ${notional:,.0f} ({inr(notional * fxr)}) | margin locked {inr(margin)} ({lev}x) | entry fee {inr(fee_usd * fxr)}\n{plan}\n"
-             f"Risk {inr(t['risk_inr'])} ({sc['risk_pct']}% of equity)" + (" | size capped by free balance" if capped else "") + f"\n💬 Kyun liya: {t['why']}\n"
+             f"Risk {inr(t['risk_inr'])} ({sc['risk_pct']}% of equity)" + (" | size capped by free balance" if capped else "") + f"\n💬 Kyun liya: {t['why']}\n🧩 Doosri raay: {(t.get('entry_ctx') or {}).get('methods_text', 'n/a')}\n"
              f"💰 Wallet: free {inr(Wl['cash'])} | in trades {inr(Wl['margin'])} | equity {inr(Wl['cash'] + Wl['margin'])}")
     return True
 
@@ -210,13 +210,17 @@ def run(S, send, now, scan=None):
             except Exception as ex: print("confirm error", ex)
     try: review.near_miss_step(S, P, scan, C["strategies"].get("early_signal", {}), h15, now, fee)
     except Exception as e: print("near-miss error", e)
+    mI = mres = None
+    try:                                                         # multi-method analysis (7 price methods + live second opinion), every scan
+        mI = MT.prepare(h1.reset_index(drop=True)); mres = MT.consensus(MT.votes(mI, i)); mres["extras"] = MT.live_extras(S); mres["ts"] = iso(now); mres["price"] = px; P["methods"] = mres
+    except Exception as ex: print("methods error", ex)
     tcls = TM.cls_of(TM.load(), now.hour); loss_hit = daily_loss_hit(P, C, now, send)
     for name, sc in C["strategies"].items():
         if loss_hit or (tcls == "LOW" and C["timing"].get("skip_low_activity")): break
         if S.get("paused") or not sc.get("enabled") or P["pos"].get(name) or name not in ST.SIGNALS: continue
         if now.timestamp() * 1000 - P["last_entry"].get(name, 0) < sc.get("cooldown_hours", 1) * 3.6e6: continue
         if len(positions(P)) >= C["wallet"]["max_open_positions"]: continue
-        sg = ST.SIGNALS[name](dict(h1=h1, i=i, S=S, scan=scan, now=now, tcls=tcls), sc)
+        sg = ST.SIGNALS[name](dict(h1=h1, i=i, S=S, scan=scan, now=now, tcls=tcls, mI=mI), sc)
         if not sg: continue
         P["last_entry"][name] = now.timestamp() * 1000; blk = learn.blocked_by(P, sg["ctx"], name)
         if blk:
@@ -226,5 +230,12 @@ def run(S, send, now, scan=None):
             send(f"🧠 Signal skipped by learned filter #{blk['id']}: {blk['text']}\nIt is tracked as a shadow trade to check whether the filter really helps."); continue
         try: sg["entry_ctx"] = review.entry_ctx(S, now)
         except Exception as e: print("ctx error", e)
+        if mres and mres.get("votes"):
+            k_ = sg["side"]; ag, op = (mres["long"], mres["short"]) if k_ == 1 else (mres["short"], mres["long"])
+            sg["entry_ctx"] = dict(sg.get("entry_ctx") or {}, methods=dict(verdict=mres["verdict"], net=mres["net"], agree=ag, against=op, total=mres["total"], keys=[v["key"] for v in mres["votes"] if v["dir"] == k_]),
+                                   methods_text=f"{ag}/{mres['total']} methods trade ke saath, {op} khilaaf (consensus: {mres['verdict']})")
+            gate = C.get("risk", {}).get("min_methods_agree", 0)
+            if gate and ag < gate:
+                jlog(P, now, "FILTERED", f"{name} skipped: only {ag} methods agree (need {gate})"); send(f"🧩 Signal skipped: sirf {ag}/{mres['total']} methods trade ke saath ({gate} chahiye). {name} {'BUY' if k_ == 1 else 'SELL'} chhoda gaya.", cat="setup"); continue
         jlog(P, now, "SIGNAL", f"{name} {'LONG' if sg['side'] == 1 else 'SHORT'} signal at ${sg['entry']:,.0f}")
         if not open_position(P, C, name, sg, now, h15, fx(P), send): P["last_entry"][name] = now.timestamp() * 1000 - max(sc.get("cooldown_hours", 1) - 1, 0) * 3.6e6

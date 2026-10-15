@@ -86,3 +86,12 @@ Files for this upgrade: `levels.py`, `moves.py`, `reversal.py`, `derivs.py`, `fl
 - **Session Breakout strategy** (experimental, risk 0.3%): 6 ghante ki tang box ka breakout + strong candle + volume 1.3x+ + 4H trend virodh mein nahi + LOW ghanta nahi. Stop box ke doosri taraf, target 2R, 24h expiry. Confirmation tracker isse bhi chalta hai. Backtest: research workflow chalao (V8): time classes pehle aadhe data se, test baaki aadhe par.
 - **Daily loss guard**: aaj ka realised loss 3% (`risk.max_daily_loss_pct`) tak pahunche to naye trades band, kal tak. Khule trades chalte rahte hain.
 - Direction ke baare mein: har ghante ka up/down bias zyadatar noise hota hai, isliye tool use "significant" tabhi kehta hai jab bahut saaf ho.
+
+## Multi-method analysis + Confluence strategy (new)
+- 7 alag tareeke har scan par market ko parakhte hain: Trend (EMAs), Market structure (HH/HL, break of structure), Candlestick patterns (engulfing, hammer, shooting star, morning/evening star, doji, inside bar), Support/Resistance, Momentum (RSI+MACD), Bollinger bands, Volume (spike + OBV). Har ek LONG / SHORT / neutral vote deta hai aur kaaran batata hai.
+- Live extra raay (vote nahi, sirf dikhti hai): order flow, OI+price, crowding, multi-timeframe.
+- Dashboard Home par "🧩 Multi-method analysis" table; Telegram `/methods`; jab 4+ tareeke ek taraf aayein to alert.
+- **Har trade** (kisi bhi strategy ka) ke saath "🧩 Doosri raay" jaati hai (entry ke waqt kitne tareeke saath/khilaaf the) aur review pack mein `by_methods_agree` se pata chalega ki jab zyada tareeke saath the to trades behtar the ya nahi.
+- **Confluence strategy** (experimental, risk 0.4%): 4+ tareeke ek taraf, doosri taraf 1 se zyada nahi, net score 35+. Stop aakhri swing ke paar, target 2R.
+- Optional gate: `/set min_methods_agree 3` => koi bhi strategy tabhi trade legi jab kam se kam 3 tareeke saath hon (default 0 = off).
+- Backtest V9 (research workflow): koi parameter fit nahi, 3 fixed strictness levels, har half, har saal, long/short alag.

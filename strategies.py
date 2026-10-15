@@ -1,6 +1,6 @@
 """Strategy registry. To add a strategy: write signal(env, cfg) -> dict | None, register it in SIGNALS, add its block in config.json."""
 import datetime as dt
-import backtest_v4 as W4
+import backtest_v4 as W4, methods as MT
 
 HIN = {"price near range low": "bhaav range ke sabse neeche (support ke paas) hai", "price near range high": "bhaav range ke upar (resistance ke paas) hai",
        "failed breakdown / liquidity sweep": "neeche tootne ki koshish fail hui (stop-loss hunt jaisa) aur bhaav wapas upar aaya",
@@ -62,4 +62,19 @@ def session_breakout(env, sc):
         return dict(side=k, entry=e, sl=e - k * risk, tp=e + k * sc.get("target_r", 2.0) * risk, confirm=e + k * 0.5 * a, risk=risk, mode="fixed", ctx=ctx, why=why)
     return None
 
-SIGNALS = {"trend_pullback": trend_pullback, "early_signal": early_signal, "session_breakout": session_breakout}
+def confluence(env, sc):
+    """Trades only when several independent methods (trend, structure, candlesticks, S/R, momentum, bands, volume) agree. Experimental."""
+    h1, i, now = env["h1"], env["i"], env["now"]
+    if env.get("tcls") == "LOW" and sc.get("skip_low", False): return None
+    if now.timestamp() - (float(h1.ts.iloc[i]) / 1000 + 3600) > 1800: return None              # candle closed >30 min ago: too late
+    I = env.get("mI") or MT.prepare(h1.reset_index(drop=True)); res = MT.consensus(MT.votes(I, i), int(sc.get("need", 4)), sc.get("net_min", 35))
+    if res["verdict"] == "WAIT": return None
+    k = 1 if res["verdict"] == "LONG" else -1; a = float(I["atr"][i]); e = float(I["c"][i]); piv = MT._last_pivots(I, i, I["sl"] if k == 1 else I["sh"], 1)
+    stop = (float(piv[0]) - 0.2 * a * k) if len(piv) else e - k * 2 * a; risk = min(max(abs(e - stop), sc.get("stop_min_atr", 1.2) * a), sc.get("stop_max_atr", 3.0) * a)
+    agree = [v for v in res["votes"] if v["dir"] == k]; ctx = dict(side_n=k, side=res["verdict"], hour=now.hour, wd=now.weekday(), atr_pct=round(a / e * 100, 3), net=res["net"], agree=len(agree), tcls=env.get("tcls"),
+                                                                    regime=(env["S"].get("market") or {}).get("regime"), funding=float((env["S"].get("market") or {}).get("funding", 0)), methods=[v["key"] for v in agree])
+    why = (f"{len(agree)} alag-alag tareeke ek hi taraf ({'BUY' if k == 1 else 'SELL'}) bol rahe the (net score {res['net']:+.0f}): " + "; ".join(f"{v['name']}: {v['why']}" for v in agree)
+           + f". Stop aakhri swing ke us paar, target {sc.get('target_r', 2)}R. Ye experimental hai: backtest (V9) se pehle isse sabit nahi maana jaata.")
+    return dict(side=k, entry=e, sl=e - k * risk, tp=e + k * sc.get("target_r", 2.0) * risk, confirm=e + k * 0.5 * a, risk=risk, mode="fixed", ctx=ctx, why=why)
+
+SIGNALS = {"trend_pullback": trend_pullback, "early_signal": early_signal, "session_breakout": session_breakout, "confluence": confluence}
