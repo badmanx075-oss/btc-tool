@@ -1,7 +1,7 @@
 """Paper trading engine: virtual wallet with ledger, strategy registry, staged exits, remarks + feedback. NO real orders are ever placed.
 Rules live in config.json (settings), strategies.py (entries) and lifecycle.py (exits)."""
 import datetime as dt, requests
-import methods as MT, timing as TM, confirm as CF, engine as E, backtest_v4 as W4, learn, config, wallet, lifecycle, advisor, review, strategies as ST
+import moveradar as MR, methods as MT, timing as TM, confirm as CF, engine as E, backtest_v4 as W4, learn, config, wallet, lifecycle, advisor, review, strategies as ST
 from config import inr
 
 FX_DEFAULT = 88.0
@@ -103,9 +103,30 @@ def apply_exit(P, C, t, kind, price, frac, now, send):
     if kind == "T1 PARTIAL" and C["alerts"].get("stage_alerts"):
         send(f"🎯 T1 HIT ({t['id']})  🕒 {config.ist(now, C)} IST\n{frac * 100:.0f}% booked at ${price:,.0f} ({'+' if pnl >= 0 else '-'}{inr(abs(pnl * t['fx']))}).\nStop moved to entry ${t['entry']:,.0f}. Remaining {t['remaining'] * 100:.0f}% runs to T2 ${t['t2']:,.0f}.")
 
+def smart_exit(S, P, C, t, hr, px, now, send):
+    """Closes a paper trade early when the move looks COMPLETE (exhaustion / expected move reached) or the trade is STALLED, so trades do not run for days.
+    The original fixed-rule trade keeps running as a SHADOW copy, so review_pack can show honestly whether smart exits help."""
+    X = C.get("exits", {})
+    if not X.get("smart_exit") or t["remaining"] <= 1e-9: return False
+    try: m = advisor.assess(t, hr, px); t["mgmt"] = m
+    except Exception: m = t.get("mgmt") or {}
+    uR = (px - t["entry"]) * t["side"] / t["risk"]; hrs = (now - dt.datetime.fromisoformat(t["created"])).total_seconds() / 3600; exh = m.get("exhaustion", 0); reason = None
+    ex = ((S.get("analysis") or {}).get("expected_move") or {}).get("expected")
+    if uR >= X.get("min_profit_R", 1.0) and (exh >= X.get("exhaustion_min", 70) or m.get("stage") in ("PROFIT BOOKING", "REVERSAL DETECTED")): reason = f"move poora hone ke sanket (thakaan {exh}/100, {uR:+.1f}R)"
+    elif X.get("use_expected_move") and ex and (px - t["entry"]) * t["side"] >= ex[0] and uR >= 0.5: reason = f"expected move (~{ex[0]:,.0f} pts) poora ho gaya ({uR:+.1f}R)"
+    elif hrs >= X.get("stall_hours", 10) and abs(uR) < X.get("stall_band_R", 0.3) and (t.get("confirm_info") or {}).get("state") != "CONFIRMED": reason = f"{hrs:.0f} ghante mein trade ne kuch nahi kiya (stall, {uR:+.1f}R)"
+    if not reason: return False
+    sh = lifecycle.new_state(t["side"], t["entry"], t["sl"], t["mode"], t.get("tp"), t.get("t1"), t.get("t2"), t.get("partial", 0.5))
+    sh.update(stage=t["stage"], remaining=t["remaining"], mfe_R=t["mfe_R"], mae_R=t["mae_R"], risk=t["risk"], id="SMARTSH-" + t["id"], strategy=t["strategy"], created=t["created"], expiry_h=t["expiry_h"], last_ts=t["last_ts"],
+              exits=[(e["kind"], e["price"], e["frac"]) for e in t["exits"]], smart_R_at_exit=round(uR, 2), reason=reason)
+    P.setdefault("smartshadow", []).append(sh); del P["smartshadow"][:-60]
+    frac = t["remaining"]; t["remaining"] = 0; t["smart_reason"] = reason; jlog(P, now, "SMART EXIT", f"{t['id']}: {reason}"); apply_exit(P, C, t, "SMART EXIT", px, frac, now, send)
+    send(f"🏁 SMART EXIT ({t['id']}): {reason}\nTrade lamba na chale isliye band kiya. Asli rule (stop/target) wali copy shadow mein chalti rahegi, taaki pata chale smart exit behtar tha ya nahi.", cat="paper_close")
+    finalize(P, C, t, now, send); return True
+
 def finalize(P, C, t, now, send):
     net = t["realized_usd"] - t["fees_usd"]; R = net / (t["qty"] * t["risk"]); kinds = [e["kind"] for e in t["exits"]]; fr = sum(e["frac"] for e in t["exits"]) or 1
-    outcome = ("T2 REACHED" if "T2 TARGET" in kinds else "TARGET" if "TARGET" in kinds else "EXPIRED" if "EXPIRED" in kinds else "T1 BOOKED, STOPPED AT ENTRY" if "BREAKEVEN STOP" in kinds else "STOP-LOSS")
+    outcome = ("SMART EXIT" if "SMART EXIT" in kinds else "T2 REACHED" if "T2 TARGET" in kinds else "TARGET" if "TARGET" in kinds else "EXPIRED" if "EXPIRED" in kinds else "T1 BOOKED, STOPPED AT ENTRY" if "BREAKEVEN STOP" in kinds else "STOP-LOSS")
     t.update(closed=iso(now), outcome=outcome, exit=sum(e["price"] * e["frac"] for e in t["exits"]) / fr, R=round(float(R), 3), pnl_inr=round(float(net * t["fx"]), 2), net_usd=round(float(net), 2),
              gross_usd=round(float(t["realized_usd"]), 2), fees_usd=round(float(t["fees_usd"]), 2), mfe_R=round(t["mfe_R"], 2), mae_R=round(t["mae_R"], 2),
              hold_h=round((now - dt.datetime.fromisoformat(t["created"])).total_seconds() / 3600, 1))
@@ -197,6 +218,8 @@ def run(S, send, now, scan=None):
         fxr = fx(P); e = px; risk = 0.003 * px; qty = round(P["wallet"]["cash"] * 0.002 / (risk * fxr), 4) or 0.0001
         P["demo"] = dict(id=f"DEMO-{now.strftime('%H%M')}", side=1, entry=e, sl=e - risk, tp=e + risk, risk=risk, qty=qty, fx=fxr, created=iso(now), why="Ye sirf test (demo) trade hai: scan, order, monitor, close aur Telegram chal rahe hain ya nahi, ye jaanchne ke liye.")
         send(f"🧪 DEMO ORDER PLACED (test only, wallet NOT affected)  🕒 {config.ist(now, C)} IST\nOrder ID: {P['demo']['id']}\nBUY (LONG) {qty} BTC @ ${e:,.0f}\nStop ${e - risk:,.0f} | Target ${e + risk:,.0f}\nCloses at stop/target or within 1 hour.")
+    for sh in P.get("smartshadow", []):
+        if "R" not in sh: shadow_step(sh, h15, now, fee)
     for sh in P["shadow"]:
         if "R" not in sh and "mode" in sh: shadow_step(sh, h15, now, fee)
     del P["shadow"][:-100]
@@ -205,6 +228,7 @@ def run(S, send, now, scan=None):
         if t: manage(P, C, t, h15, px, now, send)
     for name, t in list(P["pos"].items()):
         if t and C["alerts"].get("advice"): advise(P, C, t, hr, px, now, send)
+        if t and smart_exit(S, P, C, t, hr, px, now, send): continue
         if t:
             try: CF.step(S, P, C, t, px, now, send, ev, config.ist)
             except Exception as ex: print("confirm error", ex)
@@ -214,6 +238,9 @@ def run(S, send, now, scan=None):
     try:                                                         # multi-method analysis (7 price methods + live second opinion), every scan
         mI = MT.prepare(h1.reset_index(drop=True)); mres = MT.consensus(MT.votes(mI, i)); mres["extras"] = MT.live_extras(S); mres["ts"] = iso(now); mres["price"] = px; P["methods"] = mres
     except Exception as ex: print("methods error", ex)
+    try:                                                         # move radar: 'good move coming' -> 'move started' -> 'move complete'
+        TS_ = TM.load(); rm = MR.live(S, mI, i, now, TM.cls_of(TS_, now.hour), TM.cls_of(TS_, (now.hour + 1) % 24)); P["radar_move"] = rm; MR.watch(S, rm, px, mI, i, now, send)
+    except Exception as ex: print("move radar error", ex)
     tcls = TM.cls_of(TM.load(), now.hour); loss_hit = daily_loss_hit(P, C, now, send)
     for name, sc in C["strategies"].items():
         if loss_hit or (tcls == "LOW" and C["timing"].get("skip_low_activity")): break

@@ -4,7 +4,7 @@ import datetime as dt
 import review, config
 
 COOLDOWN_H = dict(radar=4, stage=1)
-CATS = [("paper_open", "Trade khula"), ("paper_close", "Trade band"), ("advice", "Position advice"), ("setup", "Setup ban raha hai"), ("flow", "Order flow"), ("timing", "Active window"), ("confirm", "Trade confirm"), ("stage_alerts", "Stage change"),
+CATS = [("paper_open", "Trade khula"), ("paper_close", "Trade band"), ("advice", "Position advice"), ("setup", "Setup ban raha hai"), ("move", "Good move radar"), ("flow", "Order flow"), ("timing", "Active window"), ("confirm", "Trade confirm"), ("stage_alerts", "Stage change"),
         ("signals", "Early signals"), ("reversal", "Reversal"), ("learning", "Learning"), ("milestone", "Milestone"), ("morning", "Subah"), ("evening", "Shaam"), ("weekly", "Weekly")]
 
 

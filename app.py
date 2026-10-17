@@ -1,6 +1,6 @@
 import json, os, io, datetime as dt, requests, pandas as pd, streamlit as st
 import streamlit.components.v1 as components
-import config, history, stats, decision, review, timing, sr as SRM, orderflow as OFM
+import config, history, stats, decision, review, timing, moveradar as MRD, sr as SRM, orderflow as OFM
 try:
     import chart as CH, engine as ENG
 except Exception as _e: CH = None; _CH_ERR = str(_e)
@@ -99,6 +99,17 @@ with tH_:
     st.subheader("Live positions")
     for t in POS: position_card(t); st.divider()
     if not POS: st.write("No open position.")
+    RM = P.get("radar_move"); MW = S.get("move_watch")
+    if RM:
+        st.subheader("🚀 Move radar: kya achhi move aane wali hai?")
+        a_, b_ = st.columns([1, 2]); a_.metric("Radar score", f"{RM['score']}/100", RM["state"].title()); b_.progress(min(RM["score"] / 100, 1.0), text=f"{RM['state']} | jhukaav: {({1: 'UPAR', -1: 'NEECHE', 0: 'saaf nahi'})[RM['lean']]} | typical move ~{RM['exp_pts']:,.0f} pts | trigger: ${RM['box_lo']:,.0f} ke neeche / ${RM['box_hi']:,.0f} ke upar band")
+        (st.success if RM["state"] == "GOOD MOVE LIKELY" else st.info)("Parts: " + ", ".join(f"{k.replace('_', ' ')} {v}" for k, v in RM["parts"].items()) + (" | " + "; ".join(RM["notes"]) if RM["notes"] else ""))
+        if MW:
+            _mt = ("move shuru " + ("UPAR" if MW["triggered"] == 1 else "NEECHE") + " (start $" + format(MW.get("start", 0), ",.0f") + ")") if MW.get("triggered") else "trigger ka intezaar"
+            st.warning(f"👀 Watch chalu: {_mt} | radar {MW['score']} par fire hua. Move poora hone par Telegram alert aayega.")
+        if S.get("move_log"): 
+            with st.expander("Pichle radar alerts ka natija (kitni baar sach nikla)"): st.dataframe(pd.DataFrame([{"time": x["ts"][5:16], "score": x["score"], "jhukaav": x["lean"], "natija": x["result"], "pts": x.get("traveled")} for x in S["move_log"][::-1]]), hide_index=True)
+        st.caption("Radar sambhavna batata hai, guarantee nahi. Backtest (V10) ka sach Backtests tab mein hai.")
     MR = P.get("methods")
     if MR and MR.get("votes"):
         st.subheader("🧩 Multi-method analysis (7 tareeke)")
@@ -328,6 +339,9 @@ with tRV:
         for nm, g in PK["calibration"].items():
             if g: 
                 with st.expander("Calibration: " + nm.replace("by_", "by ")): st.dataframe(pd.DataFrame(g).T[["n", "win_pct", "mean_R", "net_inr", "small_sample"]], use_container_width=True)
+        SC = PK.get("smart_exit_compare") or {}
+        if SC.get("finished") or SC.get("pending"):
+            st.markdown(f"**Smart exit vs asli rule** (shadow copy): {SC['finished']} poore, {SC['pending']} baaki. " + (f"Smart avg {SC['mean_smart_R']}R vs asli rule {SC['mean_fixed_R']}R | smart behtar {SC['smart_better']} baar, asli rule behtar {SC['fixed_better']} baar." if SC.get("finished") else "Natija shadow trades poore hone par aayega."))
         with st.expander("Review pack ka text preview"): st.code(review.pack_md(PK))
 
 with tTM:
@@ -439,6 +453,11 @@ with tB:
             st.markdown(f"**{ttl}**"); st.table(pd.DataFrame(V7_[key]).T[["n", "avg_R", "win_pct", "profit_factor", "max_drawdown_R"]])
     else: st.info("Run the 'research' workflow once to build the V7 scorecard (it also builds the move statistics).")
 
+    V10 = load("backtest_v10_results.json")
+    if V10:
+        st.markdown(f"**Move radar (V10): {V10['verdict']}** (agle {V10['forward_hours']} ghante mein {V10['big_move_atr']}x ATR se badi move)")
+        _u = V10["buckets"]["unseen_second_half"]; st.dataframe(pd.DataFrame({k: {"signals": v.get("n"), "badi move %": v.get("big_rate"), "avg move pts": v.get("avg_move_pts"), "lean sahi %": v.get("lean_right_pct")} for k, v in _u.items()}).T)
+    else: st.caption("Move radar (V10) ka backtest abhi nahi chala: GitHub Actions > research > Run workflow.")
     V9 = load("backtest_v9_results.json")
     if V9:
         st.markdown(f"**Multi-method Confluence (V9): {V9['verdict']}** (koi parameter fit nahi kiya; 3 fixed strictness levels)")

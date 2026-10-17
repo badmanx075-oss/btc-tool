@@ -35,7 +35,7 @@ def entry_ctx(S, now):
                 regime=M.get("regime") or A.get("regime"), stage=A.get("stage"), stage_status=A.get("status"), direction=A.get("direction"),
                 scores={k: round(float(v), 1) for k, v in (A.get("scores") or {}).items() if isinstance(v, (int, float))}, false_signal_risk=A.get("false_signal_risk"),
                 range=A.get("range"), expected_move=_small((A.get("expected_move") or {}).get("expected")), mtf=_small([(r["tf"], r["direction"], r["strength"]) for r in (D.get("mtf") or {}).get("rows", [])]),
-                aggression=((S.get("orderflow") or {}).get("now") or {}).get("state"), hour_class=(S.get("timing") or {}).get("cls"), hour_activity=(S.get("timing") or {}).get("activity"), crowding=d.get("crowding"), oi_quadrant=d.get("quadrant"), taker_delta=d.get("taker_delta"), liquidations=d.get("liquidations"), funding=M.get("funding"),
+                move_radar=((P.get("radar_move") or {}).get("score")), aggression=((S.get("orderflow") or {}).get("now") or {}).get("state"), hour_class=(S.get("timing") or {}).get("cls"), hour_activity=(S.get("timing") or {}).get("activity"), crowding=d.get("crowding"), oi_quadrant=d.get("quadrant"), taker_delta=d.get("taker_delta"), liquidations=d.get("liquidations"), funding=M.get("funding"),
                 radar={s: sum(c[1] for c in rad.get(s, [])) for s in ("LONG", "SHORT")} if rad else None, reversal=M.get("reversal"))
 
 
@@ -116,6 +116,16 @@ def _trade_row(r):
                 user_rating=r.get("user_rating"), user_note=r.get("user_note"), user_exit=r.get("user_exit"), config_at_entry=raw.get("cfg"))
 
 
+def smart_compare(P):
+    """Smart exit vs what the original fixed rule WOULD have done (shadow copy)."""
+    done = [s for s in (P.get("smartshadow") or []) if "R" in s]; closed = {t["id"]: t for t in P.get("closed", [])}; rows = []
+    for s in done:
+        t = closed.get(s["id"].replace("SMARTSH-", ""))
+        if t: rows.append(dict(id=t["id"], smart_R=t.get("R"), fixed_rule_R=s["R"], reason=s.get("reason")))
+    n = len(rows)
+    return dict(finished=n, pending=len(P.get("smartshadow") or []) - n, mean_smart_R=round(sum(r["smart_R"] for r in rows) / n, 3) if n else None, mean_fixed_R=round(sum(r["fixed_rule_R"] for r in rows) / n, 3) if n else None,
+                smart_better=sum(r["smart_R"] > r["fixed_rule_R"] for r in rows), fixed_better=sum(r["smart_R"] < r["fixed_rule_R"] for r in rows), rows=rows[-30:])
+
 def pack(S, now=None, records=None):
     now = now or dt.datetime.now(dt.timezone.utc); recs = list(records) if records is not None else list(history.load()["records"].values()); rows = stats.closed_paper(recs); P = S.get("paper") or {}; W = P.get("wallet") or {}
     ok_ = [r for r in rows]
@@ -123,7 +133,7 @@ def pack(S, now=None, records=None):
         about="BTC tool review pack. Paper trades only, no real money. Send this file to Claude for rule tuning. Conclusions need 30+ trades; treat small groups as noise.",
         generated_utc=now.isoformat(timespec="seconds"), readiness=readiness(S, rows), overall=stats._block(ok_) if ok_ else dict(n=0),
         wallet=dict(start=W.get("start"), cash=W.get("cash"), margin=W.get("margin"), balance=P.get("balance"), max_drawdown_pct=P.get("max_dd_pct")),
-        calibration=calibration(rows), shadows=shadow_summary(P), settings=config.load(),
+        calibration=calibration(rows), shadows=shadow_summary(P), smart_exit_compare=smart_compare(P), move_radar_log=(S.get("move_log") or [])[-40:], settings=config.load(),
         learning=dict(filters=P.get("filters"), proposals=P.get("proposals"), lessons=P.get("lessons")),
         open_trades=[dict(id=t["id"], side=t["side"], entry=t["entry"], sl=t["sl"], mgmt=t.get("mgmt"), why=t.get("why")) for t in (P.get("pos") or {}).values() if t],
         health=dict(telegram={k: v for k, v in (S.get("telegram") or {}).items() if k != "log"}, last_price=S.get("last_price")),

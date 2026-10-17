@@ -103,3 +103,10 @@ Files for this upgrade: `levels.py`, `moves.py`, `reversal.py`, `derivs.py`, `fl
 - Order-flow data scanner khud jama karta hai (orderflow_profile.json, pichle 36 ghante); poori tasveer ~1 ghante baad aati hai. Coverage % dikhata hai ki kitne trades pakde gaye.
 - Order-flow ki halat har trade ke saath entry ke waqt save hoti hai (review pack mein `by_aggression`), aur multi-method "live second opinion" mein bhi dikhti hai.
 - Chart ke liye `requirements.txt` mein `plotly` hona zaroori hai: file upload karke Streamlit app ko Reboot karo.
+
+## Move radar + Smart exit (new)
+- **🚀 Move radar** (Home card, Telegram `/radar`, alert "GOOD MOVE COMING?"): score 0-100 jo bataata hai ki badi move aane ki sambhavna kitni hai. Parts: volatility dabna (compression), tang box, volume build-up, active time window, bhaav box ke kinare, 7 tareekon ka jhukaav, + live order flow / OI.
+- Flow: **GOOD MOVE COMING?** (score 65+) -> trigger levels batata hai -> **MOVE SHURU** (box tootne par) -> **MOVE COMPLETE** (expected points ~80% ya thakaan ke sanket) ya **MOVE FAIL** (fake-out). 8 ghante mein kuch na ho to watch khatam. Natije dashboard mein "kitni baar sach nikla" table mein jama hote hain.
+- Radar sambhavna batata hai, guarantee nahi. Backtest V10 (research workflow) aise napta hai: score 65+ ke baad agle 6 ghante mein badi move (2.5x ATR) ki dar, base rate se kitni zyada, aur unseen half par.
+- **Smart exit** (paper trades, default ON): trade tab band hota hai jab (1) +1R se zyada profit ho aur thakaan 70+ / profit-booking zone ho, (2) expected move poora ho jaye, ya (3) trade 10 ghante tak chala par kuch nahi hua (stall, aur confirm nahi hua). Ye trade ko lamba chalne se rokta hai.
+- Asli rule (stop/target) wali copy **shadow** mein chalti rehti hai. Review tab mein "Smart exit vs asli rule" dikhata hai ki smart exit sach mein behtar tha ya nahi. Band karna ho: `/set smart_exit off`. Settings: `exits` section (`/config`).

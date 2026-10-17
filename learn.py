@@ -9,6 +9,7 @@ def postmortem(t):
     o, m, h, R = t.get("outcome", ""), t.get("mfe_R", 0), t.get("hold_h", 0), t.get("R", 0)
     if o in ("TARGET", "T2 REACHED"): return f"Jeet: plan jaisa socha tha waisa hi chala ({R:+.1f}R)."
     if o.startswith("T1 BOOKED"): return f"Aadha profit T1 par book hua, phir bhaav palta aur baaki hissa entry par band hua ({R:+.1f}R). Partial booking ne nuksaan bachaya."
+    if o == "SMART EXIT": return f"Smart exit ({t.get('smart_reason', 'move poora/rukne ke sanket')}): {R:+.1f}R par band kiya, taaki trade lamba na chale. Fixed rule se tulna review pack mein hoti hai."
     if o == "STOP-LOSS":
         if m >= 2: return f"Haar, par pehle +{m:.1f}R tak ja chuka tha: disha sahi thi par bhaav palat gaya. Chhota target ya trailing stop shayad profit bacha leta (sirf andaza, test karna hoga)."
         if h <= 6: return f"Jaldi haar ({h:.0f} ghante, best +{m:.1f}R): entry ka timing theek nahi tha ya achanak volatility ne stop tod diya."
