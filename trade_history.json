@@ -7106,7 +7106,7 @@
     "move_class": "LARGE",
     "risk": "Medium",
     "created": "2026-10-16T18:09:29+00:00",
-    "last_ts": 1792200900000.0,
+    "last_ts": 1792202400000.0,
     "mfe": 510.8000000000029,
     "mae": 401.3999999999942,
     "status": "EARLY SETUP",
@@ -7308,7 +7308,7 @@
      }
     ],
     "created": "2026-10-16T18:09:29+00:00",
-    "last_ts": 1792199700000.0,
+    "last_ts": 1792201500000.0,
     "expiry_h": 72,
     "cfg": {
      "enabled": true,
@@ -7424,69 +7424,390 @@
     "capped": false,
     "mgmt": {
      "status": "\ud83d\udfe2 HOLD: MORE UPSIDE POSSIBLE",
-     "stage": "ENTRY",
-     "uR": 0.26,
+     "stage": "PROFIT DEVELOPING",
+     "uR": 0.47,
      "mfe_R": 0.77,
      "exhaustion": 25,
      "reversal_flags": {
       "structure_break": false,
-      "momentum_negative": false,
+      "momentum_negative": true,
       "gave_back": false
      },
      "reasons": [
-      "Momentum dheema pad raha hai (pichle 3 ghante -0.2 ATR)",
-      "Volume kam ho raha hai (normal ka 0.4 guna)"
+      "Momentum dheema pad raha hai (pichle 3 ghante -0.5 ATR)",
+      "Volume kam ho raha hai (normal ka 0.3 guna)"
      ],
      "stop_advice": "Stop jaisa hai waisa rakho",
      "suggested_sl": 80629.1,
-     "hold_vs_book": "Hold: target 2.7R door, stop tak 1.3R (R/R 2.2). Abhi book karo to +0.3R pakka.",
+     "hold_vs_book": "Hold: target 2.5R door, stop tak 1.5R (R/R 1.7). Abhi book karo to +0.5R pakka.",
      "next_zone": 82772.3,
-     "momentum_atr": -0.21,
-     "volume_ratio": 0.36
+     "momentum_atr": -0.54,
+     "volume_ratio": 0.34
     },
     "mstatus": "\ud83d\udfe2 HOLD: MORE UPSIDE POSSIBLE",
     "mts": "2026-10-16T22:24:08+00:00",
     "confirm_info": {
      "state": "WAITING",
-     "score": 2,
+     "score": 1,
      "total": 6,
      "checks": [
       [
        "Confirm level toda",
        false,
-       "level $81,787, ab $81,459"
+       "level $81,787, ab $81,596"
       ],
       [
        "Profit +0.5R se zyada",
        false,
-       "+0.26R"
+       "+0.47R"
       ],
       [
        "Momentum trade ke saath",
        false,
-       "-0.2 ATR (3h)"
+       "-0.5 ATR (3h)"
       ],
       [
        "15m aur 1H direction trade ke saath",
-       false,
-       "15m FLAT, 1H FLAT"
+       true,
+       "15m UP, 1H FLAT"
       ],
       [
        "Order flow (taker) trade ke saath",
-       true,
-       "taker delta +0.03"
+       false,
+       "taker delta -0.03"
       ],
       [
        "Reversal ke sanket nahi",
-       true,
-       "koi flag nahi"
+       false,
+       "flag hai"
       ]
      ],
-     "ts": "2026-10-17T01:35:06+00:00",
+     "ts": "2026-10-17T02:03:58+00:00",
      "first": null
     }
    }
+  },
+  "CF-SHORT-20261017-003": {
+   "id": "CF-SHORT-20261017-003",
+   "source": "PAPER",
+   "strategy": "confluence",
+   "label": "Multi-Method Confluence (experimental)",
+   "side": "SHORT",
+   "opened": "2026-10-17T02:03:58+00:00",
+   "opened_ist": "17 Oct 2026, 07:33 AM IST",
+   "entry": 81507.4,
+   "stop": 82009.21613655212,
+   "targets": [
+    80503.76772689575
+   ],
+   "qty_btc": 0.0016,
+   "margin_inr": 4134.58,
+   "leverage": 3,
+   "risk_inr": 76.37,
+   "why": "4 alag-alag tareeke ek hi taraf (SELL) bol rahe the (net score -39): Trend: EMA20<EMA50<EMA200 aur bhaav EMA50 ke neeche: downtrend; Market structure: Lower-high aur lower-low: sellers control mein; Support/Resistance: Bhaav resistance ($81,799) ke paas aur wahan se neeche bandh hua; Volume: OBV aur bhaav dono neeche: volume trend ka saath de raha hai. Stop aakhri swing ke us paar, target 2.0R. Ye experimental hai: backtest (V9) se pehle isse sabit nahi maana jaata.",
+   "context": {
+    "side_n": -1,
+    "side": "SHORT",
+    "hour": 2,
+    "wd": 5,
+    "atr_pct": 0.513,
+    "net": -38.9,
+    "agree": 4,
+    "tcls": "MEDIUM",
+    "regime": "RANGE",
+    "funding": 0.0001,
+    "methods": [
+     "trend",
+     "structure",
+     "sr",
+     "volume"
+    ]
+   },
+   "entry_context": {
+    "time_utc": "2026-10-17T02:03:58+00:00",
+    "session": "Asia (00-08 UTC)",
+    "weekday": "Sat",
+    "regime": "RANGE",
+    "stage": "Stage 4-5: trade active",
+    "stage_status": "TRADE ACTIVE (see Home)",
+    "direction": "SHORT",
+    "scores": {
+     "structure": 0.0,
+     "volume": 29.5,
+     "momentum": 39.7,
+     "order_flow": 12.9,
+     "liquidity": 52.8,
+     "htf": 42.6,
+     "accumulation": 40.0,
+     "distribution": 40.0,
+     "volatility_pct": 58.5,
+     "large_move_potential": 39.0,
+     "continuation": 62.7,
+     "exhaustion_risk": 34.3,
+     "setup": 72.6
+    },
+    "false_signal_risk": "Medium",
+    "range": {
+     "high": 84130.9,
+     "low": 79725.3,
+     "mid": 81928.1,
+     "position_pct": 43.0043580897039
+    },
+    "expected_move": [
+     771.308055,
+     1553.226697
+    ],
+    "mtf": [
+     [
+      "4H",
+      "FLAT",
+      0.14
+     ],
+     [
+      "1H",
+      "FLAT",
+      0.12
+     ],
+     [
+      "30m",
+      "DOWN",
+      0.26
+     ],
+     [
+      "15m",
+      "UP",
+      0.26
+     ],
+     [
+      "5m",
+      "FLAT",
+      0.13
+     ]
+    ],
+    "aggression": "MILD BUYING",
+    "hour_class": "MEDIUM",
+    "hour_activity": 96,
+    "crowding": "balanced",
+    "oi_quadrant": "new_shorts",
+    "taker_delta": -0.025,
+    "liquidations": null,
+    "funding": 0.0001,
+    "radar": {
+     "LONG": 2,
+     "SHORT": 3
+    },
+    "reversal": "none",
+    "methods": {
+     "verdict": "SHORT",
+     "net": -38.9,
+     "agree": 4,
+     "against": 0,
+     "total": 7,
+     "keys": [
+      "trend",
+      "structure",
+      "sr",
+      "volume"
+     ]
+    },
+    "methods_text": "4/7 methods trade ke saath, 0 khilaaf (consensus: SHORT)"
+   },
+   "grade": "C",
+   "status": "OPEN",
+   "outcome": "",
+   "closed": null,
+   "closed_ist": "",
+   "exit": null,
+   "R": null,
+   "pnl_inr": null,
+   "fees_usd": 0.06520591999999999,
+   "hold_h": null,
+   "best_R": 0.0,
+   "worst_R": 0.0,
+   "exits": [],
+   "lesson": "",
+   "auto_feedback": "",
+   "user_rating": "",
+   "user_note": "",
+   "user_feedback_ist": "",
+   "user_exit": null,
+   "timeline": [
+    {
+     "time_ist": "17 Oct 2026, 07:33 AM IST",
+     "type": "OPENED",
+     "price": 81507.4,
+     "note": "qty 0.0016 BTC, margin \u20b94,135"
+    }
+   ],
+   "raw": {
+    "id": "CF-SHORT-20261017-003",
+    "strategy": "confluence",
+    "label": "Multi-Method Confluence (experimental)",
+    "side": -1,
+    "entry": 81507.4,
+    "sl0": 82009.21613655212,
+    "sl": 82009.21613655212,
+    "risk": 501.81613655212567,
+    "mode": "fixed",
+    "tp": 80503.76772689575,
+    "t1": null,
+    "t2": null,
+    "t3": null,
+    "partial": 0.5,
+    "qty": 0.0016,
+    "qty_btc": 0.0016,
+    "notional_usd": 130.41,
+    "margin_inr": 4134.58,
+    "margin_released": 0.0,
+    "rem_wallet": 1.0,
+    "leverage": 3,
+    "fx": 95.111965,
+    "risk_inr": 76.37,
+    "fees_usd": 0.06520591999999999,
+    "realized_usd": 0.0,
+    "stage": 0,
+    "remaining": 1.0,
+    "mfe_R": 0.0,
+    "mae_R": 0.0,
+    "exits": [],
+    "events": [
+     {
+      "ts": "2026-10-17T02:03:58+00:00",
+      "type": "OPENED",
+      "price": 81507.4,
+      "note": "qty 0.0016 BTC, margin \u20b94,135"
+     }
+    ],
+    "created": "2026-10-17T02:03:58+00:00",
+    "last_ts": 1792202400000.0,
+    "expiry_h": 48,
+    "cfg": {
+     "enabled": true,
+     "label": "Multi-Method Confluence (experimental)",
+     "risk_pct": 0.4,
+     "need": 4,
+     "net_min": 35,
+     "stop_min_atr": 1.2,
+     "stop_max_atr": 3.0,
+     "target_r": 2.0,
+     "expiry_hours": 48,
+     "cooldown_hours": 12,
+     "leverage": 3,
+     "fee_per_side": 0.0005
+    },
+    "ctx": {
+     "side_n": -1,
+     "side": "SHORT",
+     "hour": 2,
+     "wd": 5,
+     "atr_pct": 0.513,
+     "net": -38.9,
+     "agree": 4,
+     "tcls": "MEDIUM",
+     "regime": "RANGE",
+     "funding": 0.0001,
+     "methods": [
+      "trend",
+      "structure",
+      "sr",
+      "volume"
+     ]
+    },
+    "entry_ctx": {
+     "time_utc": "2026-10-17T02:03:58+00:00",
+     "session": "Asia (00-08 UTC)",
+     "weekday": "Sat",
+     "regime": "RANGE",
+     "stage": "Stage 4-5: trade active",
+     "stage_status": "TRADE ACTIVE (see Home)",
+     "direction": "SHORT",
+     "scores": {
+      "structure": 0.0,
+      "volume": 29.5,
+      "momentum": 39.7,
+      "order_flow": 12.9,
+      "liquidity": 52.8,
+      "htf": 42.6,
+      "accumulation": 40.0,
+      "distribution": 40.0,
+      "volatility_pct": 58.5,
+      "large_move_potential": 39.0,
+      "continuation": 62.7,
+      "exhaustion_risk": 34.3,
+      "setup": 72.6
+     },
+     "false_signal_risk": "Medium",
+     "range": {
+      "high": 84130.9,
+      "low": 79725.3,
+      "mid": 81928.1,
+      "position_pct": 43.0043580897039
+     },
+     "expected_move": [
+      771.308055,
+      1553.226697
+     ],
+     "mtf": [
+      [
+       "4H",
+       "FLAT",
+       0.14
+      ],
+      [
+       "1H",
+       "FLAT",
+       0.12
+      ],
+      [
+       "30m",
+       "DOWN",
+       0.26
+      ],
+      [
+       "15m",
+       "UP",
+       0.26
+      ],
+      [
+       "5m",
+       "FLAT",
+       0.13
+      ]
+     ],
+     "aggression": "MILD BUYING",
+     "hour_class": "MEDIUM",
+     "hour_activity": 96,
+     "crowding": "balanced",
+     "oi_quadrant": "new_shorts",
+     "taker_delta": -0.025,
+     "liquidations": null,
+     "funding": 0.0001,
+     "radar": {
+      "LONG": 2,
+      "SHORT": 3
+     },
+     "reversal": "none",
+     "methods": {
+      "verdict": "SHORT",
+      "net": -38.9,
+      "agree": 4,
+      "against": 0,
+      "total": 7,
+      "keys": [
+       "trend",
+       "structure",
+       "sr",
+       "volume"
+      ]
+     },
+     "methods_text": "4/7 methods trade ke saath, 0 khilaaf (consensus: SHORT)"
+    },
+    "confirm_lvl": 81298.30994310328,
+    "grade": "C",
+    "why": "4 alag-alag tareeke ek hi taraf (SELL) bol rahe the (net score -39): Trend: EMA20<EMA50<EMA200 aur bhaav EMA50 ke neeche: downtrend; Market structure: Lower-high aur lower-low: sellers control mein; Support/Resistance: Bhaav resistance ($81,799) ke paas aur wahan se neeche bandh hua; Volume: OBV aur bhaav dono neeche: volume trend ka saath de raha hai. Stop aakhri swing ke us paar, target 2.0R. Ye experimental hai: backtest (V9) se pehle isse sabit nahi maana jaata.",
+    "capped": false
+   }
   }
  },
- "updated": "2026-10-17T01:35:18+00:00"
+ "updated": "2026-10-17T02:04:12+00:00"
 }
