@@ -7106,7 +7106,7 @@
     "move_class": "LARGE",
     "risk": "Medium",
     "created": "2026-10-16T18:09:29+00:00",
-    "last_ts": 1792237800000.0,
+    "last_ts": 1792239000000.0,
     "mfe": 510.8000000000029,
     "mae": 401.3999999999942,
     "status": "EARLY SETUP",
@@ -7308,7 +7308,7 @@
      }
     ],
     "created": "2026-10-16T18:09:29+00:00",
-    "last_ts": 1792236600000.0,
+    "last_ts": 1792237500000.0,
     "expiry_h": 72,
     "cfg": {
      "enabled": true,
@@ -7425,46 +7425,46 @@
     "mgmt": {
      "status": "\ud83d\udfe2 HOLD: MORE UPSIDE POSSIBLE",
      "stage": "PROFIT DEVELOPING",
-     "uR": 0.42,
+     "uR": 0.36,
      "mfe_R": 0.77,
      "exhaustion": 25,
      "reversal_flags": {
       "structure_break": false,
-      "momentum_negative": false,
+      "momentum_negative": true,
       "gave_back": false
      },
      "reasons": [
-      "Momentum dheema pad raha hai (pichle 3 ghante -0.5 ATR)",
+      "Momentum dheema pad raha hai (pichle 3 ghante -0.9 ATR)",
       "Volume kam ho raha hai (normal ka 0.3 guna)"
      ],
      "stop_advice": "Stop jaisa hai waisa rakho",
      "suggested_sl": 80629.1,
-     "hold_vs_book": "Hold: target 2.6R door, stop tak 1.4R (R/R 1.8). Abhi book karo to +0.4R pakka.",
+     "hold_vs_book": "Hold: target 2.6R door, stop tak 1.4R (R/R 1.9). Abhi book karo to +0.4R pakka.",
      "next_zone": 82772.3,
-     "momentum_atr": -0.49,
-     "volume_ratio": 0.31
+     "momentum_atr": -0.92,
+     "volume_ratio": 0.26
     },
     "mstatus": "\ud83d\udfe2 HOLD: MORE UPSIDE POSSIBLE",
     "mts": "2026-10-16T22:24:08+00:00",
     "confirm_info": {
      "state": "WAITING",
-     "score": 1,
+     "score": 0,
      "total": 6,
      "checks": [
       [
        "Confirm level toda",
        false,
-       "level $81,787, ab $81,564"
+       "level $81,787, ab $81,528"
       ],
       [
        "Profit +0.5R se zyada",
        false,
-       "+0.42R"
+       "+0.36R"
       ],
       [
        "Momentum trade ke saath",
        false,
-       "-0.5 ATR (3h)"
+       "-0.9 ATR (3h)"
       ],
       [
        "15m aur 1H direction trade ke saath",
@@ -7474,15 +7474,15 @@
       [
        "Order flow (taker) trade ke saath",
        false,
-       "taker delta -0.21"
+       "taker delta -0.22"
       ],
       [
        "Reversal ke sanket nahi",
-       true,
-       "koi flag nahi"
+       false,
+       "flag hai"
       ]
      ],
-     "ts": "2026-10-17T11:54:39+00:00",
+     "ts": "2026-10-17T12:14:50+00:00",
      "first": null
     }
    }
@@ -7613,20 +7613,28 @@
     "methods_text": "4/7 methods trade ke saath, 0 khilaaf (consensus: SHORT)"
    },
    "grade": "C",
-   "status": "OPEN",
-   "outcome": "",
-   "closed": null,
-   "closed_ist": "",
-   "exit": null,
-   "R": null,
-   "pnl_inr": null,
-   "fees_usd": 0.06520591999999999,
-   "hold_h": null,
-   "best_R": 0.2777909872683302,
-   "worst_R": 0.46610697218125946,
-   "exits": [],
-   "lesson": "",
-   "auto_feedback": "",
+   "status": "CLOSED",
+   "outcome": "SMART EXIT",
+   "closed": "2026-10-17T12:14:50+00:00",
+   "closed_ist": "17 Oct 2026, 05:44 PM IST",
+   "exit": 81528.0,
+   "R": -0.203,
+   "pnl_inr": -15.54,
+   "fees_usd": 0.13,
+   "hold_h": 10.2,
+   "best_R": 0.28,
+   "worst_R": 0.47,
+   "exits": [
+    {
+     "ts": "2026-10-17T12:14:50+00:00",
+     "kind": "SMART EXIT",
+     "price": 81528.0,
+     "frac": 1.0,
+     "pnl_inr": -3.13
+    }
+   ],
+   "lesson": "Smart exit (10 ghante mein trade ne kuch nahi kiya (stall, -0.0R)): -0.2R par band kiya, taaki trade lamba na chale. Fixed rule se tulna review pack mein hoti hai.",
+   "auto_feedback": "\ud83d\udfe1 Normal haar: sirf tay risk (-0.2R) gaya. Is tarah ki strategy mein aksar 3 mein 2 trade harte hain.",
    "user_rating": "",
    "user_note": "",
    "user_feedback_ist": "",
@@ -7637,6 +7645,18 @@
      "type": "OPENED",
      "price": 81507.4,
      "note": "qty 0.0016 BTC, margin \u20b94,135"
+    },
+    {
+     "time_ist": "17 Oct 2026, 05:44 PM IST",
+     "type": "SMART EXIT",
+     "price": 81528.0,
+     "note": "100% of position, P/L -\u20b93"
+    },
+    {
+     "time_ist": "17 Oct 2026, 05:44 PM IST",
+     "type": "CLOSED",
+     "price": 81528.0,
+     "note": "SMART EXIT"
     }
    ],
    "raw": {
@@ -7658,28 +7678,48 @@
     "qty_btc": 0.0016,
     "notional_usd": 130.41,
     "margin_inr": 4134.58,
-    "margin_released": 0.0,
-    "rem_wallet": 1.0,
+    "margin_released": 4134.58,
+    "rem_wallet": 0.0,
     "leverage": 3,
     "fx": 95.111965,
     "risk_inr": 76.37,
-    "fees_usd": 0.06520591999999999,
-    "realized_usd": 0.0,
+    "fees_usd": 0.13,
+    "realized_usd": -0.032960000000009315,
     "stage": 0,
-    "remaining": 1.0,
-    "mfe_R": 0.2777909872683302,
-    "mae_R": 0.46610697218125946,
-    "exits": [],
+    "remaining": 0,
+    "mfe_R": 0.28,
+    "mae_R": 0.47,
+    "exits": [
+     {
+      "ts": "2026-10-17T12:14:50+00:00",
+      "kind": "SMART EXIT",
+      "price": 81528.0,
+      "frac": 1.0,
+      "pnl_inr": -3.13
+     }
+    ],
     "events": [
      {
       "ts": "2026-10-17T02:03:58+00:00",
       "type": "OPENED",
       "price": 81507.4,
       "note": "qty 0.0016 BTC, margin \u20b94,135"
+     },
+     {
+      "ts": "2026-10-17T12:14:50+00:00",
+      "type": "SMART EXIT",
+      "price": 81528.0,
+      "note": "100% of position, P/L -\u20b93"
+     },
+     {
+      "ts": "2026-10-17T12:14:50+00:00",
+      "type": "CLOSED",
+      "price": 81528.0,
+      "note": "SMART EXIT"
      }
     ],
     "created": "2026-10-17T02:03:58+00:00",
-    "last_ts": 1792236600000.0,
+    "last_ts": 1792237500000.0,
     "expiry_h": 48,
     "cfg": {
      "enabled": true,
@@ -7809,7 +7849,7 @@
     "mgmt": {
      "status": "\ud83d\udfe2 HOLD: THESIS INTACT",
      "stage": "ENTRY",
-     "uR": -0.11,
+     "uR": -0.04,
      "mfe_R": 0.21,
      "exhaustion": 25,
      "reversal_flags": {
@@ -7818,15 +7858,15 @@
       "gave_back": false
      },
      "reasons": [
-      "Momentum trend ke saath chal raha hai (pichle 3 ghante +0.5 ATR)",
+      "Momentum trend ke saath chal raha hai (pichle 3 ghante +0.9 ATR)",
       "Volume kam ho raha hai (normal ka 0.3 guna)"
      ],
      "stop_advice": "Stop jaisa hai waisa rakho",
      "suggested_sl": 82009.2,
-     "hold_vs_book": "Hold: target 2.1R door, stop tak 0.9R (R/R 2.4). Abhi book karo to +-0.1R pakka.",
+     "hold_vs_book": "Hold: target 2.0R door, stop tak 1.0R (R/R 2.1). Abhi book karo to +-0.0R pakka.",
      "next_zone": 80754.7,
-     "momentum_atr": 0.49,
-     "volume_ratio": 0.31
+     "momentum_atr": 0.92,
+     "volume_ratio": 0.26
     },
     "mstatus": "\ud83d\udfe2 HOLD: THESIS INTACT",
     "mts": "2026-10-17T09:01:18+00:00",
@@ -7868,9 +7908,29 @@
      ],
      "ts": "2026-10-17T11:54:39+00:00",
      "first": null
+    },
+    "smart_reason": "10 ghante mein trade ne kuch nahi kiya (stall, -0.0R)",
+    "closed": "2026-10-17T12:14:50+00:00",
+    "outcome": "SMART EXIT",
+    "exit": 81528.0,
+    "R": -0.203,
+    "pnl_inr": -15.54,
+    "net_usd": -0.16,
+    "gross_usd": -0.03,
+    "hold_h": 10.2,
+    "lesson": "Smart exit (10 ghante mein trade ne kuch nahi kiya (stall, -0.0R)): -0.2R par band kiya, taaki trade lamba na chale. Fixed rule se tulna review pack mein hoti hai.",
+    "feedback": {
+     "auto": {
+      "result": "LOSS",
+      "verdict": "\ud83d\udfe1 Normal haar: sirf tay risk (-0.2R) gaya. Is tarah ki strategy mein aksar 3 mein 2 trade harte hain.",
+      "plan_followed": true,
+      "best_R": 0.28,
+      "worst_R": 0.47
+     },
+     "user": null
     }
    }
   }
  },
- "updated": "2026-10-17T11:54:51+00:00"
+ "updated": "2026-10-17T12:15:02+00:00"
 }
