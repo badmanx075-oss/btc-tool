@@ -10316,7 +10316,7 @@
    "outcome": "T2 REACHED",
    "closed": null,
    "closed_ist": "",
-   "best_move_pts": 1552.5,
+   "best_move_pts": 1754.6000000000058,
    "worst_dip_pts": 0,
    "user_rating": "",
    "user_note": "",
@@ -10389,8 +10389,8 @@
     "move_class": "VERY LARGE",
     "risk": "Medium",
     "created": "2026-10-18T21:35:11+00:00",
-    "last_ts": 1792376100000.0,
-    "mfe": 1552.5,
+    "last_ts": 1792378200000.0,
+    "mfe": 1754.6000000000058,
     "mae": 0,
     "status": "EXTENDED MOVE WATCH",
     "outcome": "T2 REACHED",
@@ -11024,20 +11024,28 @@
     "methods_text": "0/7 methods trade ke saath, 3 khilaaf (consensus: WAIT)"
    },
    "grade": "B",
-   "status": "OPEN",
-   "outcome": "",
-   "closed": null,
-   "closed_ist": "",
-   "exit": null,
-   "R": null,
-   "pnl_inr": null,
-   "fees_usd": 0.16067688,
-   "hold_h": null,
-   "best_R": 0.0,
-   "worst_R": 0.0,
-   "exits": [],
-   "lesson": "",
-   "auto_feedback": "",
+   "status": "CLOSED",
+   "outcome": "STOP-LOSS",
+   "closed": "2026-10-19T02:53:28+00:00",
+   "closed_ist": "19 Oct 2026, 08:23 AM IST",
+   "exit": 82656.33142857143,
+   "R": -1.32,
+   "pnl_inr": -126.39,
+   "fees_usd": 0.32,
+   "hold_h": 0.6,
+   "best_R": 0.3,
+   "worst_R": 1.47,
+   "exits": [
+    {
+     "ts": "2026-10-19T02:53:28+00:00",
+     "kind": "STOP-LOSS",
+     "price": 82656.33142857143,
+     "frac": 1.0,
+     "pnl_inr": -95.75
+    }
+   ],
+   "lesson": "Jaldi haar (1 ghante, best +0.3R): entry ka timing theek nahi tha ya achanak volatility ne stop tod diya.",
+   "auto_feedback": "\ud83d\udfe1 Normal haar: sirf tay risk (-1.3R) gaya. Is tarah ki strategy mein aksar 3 mein 2 trade harte hain.",
    "user_rating": "",
    "user_note": "",
    "user_feedback_ist": "",
@@ -11048,6 +11056,18 @@
      "type": "OPENED",
      "price": 82398.4,
      "note": "qty 0.0039 BTC, margin \u20b910,196"
+    },
+    {
+     "time_ist": "19 Oct 2026, 08:23 AM IST",
+     "type": "STOP-LOSS",
+     "price": 82656.3,
+     "note": "100% of position, P/L -\u20b996"
+    },
+    {
+     "time_ist": "19 Oct 2026, 08:23 AM IST",
+     "type": "CLOSED",
+     "price": 82656.3,
+     "note": "STOP-LOSS"
     }
    ],
    "raw": {
@@ -11069,28 +11089,48 @@
     "qty_btc": 0.0039,
     "notional_usd": 321.35,
     "margin_inr": 10196.01,
-    "margin_released": 0.0,
-    "rem_wallet": 1.0,
+    "margin_released": 10196.01,
+    "rem_wallet": 0.0,
     "leverage": 3,
     "fx": 95.184915,
     "risk_inr": 95.75,
-    "fees_usd": 0.16067688,
-    "realized_usd": 0.0,
+    "fees_usd": 0.32,
+    "realized_usd": -1.005932571428598,
     "stage": 0,
-    "remaining": 1.0,
-    "mfe_R": 0.0,
-    "mae_R": 0.0,
-    "exits": [],
+    "remaining": 0,
+    "mfe_R": 0.3,
+    "mae_R": 1.47,
+    "exits": [
+     {
+      "ts": "2026-10-19T02:53:28+00:00",
+      "kind": "STOP-LOSS",
+      "price": 82656.33142857143,
+      "frac": 1.0,
+      "pnl_inr": -95.75
+     }
+    ],
     "events": [
      {
       "ts": "2026-10-19T02:19:14+00:00",
       "type": "OPENED",
       "price": 82398.4,
       "note": "qty 0.0039 BTC, margin \u20b910,196"
+     },
+     {
+      "ts": "2026-10-19T02:53:28+00:00",
+      "type": "STOP-LOSS",
+      "price": 82656.3,
+      "note": "100% of position, P/L -\u20b996"
+     },
+     {
+      "ts": "2026-10-19T02:53:28+00:00",
+      "type": "CLOSED",
+      "price": 82656.3,
+      "note": "STOP-LOSS"
      }
     ],
     "created": "2026-10-19T02:19:14+00:00",
-    "last_ts": 1792376100000.0,
+    "last_ts": 1792377000000.0,
     "expiry_h": 72,
     "cfg": {
      "enabled": true,
@@ -11204,9 +11244,28 @@
     "confirm_lvl": 82088.7,
     "grade": "B",
     "why": "Bhaav range ke upar (resistance) ke paas tha aur ye cheezein ek saath mili: bhaav range ke upar (resistance ke paas) hai; upar nikalne ki koshish fail hui aur bhaav wapas neeche aaya; kharidne wala volume ghat raha hai; momentum neeche mudne laga hai. Setup score 75/100 (kam se kam 65 chahiye). Kamzor pehlu: lower-high abhi nahi bana; volatility sikudi nahi. Ye 'early' signal hai (palatne se pehle pakadne ki koshish), isliye risk kam rakha aur aadha profit T1 par book hota hai. Iska pichla backtest record negative tha, to ise experiment samjho.",
-    "capped": false
+    "capped": false,
+    "closed": "2026-10-19T02:53:28+00:00",
+    "outcome": "STOP-LOSS",
+    "exit": 82656.33142857143,
+    "R": -1.32,
+    "pnl_inr": -126.39,
+    "net_usd": -1.33,
+    "gross_usd": -1.01,
+    "hold_h": 0.6,
+    "lesson": "Jaldi haar (1 ghante, best +0.3R): entry ka timing theek nahi tha ya achanak volatility ne stop tod diya.",
+    "feedback": {
+     "auto": {
+      "result": "LOSS",
+      "verdict": "\ud83d\udfe1 Normal haar: sirf tay risk (-1.3R) gaya. Is tarah ki strategy mein aksar 3 mein 2 trade harte hain.",
+      "plan_followed": true,
+      "best_R": 0.3,
+      "worst_R": 1.47
+     },
+     "user": null
+    }
    }
   }
  },
- "updated": "2026-10-19T02:19:28+00:00"
+ "updated": "2026-10-19T02:53:43+00:00"
 }
