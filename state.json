@@ -1614,7 +1614,7 @@
    "move_class": "VERY LARGE",
    "risk": "Medium",
    "created": "2026-10-18T21:35:11+00:00",
-   "last_ts": 1792422300000.0,
+   "last_ts": 1792424100000.0,
    "mfe": 2127.4000000000087,
    "mae": 0,
    "status": "EXTENDED MOVE WATCH",
@@ -1686,18 +1686,18 @@
   "morning": "2026-10-19",
   "weekly": "2026-10-18"
  },
- "last_price": 82210.3,
+ "last_price": 82074.0,
  "market": {
-  "price": 82210.3,
+  "price": 82074.0,
   "regime": "RANGE",
   "signal": "NO TRADE",
-  "side": "LONG",
-  "score": 25,
+  "side": "SHORT",
+  "score": 30,
   "scores": {
-   "LONG": 25,
-   "SHORT": 15
+   "LONG": 20,
+   "SHORT": 30
   },
-  "atr1h": 429.500000000001,
+  "atr1h": 453.7928571428586,
   "atr4h": 738.1071428571419,
   "reversal": "none",
   "tf": {
@@ -1706,11 +1706,11 @@
     "label": "FLAT"
    },
    "15m": {
-    "er": 0.19,
+    "er": 0.1,
     "label": "FLAT"
    },
    "30m": {
-    "er": 0.03,
+    "er": 0.02,
     "label": "FLAT"
    },
    "1H": {
@@ -1723,18 +1723,18 @@
    }
   },
   "funding": 0.0001,
-  "oi": 2484515999.8290095,
+  "oi": 2471063472.9984117,
   "pro": [
-   "failed breakdown / liquidity sweep"
+   "lower high forming",
+   "momentum turning down"
   ],
   "con": [
    "price not at range edge (mid-range risk)",
-   "no higher low yet",
-   "selling volume not fading",
-   "no compression",
-   "momentum not turning"
+   "no sweep of prior highs",
+   "buying volume not fading",
+   "no compression"
   ],
-  "ts": "2026-10-19T15:07:39+00:00"
+  "ts": "2026-10-19T15:39:17+00:00"
  },
  "paper": {
   "closed": [
@@ -7464,8 +7464,8 @@
    }
   },
   "radar": {
-   "ts": "2026-10-19T15:07:39+00:00",
-   "price": 82180.0,
+   "ts": "2026-10-19T15:39:17+00:00",
+   "price": 82074.5,
    "LONG": [
     [
      "4H trend up",
@@ -9399,13 +9399,18 @@
    "extras": [
     {
      "name": "Order flow (taker)",
-     "dir": -1,
-     "why": "Taker delta -0.07: sellers aggressive"
+     "dir": 1,
+     "why": "Taker delta +0.07: buyers aggressive"
+    },
+    {
+     "name": "OI + price",
+     "dir": 1,
+     "why": "Open interest/price: short covering"
     },
     {
      "name": "Aggression (60 min)",
      "dir": -1,
-     "why": "MILD SELLING (delta -20%, bade orders 4%)"
+     "why": "MILD SELLING (delta -22%, bade orders 0%)"
     },
     {
      "name": "Multi-timeframe",
@@ -9413,11 +9418,11 @@
      "why": "0 timeframe UP, 0 DOWN (5m..4H)"
     }
    ],
-   "ts": "2026-10-19T15:07:39+00:00",
-   "price": 82180.0
+   "ts": "2026-10-19T15:39:17+00:00",
+   "price": 82074.5
   },
   "radar_move": {
-   "ts": "2026-10-19T15:07:39+00:00",
+   "ts": "2026-10-19T15:39:17+00:00",
    "score": 23,
    "state": "QUIET",
    "lean": 0,
@@ -9433,7 +9438,7 @@
    "box_hi": 83149.8,
    "box_lo": 81720.0,
    "atr": 430.7,
-   "exp_pts": 819,
+   "exp_pts": 776,
    "tm": {
     "now": "HIGH",
     "next": "HIGH"
@@ -9544,17 +9549,11 @@
   "bot": "btcstochbot",
   "poll_error": "",
   "last_error": "",
-  "last_send_ok": "2026-10-19T15:07:52+00:00",
+  "last_send_ok": "2026-10-19T15:39:31+00:00",
   "last_run": "2026-10-19T15:11:26+00:00",
   "last_cmd_ts": "2026-10-19T06:54:16+00:00",
   "last_cmd": "button",
   "log": [
-   {
-    "ts": "2026-10-18T23:48:14+00:00",
-    "cat": "stage_alerts",
-    "ok": true,
-    "text": "\ud83d\udd00 STAGE BADLA Stage 4-5: trade active  \u2192  Stage 0: no clear opportunit"
-   },
    {
     "ts": "2026-10-18T23:48:15+00:00",
     "cat": "milestone",
@@ -9728,45 +9727,72 @@
     "cat": "evening",
     "ok": true,
     "text": "\ud83c\udf06 GOOD EVENING Daily Review Price: $82,210 Regime: RANGE Signals: 0 T1"
+   },
+   {
+    "ts": "2026-10-19T15:39:31+00:00",
+    "cat": "timing",
+    "ok": true,
+    "text": "\u23f0 ACTIVE WINDOW SHURU HONE WALI HAI (21 min baad) Samay: 21:30-22:30 I"
    }
   ]
  },
  "analysis": {
-  "price": 82210.3,
+  "price": 82074.0,
   "regime": "RANGE",
   "stage": "Stage 0: no clear opportunity",
   "status": "NO TRADE",
-  "direction": "NONE",
+  "direction": "SHORT",
   "scores": {
    "structure": 50,
    "volume": 45.18025588845251,
    "momentum": 23.28346367448709,
-   "order_flow": 41.0925,
-   "liquidity": 50.228947070157346,
+   "order_flow": 32.345,
+   "liquidity": 50.65057236767532,
    "htf": 45.86163465431154,
-   "accumulation": 25,
-   "distribution": 15,
+   "accumulation": 20,
+   "distribution": 30,
    "volatility_pct": 61.5,
    "large_move_potential": 39,
-   "continuation": 38.10845140575038,
+   "continuation": 61.89154859424962,
    "exhaustion_risk": 9.728172579244095,
-   "setup": 0.0
+   "setup": 58.778134102613166
   },
-  "levels": null,
+  "levels": {
+   "early_zone": [
+    82029.885,
+    82206.345
+   ],
+   "confirmation": 81720.0,
+   "retest_zone": [
+    81675.885,
+    81852.345
+   ],
+   "late_above": 81278.85,
+   "hard_invalidation": 83326.26000000001,
+   "preferred_sl": 83326.26000000001,
+   "emergency_sl": 83397.45000000001,
+   "t1": 81298.4007,
+   "t2": 80512.13178,
+   "t3": 79416.44388,
+   "extended": 78621.96756,
+   "rr_t1": 0.62,
+   "targets_from": "history quantiles",
+   "entry_state": "inside EARLY entry zone"
+  },
   "expected_move": {
    "expected": [
-    818.8145880000001,
-    1578.43776
+    775.5993,
+    1561.86822
    ],
    "strong": [
-    1578.43776,
-    2674.3010590000004
+    1561.86822,
+    2657.5561199999997
    ],
    "extended": [
-    2674.3010590000004,
-    3702.7519119999997
+    2657.5561199999997,
+    3452.0324400000004
    ],
-   "side": "up",
+   "side": "dn",
    "sample": 15955,
    "odds": {
     "500": [
@@ -9774,12 +9800,12 @@
      0.649
     ],
     "1000": [
-     0.421,
-     0.41
+     0.42,
+     0.409
     ],
     "2000": [
      0.177,
-     0.17
+     0.169
     ],
     "5000": [
      0.022,
@@ -9791,47 +9817,88 @@
     ]
    }
   },
-  "checklist": [],
-  "false_signal_risk": "n/a",
+  "checklist": [
+   [
+    "Volume not supporting the move",
+    false
+   ],
+   [
+    "Market structure not supporting",
+    false
+   ],
+   [
+    "Liquidity against the trade (level within 1 ATR)",
+    true
+   ],
+   [
+    "Higher timeframe against",
+    false
+   ],
+   [
+    "Momentum not improving",
+    false
+   ],
+   [
+    "Price rejecting the direction (wick)",
+    false
+   ],
+   [
+    "Possible liquidity trap (sweep and reverse)",
+    false
+   ],
+   [
+    "Failed-breakout signs",
+    false
+   ],
+   [
+    "Volatility too high (top 10%)",
+    false
+   ],
+   [
+    "Middle of range",
+    true
+   ]
+  ],
+  "false_signal_risk": "Low",
   "range": {
    "high": 83149.8,
    "low": 80621.4,
    "mid": 81885.6,
-   "position_pct": 62.84211358962203
+   "position_pct": 57.45135263407691
   },
   "breakout": "none",
   "notes": {
-   "order_flow": "book imbalance -0.36, OI -0.16% (4h)",
+   "order_flow": "book imbalance -0.71, OI -0.68% (4h)",
    "atr": 441.15000000000146,
    "funding": 0.0001,
-   "oi": 2484515999.8290095
+   "oi": 2471063472.9984117
   }
  },
  "desk": {
-  "price": 82210.3,
+  "price": 82074.0,
   "atr1h": 441.15000000000146,
   "atr4h": 684.3857142857139,
   "derivs": {
    "crowding": "balanced",
-   "quadrant": null,
-   "oi_change_4h": -0.16,
-   "oi_change_24h": 2.12,
-   "price_change_4h": 1.29,
-   "taker_delta": -0.07,
+   "quadrant": "short_covering",
+   "oi_change_4h": -0.68,
+   "oi_change_24h": 1.25,
+   "price_change_4h": 1.3,
+   "taker_delta": 0.066,
    "liquidations": {
     "long_usd": 607893.0,
     "short_usd": 9418264.0
    },
-   "bias": -0.21,
+   "bias": 0.5,
    "items": [
     "Funding 0.0100% per 8h is normal: no obvious crowding",
-    "Open interest -0.16% over 4h with small price change: no clear signal",
-    "Taker flow (last ~1h of samples): sellers (-0.07)",
+    "Price up but open interest down: the rise is short-covering, not new buying (weaker, can fade)",
+    "Taker flow (last ~1h of samples): buyers (+0.07)",
     "Recent liquidations: longs $0.6M, shorts $9.4M (forced closing can extend or end a move)"
    ]
   },
   "levels": {
-   "price": 82210.3,
+   "price": 82074.0,
    "resistance": [
     {
      "price": 82267.7,
@@ -9841,22 +9908,22 @@
      ],
      "count": 2,
      "strength": "strong",
-     "dist_pts": 57.4,
-     "dist_pct": 0.07,
-     "dist_atr1h": 0.13,
+     "dist_pts": 193.7,
+     "dist_pct": 0.24,
+     "dist_atr1h": 0.44,
      "side": "resistance"
     },
     {
-     "price": 82488.5,
+     "price": 82483.6,
      "names": [
       "Today's VWAP",
       "Half-round number"
      ],
      "count": 2,
      "strength": "medium",
-     "dist_pts": 278.2,
-     "dist_pct": 0.34,
-     "dist_atr1h": 0.63,
+     "dist_pts": 409.6,
+     "dist_pct": 0.5,
+     "dist_atr1h": 0.93,
      "side": "resistance"
     },
     {
@@ -9866,9 +9933,9 @@
      ],
      "count": 1,
      "strength": "light",
-     "dist_pts": 789.7,
-     "dist_pct": 0.96,
-     "dist_atr1h": 1.79,
+     "dist_pts": 926.0,
+     "dist_pct": 1.13,
+     "dist_atr1h": 2.1,
      "side": "resistance"
     },
     {
@@ -9879,15 +9946,15 @@
      ],
      "count": 2,
      "strength": "medium",
-     "dist_pts": 939.5,
-     "dist_pct": 1.14,
-     "dist_atr1h": 2.13,
+     "dist_pts": 1075.8,
+     "dist_pct": 1.31,
+     "dist_atr1h": 2.44,
      "side": "resistance"
     }
    ],
    "support": [
     {
-     "price": 82054.4,
+     "price": 82054.5,
      "names": [
       "Round number",
       "Swing high",
@@ -9897,9 +9964,9 @@
      ],
      "count": 5,
      "strength": "strong",
-     "dist_pts": -155.9,
-     "dist_pct": -0.19,
-     "dist_atr1h": -0.35,
+     "dist_pts": -19.5,
+     "dist_pct": -0.02,
+     "dist_atr1h": -0.04,
      "side": "support"
     },
     {
@@ -9910,9 +9977,9 @@
      ],
      "count": 3,
      "strength": "strong",
-     "dist_pts": -498.9,
-     "dist_pct": -0.61,
-     "dist_atr1h": -1.13,
+     "dist_pts": -362.6,
+     "dist_pct": -0.44,
+     "dist_atr1h": -0.82,
      "side": "support"
     },
     {
@@ -9923,9 +9990,9 @@
      ],
      "count": 2,
      "strength": "medium",
-     "dist_pts": -669.6,
-     "dist_pct": -0.81,
-     "dist_atr1h": -1.52,
+     "dist_pts": -533.3,
+     "dist_pct": -0.65,
+     "dist_atr1h": -1.21,
      "side": "support"
     },
     {
@@ -9935,15 +10002,15 @@
      ],
      "count": 1,
      "strength": "light",
-     "dist_pts": -842.3,
-     "dist_pct": -1.02,
-     "dist_atr1h": -1.91,
+     "dist_pts": -706.0,
+     "dist_pct": -0.86,
+     "dist_atr1h": -1.6,
      "side": "support"
     }
    ],
    "vwap": {
-    "vwap": 82477.0,
-    "dev_atr": -0.6,
+    "vwap": 82467.2,
+    "dev_atr": -0.89,
     "note": "near VWAP (not stretched)"
    },
    "nearest_resistance": {
@@ -9954,13 +10021,13 @@
     ],
     "count": 2,
     "strength": "strong",
-    "dist_pts": 57.4,
-    "dist_pct": 0.07,
-    "dist_atr1h": 0.13,
+    "dist_pts": 193.7,
+    "dist_pct": 0.24,
+    "dist_atr1h": 0.44,
     "side": "resistance"
    },
    "nearest_support": {
-    "price": 82054.4,
+    "price": 82054.5,
     "names": [
      "Round number",
      "Swing high",
@@ -9970,9 +10037,9 @@
     ],
     "count": 5,
     "strength": "strong",
-    "dist_pts": -155.9,
-    "dist_pct": -0.19,
-    "dist_atr1h": -0.35,
+    "dist_pts": -19.5,
+    "dist_pct": -0.02,
+    "dist_atr1h": -0.04,
     "side": "support"
    }
   },
@@ -9989,7 +10056,7 @@
      "atr1h_multiple": 1.1,
      "up_24h": 0.68,
      "dn_24h": 0.649,
-     "up_72h": 0.846,
+     "up_72h": 0.845,
      "dn_72h": 0.816
     },
     {
@@ -9998,36 +10065,36 @@
      "atr4h_multiple": 1.46,
      "size_class": "MEDIUM",
      "atr1h_multiple": 2.3,
-     "up_24h": 0.421,
-     "dn_24h": 0.41,
-     "up_72h": 0.692,
+     "up_24h": 0.42,
+     "dn_24h": 0.409,
+     "up_72h": 0.691,
      "dn_72h": 0.662
     },
     {
      "points": 2000,
-     "pct": 2.43,
+     "pct": 2.44,
      "atr4h_multiple": 2.92,
      "size_class": "LARGE",
      "atr1h_multiple": 4.5,
      "up_24h": 0.177,
-     "dn_24h": 0.17,
+     "dn_24h": 0.169,
      "up_72h": 0.451,
-     "dn_72h": 0.427
+     "dn_72h": 0.426
     },
     {
      "points": 5000,
-     "pct": 6.08,
+     "pct": 6.09,
      "atr4h_multiple": 7.31,
      "size_class": "VERY LARGE / EXTENDED",
      "atr1h_multiple": 11.3,
      "up_24h": 0.022,
      "dn_24h": 0.017,
-     "up_72h": 0.127,
+     "up_72h": 0.126,
      "dn_72h": 0.103
     },
     {
      "points": 10000,
-     "pct": 12.16,
+     "pct": 12.18,
      "atr4h_multiple": 14.61,
      "size_class": "VERY LARGE / EXTENDED",
      "atr1h_multiple": 22.7,
@@ -10039,16 +10106,16 @@
    ],
    "typical_24h_points": {
     "up": [
-     819,
-     1578,
-     2674,
-     3703
+     817,
+     1576,
+     2670,
+     3697
     ],
     "dn": [
-     777,
-     1564,
-     2662,
-     3458
+     776,
+     1562,
+     2658,
+     3452
     ]
    },
    "note": "Class is relative to the 4H ATR (SMALL <1x, MEDIUM 1-2x, LARGE 2-4x, VERY LARGE >4x). Probabilities are history, not forecasts."
@@ -10082,13 +10149,13 @@
      "tf": "30m",
      "role": "Setup context",
      "direction": "FLAT",
-     "strength": 0.03
+     "strength": 0.02
     },
     {
      "tf": "15m",
      "role": "Setup",
      "direction": "FLAT",
-     "strength": 0.19
+     "strength": 0.1
     },
     {
      "tf": "5m",
@@ -10566,7 +10633,7 @@
   "win-13": "2026-10-18T12:56:31+00:00",
   "win-14": "2026-10-19T13:52:19+00:00",
   "win-15": "2026-10-18T14:33:48+00:00",
-  "win-16": "2026-10-18T15:46:37+00:00",
+  "win-16": "2026-10-19T15:39:17+00:00",
   "win-17": "2026-10-18T16:33:44+00:00",
   "stage-Stage 4-5: trade active>Stage 2: early setup": "2026-10-15T03:14:48+00:00",
   "win-18": "2026-10-18T17:46:24+00:00",
@@ -10604,7 +10671,7 @@
   "next_high": {
    "hr": 16,
    "ist": "21:30-22:30",
-   "in_min": 53,
+   "in_min": 21,
    "avg_range": 628.5,
    "avg_up": 303.6,
    "avg_down": 325.0
@@ -10639,94 +10706,94 @@
   "hist_days": 367
  },
  "sr": {
-  "px": 82210.3,
+  "px": 82074.0,
   "tf": {
    "5m": {
-    "atr": 188.8,
+    "atr": 188.2,
     "supports": [
      {
-      "price": 82196.5,
-      "touches": 21,
+      "price": 81966.5,
+      "touches": 9,
       "recent": false,
-      "dist_pct": -0.02,
-      "dist_atr": -0.1
+      "dist_pct": -0.13,
+      "dist_atr": -0.6
      },
      {
-      "price": 82093.9,
-      "touches": 20,
-      "recent": false,
-      "dist_pct": -0.14,
-      "dist_atr": -0.6
+      "price": 81827.7,
+      "touches": 8,
+      "recent": true,
+      "dist_pct": -0.3,
+      "dist_atr": -1.3
      }
     ],
     "resistances": [
      {
-      "price": 82288.5,
-      "touches": 25,
-      "recent": true,
-      "dist_pct": 0.1,
-      "dist_atr": 0.4
+      "price": 82093.9,
+      "touches": 21,
+      "recent": false,
+      "dist_pct": 0.02,
+      "dist_atr": 0.1
      },
      {
-      "price": 82423.0,
-      "touches": 42,
-      "recent": true,
-      "dist_pct": 0.26,
-      "dist_atr": 1.1
+      "price": 82196.5,
+      "touches": 23,
+      "recent": false,
+      "dist_pct": 0.15,
+      "dist_atr": 0.7
      }
     ]
    },
    "15m": {
-    "atr": 256.7,
+    "atr": 268.0,
     "supports": [
      {
-      "price": 82079.1,
-      "touches": 19,
-      "recent": true,
-      "dist_pct": -0.16,
-      "dist_atr": -0.5
+      "price": 81916.3,
+      "touches": 20,
+      "recent": false,
+      "dist_pct": -0.19,
+      "dist_atr": -0.6
      },
      {
-      "price": 81916.3,
-      "touches": 19,
-      "recent": false,
-      "dist_pct": -0.36,
-      "dist_atr": -1.1
+      "price": 81723.2,
+      "touches": 42,
+      "recent": true,
+      "dist_pct": -0.43,
+      "dist_atr": -1.3
      }
     ],
     "resistances": [
      {
+      "price": 82079.1,
+      "touches": 21,
+      "recent": true,
+      "dist_pct": 0.01,
+      "dist_atr": 0.0
+     },
+     {
       "price": 82268.0,
       "touches": 16,
       "recent": false,
-      "dist_pct": 0.07,
-      "dist_atr": 0.2
-     },
-     {
-      "price": 82495.9,
-      "touches": 22,
-      "recent": true,
-      "dist_pct": 0.35,
-      "dist_atr": 1.1
+      "dist_pct": 0.24,
+      "dist_atr": 0.7
      }
     ]
    },
    "1H": {
-    "atr": 408.9,
+    "atr": 433.2,
     "supports": [
      {
-      "price": 82049.5,
-      "touches": 21,
+      "price": 81951.5,
+      "touches": 29,
       "recent": true,
-      "dist_pct": -0.2,
-      "dist_atr": -0.4
+      "dist_pct": -0.15,
+      "dist_atr": -0.3
      },
      {
-      "price": 81902.6,
-      "touches": 25,
-      "recent": false,
-      "dist_pct": -0.37,
-      "dist_atr": -0.8
+      "price": 81687.2,
+      "touches": 42,
+      "recent": true,
+      "dist_pct": -0.47,
+      "dist_atr": -0.9
      }
     ],
     "resistances": [
@@ -10734,15 +10801,15 @@
       "price": 82258.9,
       "touches": 23,
       "recent": true,
-      "dist_pct": 0.06,
-      "dist_atr": 0.1
+      "dist_pct": 0.23,
+      "dist_atr": 0.4
      },
      {
       "price": 82412.1,
-      "touches": 23,
+      "touches": 27,
       "recent": false,
-      "dist_pct": 0.25,
-      "dist_atr": 0.5
+      "dist_pct": 0.41,
+      "dist_atr": 0.8
      }
     ]
    },
@@ -10753,15 +10820,15 @@
       "price": 81930.0,
       "touches": 23,
       "recent": false,
-      "dist_pct": -0.34,
-      "dist_atr": -0.3
+      "dist_pct": -0.18,
+      "dist_atr": -0.2
      },
      {
       "price": 80777.0,
       "touches": 15,
       "recent": true,
-      "dist_pct": -1.74,
-      "dist_atr": -1.7
+      "dist_pct": -1.58,
+      "dist_atr": -1.6
      }
     ],
     "resistances": [
@@ -10769,15 +10836,15 @@
       "price": 82701.8,
       "touches": 27,
       "recent": true,
-      "dist_pct": 0.6,
-      "dist_atr": 0.6
+      "dist_pct": 0.76,
+      "dist_atr": 0.8
      },
      {
       "price": 83120.6,
       "touches": 38,
       "recent": false,
-      "dist_pct": 1.11,
-      "dist_atr": 1.1
+      "dist_pct": 1.28,
+      "dist_atr": 1.3
      }
     ]
    },
@@ -10788,15 +10855,15 @@
       "price": 81520.0,
       "touches": 13,
       "recent": false,
-      "dist_pct": -0.84,
+      "dist_pct": -0.68,
       "dist_atr": -0.3
      },
      {
       "price": 80351.0,
       "touches": 18,
       "recent": true,
-      "dist_pct": -2.26,
-      "dist_atr": -0.9
+      "dist_pct": -2.1,
+      "dist_atr": -0.8
      }
     ],
     "resistances": [
@@ -10804,24 +10871,24 @@
       "price": 82511.2,
       "touches": 16,
       "recent": true,
-      "dist_pct": 0.37,
-      "dist_atr": 0.1
+      "dist_pct": 0.53,
+      "dist_atr": 0.2
      },
      {
       "price": 84348.2,
       "touches": 10,
       "recent": true,
-      "dist_pct": 2.6,
-      "dist_atr": 1.0
+      "dist_pct": 2.77,
+      "dist_atr": 1.1
      }
     ]
    }
   },
   "zones": [
    {
-    "lo": 81902.6,
+    "lo": 81520.0,
     "hi": 82701.8,
-    "mid": 82235.2,
+    "mid": 82065.2,
     "tfs": [
      "5m",
      "15m",
@@ -10829,45 +10896,45 @@
      "4H",
      "1D"
     ],
-    "score": 50.5,
-    "kind": "resistance"
+    "score": 56.0,
+    "kind": "support"
    }
   ]
  },
  "orderflow": {
-  "ts": "2026-10-19T15:07:39+00:00",
-  "px": 82210.3,
+  "ts": "2026-10-19T15:39:17+00:00",
+  "px": 82074.0,
   "now": {
    "state": "MILD SELLING",
-   "buy": 30.5,
-   "sell": 45.7,
-   "big_buy": 3.1,
+   "buy": 36.6,
+   "sell": 56.7,
+   "big_buy": 0.0,
    "big_sell": 0.0,
-   "vol": 76.2,
-   "delta": -15.2,
-   "ratio": -0.2,
-   "big_share": 0.041
+   "vol": 93.3,
+   "delta": -20.1,
+   "ratio": -0.216,
+   "big_share": 0.0
   },
   "h4": {
    "state": "AGGRESSIVE SELLING",
-   "buy": 201.0,
-   "sell": 353.0,
+   "buy": 199.5,
+   "sell": 364.6,
    "big_buy": 6.0,
    "big_sell": 53.9,
-   "vol": 554.1,
-   "delta": -152.0,
-   "ratio": -0.274,
-   "big_share": 0.108
+   "vol": 564.1,
+   "delta": -165.0,
+   "ratio": -0.293,
+   "big_share": 0.106
   },
   "h24": {
    "state": "NORMAL / BALANCED",
-   "buy": 1784.7,
-   "sell": 2094.4,
-   "big_buy": 92.9,
+   "buy": 1769.3,
+   "sell": 2106.8,
+   "big_buy": 90.5,
    "big_sell": 152.7,
-   "vol": 3879.1,
-   "delta": -309.6,
-   "ratio": -0.08,
+   "vol": 3876.1,
+   "delta": -337.5,
+   "ratio": -0.087,
    "big_share": 0.063
   },
   "buy_zones": [
@@ -10912,21 +10979,21 @@
    {
     "lo": 82150,
     "hi": 82200,
-    "buy": 37.1,
-    "sell": 67.7,
-    "vol": 104.8,
-    "ratio": -0.29,
+    "buy": 7.1,
+    "sell": 34.0,
+    "vol": 41.1,
+    "ratio": -0.66,
     "big_share": 0.0
    }
   ],
   "poc": {
-   "lo": 82150,
-   "hi": 82200,
-   "buy": 37.1,
-   "sell": 67.7,
-   "vol": 104.8,
-   "ratio": -0.29,
-   "big_share": 0.0
+   "lo": 82650,
+   "hi": 82700,
+   "buy": 12.5,
+   "sell": 90.9,
+   "vol": 103.4,
+   "ratio": -0.76,
+   "big_share": 0.26
   },
   "coverage_pct": 0,
   "history_h": 24.0
