@@ -12812,20 +12812,28 @@
     "methods_text": "4/7 methods trade ke saath, 0 khilaaf (consensus: SHORT)"
    },
    "grade": "C",
-   "status": "OPEN",
-   "outcome": "",
-   "closed": null,
-   "closed_ist": "",
-   "exit": null,
-   "R": null,
-   "pnl_inr": null,
-   "fees_usd": 0.03665601,
-   "hold_h": null,
-   "best_R": 0.2160432094377157,
-   "worst_R": 0.33435258603455476,
-   "exits": [],
-   "lesson": "",
-   "auto_feedback": "",
+   "status": "CLOSED",
+   "outcome": "STOP-LOSS",
+   "closed": "2026-10-20T14:14:15+00:00",
+   "closed_ist": "20 Oct 2026, 07:44 PM IST",
+   "exit": 82313.18444129289,
+   "R": -1.096,
+   "pnl_inr": -80.18,
+   "fees_usd": 0.07,
+   "hold_h": 4.0,
+   "best_R": 0.22,
+   "worst_R": 2.04,
+   "exits": [
+    {
+     "ts": "2026-10-20T14:14:15+00:00",
+     "kind": "STOP-LOSS",
+     "price": 82313.18444129289,
+     "frac": 1.0,
+     "pnl_inr": -73.18
+    }
+   ],
+   "lesson": "Jaldi haar (4 ghante, best +0.2R): entry ka timing theek nahi tha ya achanak volatility ne stop tod diya.",
+   "auto_feedback": "\ud83d\udfe1 Normal haar: sirf tay risk (-1.1R) gaya. Is tarah ki strategy mein aksar 3 mein 2 trade harte hain.",
    "user_rating": "",
    "user_note": "",
    "user_feedback_ist": "",
@@ -12836,6 +12844,18 @@
      "type": "OPENED",
      "price": 81457.8,
      "note": "qty 0.0009 BTC, margin \u20b92,323"
+    },
+    {
+     "time_ist": "20 Oct 2026, 07:44 PM IST",
+     "type": "STOP-LOSS",
+     "price": 82313.2,
+     "note": "100% of position, P/L -\u20b973"
+    },
+    {
+     "time_ist": "20 Oct 2026, 07:44 PM IST",
+     "type": "CLOSED",
+     "price": 82313.2,
+     "note": "STOP-LOSS"
     }
    ],
    "raw": {
@@ -12857,28 +12877,48 @@
     "qty_btc": 0.0009,
     "notional_usd": 73.31,
     "margin_inr": 2322.83,
-    "margin_released": 0.0,
-    "rem_wallet": 1.0,
+    "margin_released": 2322.83,
+    "rem_wallet": 0.0,
     "leverage": 3,
     "fx": 95.052511,
     "risk_inr": 73.18,
-    "fees_usd": 0.03665601,
-    "realized_usd": 0.0,
+    "fees_usd": 0.07,
+    "realized_usd": -0.7698459971635995,
     "stage": 0,
-    "remaining": 1.0,
-    "mfe_R": 0.2160432094377157,
-    "mae_R": 0.33435258603455476,
-    "exits": [],
+    "remaining": 0,
+    "mfe_R": 0.22,
+    "mae_R": 2.04,
+    "exits": [
+     {
+      "ts": "2026-10-20T14:14:15+00:00",
+      "kind": "STOP-LOSS",
+      "price": 82313.18444129289,
+      "frac": 1.0,
+      "pnl_inr": -73.18
+     }
+    ],
     "events": [
      {
       "ts": "2026-10-20T10:12:38+00:00",
       "type": "OPENED",
       "price": 81457.8,
       "note": "qty 0.0009 BTC, margin \u20b92,323"
+     },
+     {
+      "ts": "2026-10-20T14:14:15+00:00",
+      "type": "STOP-LOSS",
+      "price": 82313.2,
+      "note": "100% of position, P/L -\u20b973"
+     },
+     {
+      "ts": "2026-10-20T14:14:15+00:00",
+      "type": "CLOSED",
+      "price": 82313.2,
+      "note": "STOP-LOSS"
      }
     ],
     "created": "2026-10-20T10:12:38+00:00",
-    "last_ts": 1792502100000.0,
+    "last_ts": 1792503900000.0,
     "expiry_h": 48,
     "cfg": {
      "enabled": true,
@@ -13068,9 +13108,335 @@
      ],
      "ts": "2026-10-20T13:34:43+00:00",
      "first": null
+    },
+    "closed": "2026-10-20T14:14:15+00:00",
+    "outcome": "STOP-LOSS",
+    "exit": 82313.18444129289,
+    "R": -1.096,
+    "pnl_inr": -80.18,
+    "net_usd": -0.84,
+    "gross_usd": -0.77,
+    "hold_h": 4.0,
+    "lesson": "Jaldi haar (4 ghante, best +0.2R): entry ka timing theek nahi tha ya achanak volatility ne stop tod diya.",
+    "feedback": {
+     "auto": {
+      "result": "LOSS",
+      "verdict": "\ud83d\udfe1 Normal haar: sirf tay risk (-1.1R) gaya. Is tarah ki strategy mein aksar 3 mein 2 trade harte hain.",
+      "plan_followed": true,
+      "best_R": 0.22,
+      "worst_R": 2.04
+     },
+     "user": null
     }
+   }
+  },
+  "SB-LONG-20261020-001": {
+   "id": "SB-LONG-20261020-001",
+   "source": "PAPER",
+   "strategy": "session_breakout",
+   "label": "Session Breakout (experimental)",
+   "side": "LONG",
+   "opened": "2026-10-20T14:14:15+00:00",
+   "opened_ist": "20 Oct 2026, 07:44 PM IST",
+   "entry": 82124.3,
+   "stop": 81208.08285714286,
+   "targets": [
+    83956.7342857143
+   ],
+   "qty_btc": 0.0006,
+   "margin_inr": 1561.22,
+   "leverage": 3,
+   "risk_inr": 52.25,
+   "why": "Pichle 6 ghante bhaav ek tang box mein (1.3 ATR) ghoom raha tha. Ab 1H candle ne box ke upar mazboot band di, volume normal ka 2.2 guna tha, aur bade (4H) trend ne iska virodh nahi kiya. Active samay mein breakout hone se follow-through ki sambhavna behtar hoti hai. Isliye BUY liya. Stop box ke doosri taraf, target 2.0R. Ye experimental hai: backtest se pehle isse sabit nahi maana jaata.",
+   "context": {
+    "side_n": 1,
+    "side": "LONG",
+    "hour": 14,
+    "wd": 1,
+    "atr_pct": 0.487,
+    "vol_ratio": 2.2,
+    "box_atr": 1.31,
+    "tcls": "HIGH",
+    "regime": "RANGE",
+    "funding": 3.82776883218e-05
+   },
+   "entry_context": {
+    "time_utc": "2026-10-20T14:14:15+00:00",
+    "session": "US (13-21 UTC)",
+    "weekday": "Tue",
+    "regime": "RANGE",
+    "stage": "Stage 4-5: trade active",
+    "stage_status": "TRADE ACTIVE (see Home)",
+    "direction": "NONE",
+    "scores": {
+     "structure": 50.0,
+     "volume": 48.0,
+     "momentum": 100.0,
+     "order_flow": 27.7,
+     "liquidity": 50.0,
+     "htf": 52.5,
+     "accumulation": 55.0,
+     "distribution": 20.0,
+     "volatility_pct": 45.0,
+     "large_move_potential": 40.0,
+     "continuation": 66.8,
+     "exhaustion_risk": 15.2,
+     "setup": 0.0
+    },
+    "false_signal_risk": "n/a",
+    "range": {
+     "high": 83149.8,
+     "low": 80621.4,
+     "mid": 81885.6,
+     "position_pct": 97.28286663502624
+    },
+    "expected_move": [
+     827.4877560000001,
+     1595.15712
+    ],
+    "mtf": [
+     [
+      "4H",
+      "FLAT",
+      0.1
+     ],
+     [
+      "1H",
+      "FLAT",
+      0.15
+     ],
+     [
+      "30m",
+      "FLAT",
+      0.03
+     ],
+     [
+      "15m",
+      "FLAT",
+      0.11
+     ],
+     [
+      "5m",
+      "UP",
+      0.4
+     ]
+    ],
+    "move_radar": 52,
+    "aggression": "MILD BUYING",
+    "hour_class": "HIGH",
+    "hour_activity": 162,
+    "crowding": "balanced",
+    "oi_quadrant": null,
+    "taker_delta": -0.113,
+    "liquidations": null,
+    "funding": 3.82776883218e-05,
+    "radar": {
+     "LONG": 2,
+     "SHORT": 2
+    },
+    "reversal": "none",
+    "methods": {
+     "verdict": "WAIT",
+     "net": 18.5,
+     "agree": 2,
+     "against": 0,
+     "total": 7,
+     "keys": [
+      "momentum",
+      "volume"
+     ]
+    },
+    "methods_text": "2/7 methods trade ke saath, 0 khilaaf (consensus: WAIT)"
+   },
+   "grade": "A",
+   "status": "OPEN",
+   "outcome": "",
+   "closed": null,
+   "closed_ist": "",
+   "exit": null,
+   "R": null,
+   "pnl_inr": null,
+   "fees_usd": 0.02463729,
+   "hold_h": null,
+   "best_R": 0.0,
+   "worst_R": 0.0,
+   "exits": [],
+   "lesson": "",
+   "auto_feedback": "",
+   "user_rating": "",
+   "user_note": "",
+   "user_feedback_ist": "",
+   "user_exit": null,
+   "timeline": [
+    {
+     "time_ist": "20 Oct 2026, 07:44 PM IST",
+     "type": "OPENED",
+     "price": 82124.3,
+     "note": "qty 0.0006 BTC, margin \u20b91,561"
+    }
+   ],
+   "raw": {
+    "id": "SB-LONG-20261020-001",
+    "strategy": "session_breakout",
+    "label": "Session Breakout (experimental)",
+    "side": 1,
+    "entry": 82124.3,
+    "sl0": 81208.08285714286,
+    "sl": 81208.08285714286,
+    "risk": 916.2171428571455,
+    "mode": "fixed",
+    "tp": 83956.7342857143,
+    "t1": null,
+    "t2": null,
+    "t3": null,
+    "partial": 0.5,
+    "qty": 0.0006,
+    "qty_btc": 0.0006,
+    "notional_usd": 49.27,
+    "margin_inr": 1561.22,
+    "margin_released": 0.0,
+    "rem_wallet": 1.0,
+    "leverage": 3,
+    "fx": 95.052511,
+    "risk_inr": 52.25,
+    "fees_usd": 0.02463729,
+    "realized_usd": 0.0,
+    "stage": 0,
+    "remaining": 1.0,
+    "mfe_R": 0.0,
+    "mae_R": 0.0,
+    "exits": [],
+    "events": [
+     {
+      "ts": "2026-10-20T14:14:15+00:00",
+      "type": "OPENED",
+      "price": 82124.3,
+      "note": "qty 0.0006 BTC, margin \u20b91,561"
+     }
+    ],
+    "created": "2026-10-20T14:14:15+00:00",
+    "last_ts": 1792504800000.0,
+    "expiry_h": 24,
+    "cfg": {
+     "enabled": true,
+     "label": "Session Breakout (experimental)",
+     "risk_pct": 0.3,
+     "box_hours": 6,
+     "vol_mult": 1.3,
+     "stop_min_atr": 1.0,
+     "stop_max_atr": 2.5,
+     "target_r": 2.0,
+     "expiry_hours": 24,
+     "cooldown_hours": 6,
+     "leverage": 3,
+     "fee_per_side": 0.0005
+    },
+    "ctx": {
+     "side_n": 1,
+     "side": "LONG",
+     "hour": 14,
+     "wd": 1,
+     "atr_pct": 0.487,
+     "vol_ratio": 2.2,
+     "box_atr": 1.31,
+     "tcls": "HIGH",
+     "regime": "RANGE",
+     "funding": 3.82776883218e-05
+    },
+    "entry_ctx": {
+     "time_utc": "2026-10-20T14:14:15+00:00",
+     "session": "US (13-21 UTC)",
+     "weekday": "Tue",
+     "regime": "RANGE",
+     "stage": "Stage 4-5: trade active",
+     "stage_status": "TRADE ACTIVE (see Home)",
+     "direction": "NONE",
+     "scores": {
+      "structure": 50.0,
+      "volume": 48.0,
+      "momentum": 100.0,
+      "order_flow": 27.7,
+      "liquidity": 50.0,
+      "htf": 52.5,
+      "accumulation": 55.0,
+      "distribution": 20.0,
+      "volatility_pct": 45.0,
+      "large_move_potential": 40.0,
+      "continuation": 66.8,
+      "exhaustion_risk": 15.2,
+      "setup": 0.0
+     },
+     "false_signal_risk": "n/a",
+     "range": {
+      "high": 83149.8,
+      "low": 80621.4,
+      "mid": 81885.6,
+      "position_pct": 97.28286663502624
+     },
+     "expected_move": [
+      827.4877560000001,
+      1595.15712
+     ],
+     "mtf": [
+      [
+       "4H",
+       "FLAT",
+       0.1
+      ],
+      [
+       "1H",
+       "FLAT",
+       0.15
+      ],
+      [
+       "30m",
+       "FLAT",
+       0.03
+      ],
+      [
+       "15m",
+       "FLAT",
+       0.11
+      ],
+      [
+       "5m",
+       "UP",
+       0.4
+      ]
+     ],
+     "move_radar": 52,
+     "aggression": "MILD BUYING",
+     "hour_class": "HIGH",
+     "hour_activity": 162,
+     "crowding": "balanced",
+     "oi_quadrant": null,
+     "taker_delta": -0.113,
+     "liquidations": null,
+     "funding": 3.82776883218e-05,
+     "radar": {
+      "LONG": 2,
+      "SHORT": 2
+     },
+     "reversal": "none",
+     "methods": {
+      "verdict": "WAIT",
+      "net": 18.5,
+      "agree": 2,
+      "against": 0,
+      "total": 7,
+      "keys": [
+       "momentum",
+       "volume"
+      ]
+     },
+     "methods_text": "2/7 methods trade ke saath, 0 khilaaf (consensus: WAIT)"
+    },
+    "confirm_lvl": 82324.09285714287,
+    "grade": "A",
+    "why": "Pichle 6 ghante bhaav ek tang box mein (1.3 ATR) ghoom raha tha. Ab 1H candle ne box ke upar mazboot band di, volume normal ka 2.2 guna tha, aur bade (4H) trend ne iska virodh nahi kiya. Active samay mein breakout hone se follow-through ki sambhavna behtar hoti hai. Isliye BUY liya. Stop box ke doosri taraf, target 2.0R. Ye experimental hai: backtest se pehle isse sabit nahi maana jaata.",
+    "capped": false
    }
   }
  },
- "updated": "2026-10-20T13:34:55+00:00"
+ "updated": "2026-10-20T14:14:30+00:00"
 }
