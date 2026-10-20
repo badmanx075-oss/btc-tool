@@ -13249,20 +13249,28 @@
     "methods_text": "2/7 methods trade ke saath, 0 khilaaf (consensus: WAIT)"
    },
    "grade": "A",
-   "status": "OPEN",
-   "outcome": "",
-   "closed": null,
-   "closed_ist": "",
-   "exit": null,
-   "R": null,
-   "pnl_inr": null,
-   "fees_usd": 0.02463729,
-   "hold_h": null,
-   "best_R": 0.0,
+   "status": "CLOSED",
+   "outcome": "SMART EXIT",
+   "closed": "2026-10-20T14:50:05+00:00",
+   "closed_ist": "20 Oct 2026, 08:20 PM IST",
+   "exit": 82968.7,
+   "R": 0.832,
+   "pnl_inr": 43.45,
+   "fees_usd": 0.05,
+   "hold_h": 0.6,
+   "best_R": 1.32,
    "worst_R": 0.0,
-   "exits": [],
-   "lesson": "",
-   "auto_feedback": "",
+   "exits": [
+    {
+     "ts": "2026-10-20T14:50:05+00:00",
+     "kind": "SMART EXIT",
+     "price": 82968.7,
+     "frac": 1.0,
+     "pnl_inr": 48.16
+    }
+   ],
+   "lesson": "Smart exit (expected move (~826 pts) poora ho gaya (+0.9R)): +0.8R par band kiya, taaki trade lamba na chale. Fixed rule se tulna review pack mein hoti hai.",
+   "auto_feedback": "\u2705 Achha trade: plan ke mutabik +0.8R. Best move +1.3R tak gayi, uska 63% pakda.",
    "user_rating": "",
    "user_note": "",
    "user_feedback_ist": "",
@@ -13273,6 +13281,18 @@
      "type": "OPENED",
      "price": 82124.3,
      "note": "qty 0.0006 BTC, margin \u20b91,561"
+    },
+    {
+     "time_ist": "20 Oct 2026, 08:20 PM IST",
+     "type": "SMART EXIT",
+     "price": 82968.7,
+     "note": "100% of position, P/L \u20b948"
+    },
+    {
+     "time_ist": "20 Oct 2026, 08:20 PM IST",
+     "type": "CLOSED",
+     "price": 82968.7,
+     "note": "SMART EXIT"
     }
    ],
    "raw": {
@@ -13294,28 +13314,48 @@
     "qty_btc": 0.0006,
     "notional_usd": 49.27,
     "margin_inr": 1561.22,
-    "margin_released": 0.0,
-    "rem_wallet": 1.0,
+    "margin_released": 1561.22,
+    "rem_wallet": 0.0,
     "leverage": 3,
     "fx": 95.052511,
     "risk_inr": 52.25,
-    "fees_usd": 0.02463729,
-    "realized_usd": 0.0,
+    "fees_usd": 0.05,
+    "realized_usd": 0.5066399999999964,
     "stage": 0,
-    "remaining": 1.0,
-    "mfe_R": 0.0,
+    "remaining": 0,
+    "mfe_R": 1.32,
     "mae_R": 0.0,
-    "exits": [],
+    "exits": [
+     {
+      "ts": "2026-10-20T14:50:05+00:00",
+      "kind": "SMART EXIT",
+      "price": 82968.7,
+      "frac": 1.0,
+      "pnl_inr": 48.16
+     }
+    ],
     "events": [
      {
       "ts": "2026-10-20T14:14:15+00:00",
       "type": "OPENED",
       "price": 82124.3,
       "note": "qty 0.0006 BTC, margin \u20b91,561"
+     },
+     {
+      "ts": "2026-10-20T14:50:05+00:00",
+      "type": "SMART EXIT",
+      "price": 82968.7,
+      "note": "100% of position, P/L \u20b948"
+     },
+     {
+      "ts": "2026-10-20T14:50:05+00:00",
+      "type": "CLOSED",
+      "price": 82968.7,
+      "note": "SMART EXIT"
      }
     ],
     "created": "2026-10-20T14:14:15+00:00",
-    "last_ts": 1792504800000.0,
+    "last_ts": 1792506600000.0,
     "expiry_h": 24,
     "cfg": {
      "enabled": true,
@@ -13434,9 +13474,53 @@
     "confirm_lvl": 82324.09285714287,
     "grade": "A",
     "why": "Pichle 6 ghante bhaav ek tang box mein (1.3 ATR) ghoom raha tha. Ab 1H candle ne box ke upar mazboot band di, volume normal ka 2.2 guna tha, aur bade (4H) trend ne iska virodh nahi kiya. Active samay mein breakout hone se follow-through ki sambhavna behtar hoti hai. Isliye BUY liya. Stop box ke doosri taraf, target 2.0R. Ye experimental hai: backtest se pehle isse sabit nahi maana jaata.",
-    "capped": false
+    "capped": false,
+    "mgmt": {
+     "status": "\ud83d\udfe2 HOLD: MOMENTUM STRONG",
+     "stage": "PROFIT DEVELOPING",
+     "uR": 0.92,
+     "mfe_R": 0.92,
+     "exhaustion": 0,
+     "reversal_flags": {
+      "structure_break": false,
+      "momentum_negative": false,
+      "gave_back": false
+     },
+     "reasons": [
+      "Momentum trend ke saath chal raha hai (pichle 3 ghante +1.5 ATR)",
+      "Volume theek hai (normal ka 1.2 guna)"
+     ],
+     "stop_advice": "Stop jaisa hai waisa rakho",
+     "suggested_sl": 81208.1,
+     "hold_vs_book": "Hold: target 1.1R door, stop tak 1.9R (R/R 0.6). Abhi book karo to +0.9R pakka.",
+     "next_zone": 83498.6,
+     "momentum_atr": 1.52,
+     "volume_ratio": 1.21
+    },
+    "mstatus": "\ud83d\udfe2 HOLD: MOMENTUM STRONG",
+    "mts": "2026-10-20T14:50:05+00:00",
+    "smart_reason": "expected move (~826 pts) poora ho gaya (+0.9R)",
+    "closed": "2026-10-20T14:50:05+00:00",
+    "outcome": "SMART EXIT",
+    "exit": 82968.7,
+    "R": 0.832,
+    "pnl_inr": 43.45,
+    "net_usd": 0.46,
+    "gross_usd": 0.51,
+    "hold_h": 0.6,
+    "lesson": "Smart exit (expected move (~826 pts) poora ho gaya (+0.9R)): +0.8R par band kiya, taaki trade lamba na chale. Fixed rule se tulna review pack mein hoti hai.",
+    "feedback": {
+     "auto": {
+      "result": "WIN",
+      "verdict": "\u2705 Achha trade: plan ke mutabik +0.8R. Best move +1.3R tak gayi, uska 63% pakda.",
+      "plan_followed": true,
+      "best_R": 1.32,
+      "worst_R": 0.0
+     },
+     "user": null
+    }
    }
   }
  },
- "updated": "2026-10-20T14:14:30+00:00"
+ "updated": "2026-10-20T14:50:21+00:00"
 }
