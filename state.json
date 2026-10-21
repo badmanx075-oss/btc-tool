@@ -1748,31 +1748,31 @@
   "morning": "2026-10-20",
   "weekly": "2026-10-18"
  },
- "last_price": 82909.5,
+ "last_price": 83110.1,
  "market": {
-  "price": 82909.5,
+  "price": 83110.1,
   "regime": "RANGE",
   "signal": "NO TRADE",
-  "side": "SHORT",
-  "score": 45,
+  "side": "LONG",
+  "score": 30,
   "scores": {
-   "LONG": 25,
-   "SHORT": 45
+   "LONG": 30,
+   "SHORT": 20
   },
-  "atr1h": 463.278571428571,
-  "atr4h": 824.9857142857124,
+  "atr1h": 483.19285714285695,
+  "atr4h": 844.8999999999984,
   "reversal": "none",
   "tf": {
    "5m": {
-    "er": 0.15,
+    "er": 0.09,
     "label": "FLAT"
    },
    "15m": {
-    "er": 0.21,
-    "label": "UP"
+    "er": 0.18,
+    "label": "FLAT"
    },
    "30m": {
-    "er": 0.3,
+    "er": 0.31,
     "label": "UP"
    },
    "1H": {
@@ -1784,19 +1784,19 @@
     "label": "FLAT"
    }
   },
-  "funding": 5.47704558544e-05,
-  "oi": 2435979950.6061573,
+  "funding": 5.04055748561e-05,
+  "oi": 2450509900.9573083,
   "pro": [
-   "price near range high",
-   "buying volume fading",
-   "volatility compression"
+   "higher low forming",
+   "selling volume fading"
   ],
   "con": [
-   "no sweep of prior highs",
-   "no lower high yet",
+   "price not at range edge (mid-range risk)",
+   "no sweep of prior lows",
+   "no compression",
    "momentum not turning"
   ],
-  "ts": "2026-10-21T00:00:26+00:00"
+  "ts": "2026-10-21T00:38:30+00:00"
  },
  "paper": {
   "closed": [
@@ -8623,8 +8623,8 @@
    }
   },
   "radar": {
-   "ts": "2026-10-21T00:00:26+00:00",
-   "price": 82909.9,
+   "ts": "2026-10-21T00:38:30+00:00",
+   "price": 83094.2,
    "LONG": [
     [
      "4H trend up",
@@ -10846,30 +10846,25 @@
     {
      "name": "Order flow (taker)",
      "dir": -1,
-     "why": "Taker delta -0.28: sellers aggressive"
-    },
-    {
-     "name": "OI + price",
-     "dir": 1,
-     "why": "Open interest/price: short covering"
+     "why": "Taker delta -0.31: sellers aggressive"
     },
     {
      "name": "Aggression (60 min)",
-     "dir": 0,
-     "why": "NORMAL / BALANCED (delta -5%, bade orders 16%)"
+     "dir": -1,
+     "why": "AGGRESSIVE SELLING (delta -25%, bade orders 12%)"
     },
     {
      "name": "Multi-timeframe",
      "dir": 0,
-     "why": "2 timeframe UP, 0 DOWN (5m..4H)"
+     "why": "1 timeframe UP, 0 DOWN (5m..4H)"
     }
    ],
-   "ts": "2026-10-21T00:00:26+00:00",
-   "price": 82909.9
+   "ts": "2026-10-21T00:38:30+00:00",
+   "price": 83094.2
   },
   "radar_move": {
-   "ts": "2026-10-21T00:00:26+00:00",
-   "score": 60,
+   "ts": "2026-10-21T00:38:30+00:00",
+   "score": 50,
    "state": "BUILDING",
    "lean": 1,
    "parts": {
@@ -10880,11 +10875,13 @@
     "near_box_edge": 15,
     "methods_lean": 15
    },
-   "notes": [],
+   "notes": [
+    "order flow lean ke khilaaf"
+   ],
    "box_hi": 83148.4,
    "box_lo": 82312.0,
    "atr": 407.4,
-   "exp_pts": 1135,
+   "exp_pts": 1138,
    "tm": {
     "now": "HIGH",
     "next": "HIGH"
@@ -11004,7 +11001,7 @@
     "strategy": "session_breakout",
     "created": "2026-10-20T14:14:15+00:00",
     "expiry_h": 24,
-    "last_ts": 1792539900000.0,
+    "last_ts": 1792541700000.0,
     "exits": [],
     "smart_R_at_exit": 0.92,
     "reason": "expected move (~826 pts) poora ho gaya (+0.9R)"
@@ -11018,29 +11015,11 @@
   "bot": "btcstochbot",
   "poll_error": "",
   "last_error": "",
-  "last_send_ok": "2026-10-21T00:00:38+00:00",
+  "last_send_ok": "2026-10-21T00:38:44+00:00",
   "last_run": "2026-10-21T00:04:10+00:00",
   "last_cmd_ts": "2026-10-19T06:54:16+00:00",
   "last_cmd": "button",
   "log": [
-   {
-    "ts": "2026-10-20T10:44:30+00:00",
-    "cat": "stage_alerts",
-    "ok": true,
-    "text": "\ud83d\udd00 STAGE BADLA Stage 2: early setup  \u2192  Stage 4-5: trade active Status:"
-   },
-   {
-    "ts": "2026-10-20T11:13:41+00:00",
-    "cat": "setup",
-    "ok": true,
-    "text": "\ud83d\udc40 SETUP BAN RAHA HAI (BUY) 3/4 BTC $81,540 Baaki ek shart: 4H trend up"
-   },
-   {
-    "ts": "2026-10-20T11:45:58+00:00",
-    "cat": "move",
-    "ok": true,
-    "text": "\ud83d\ude80 GOOD MOVE COMING? (radar 67/100) BTC $81,493 | jhukaav: NEECHE (SHOR"
-   },
    {
     "ts": "2026-10-20T11:45:59+00:00",
     "cat": "flow",
@@ -11202,24 +11181,42 @@
     "cat": "stage_alerts",
     "ok": true,
     "text": "\ud83d\udd00 STAGE BADLA Stage 0: no clear opportunity  \u2192  Stage 1: accumulation/"
+   },
+   {
+    "ts": "2026-10-21T00:38:43+00:00",
+    "cat": "flow",
+    "ok": true,
+    "text": "\ud83d\udd34\ud83d\udd25 AGGRESSIVE SELLING (pichle 60 min) \ud83c\udf0a ORDER FLOW (BTC $83,110) Abhi "
+   },
+   {
+    "ts": "2026-10-21T00:38:43+00:00",
+    "cat": "timing",
+    "ok": true,
+    "text": "\u23f0 ACTIVE WINDOW SHURU HONE WALI HAI (22 min baad) Samay: 06:30-07:30 I"
+   },
+   {
+    "ts": "2026-10-21T00:38:44+00:00",
+    "cat": "stage_alerts",
+    "ok": true,
+    "text": "\ud83d\udd00 STAGE BADLA Stage 1: accumulation/distribution developing  \u2192  Stage "
    }
   ]
  },
  "analysis": {
-  "price": 82909.5,
+  "price": 83104.7,
   "regime": "RANGE",
-  "stage": "Stage 1: accumulation/distribution developing",
+  "stage": "Stage 0: no clear opportunity",
   "status": "NO TRADE",
   "direction": "NONE",
   "scores": {
    "structure": 50,
    "volume": 69.2528964853286,
    "momentum": 72.02134928709192,
-   "order_flow": 46.1825,
-   "liquidity": 54.3047815721943,
+   "order_flow": 35.105000000000004,
+   "liquidity": 50.09353599465527,
    "htf": 53.7592020897649,
-   "accumulation": 25,
-   "distribution": 45,
+   "accumulation": 30,
+   "distribution": 20,
    "volatility_pct": 63.5,
    "large_move_potential": 64,
    "continuation": 65.01114928739514,
@@ -11229,31 +11226,31 @@
   "levels": null,
   "expected_move": {
    "expected": [
-    1135.0310550000002,
-    2115.021345
+    1137.7033430000001,
+    2120.000897
    ],
    "strong": [
-    2115.021345,
-    3446.547915
+    2120.000897,
+    3454.6623790000003
    ],
    "extended": [
-    3446.547915,
-    4520.22594
+    3454.6623790000003,
+    4530.868243999999
    ],
    "side": "up",
    "sample": 15986,
    "odds": {
     "500": [
-     0.765,
+     0.766,
      0.782
     ],
     "1000": [
-     0.548,
-     0.581
+     0.549,
+     0.582
     ],
     "2000": [
-     0.272,
-     0.297
+     0.273,
+     0.298
     ],
     "5000": [
      0.035,
@@ -11271,68 +11268,53 @@
    "high": 83436.9,
    "low": 80621.4,
    "mid": 82029.15,
-   "position_pct": 81.26798082045839
+   "position_pct": 88.20103001243129
   },
   "breakout": "none",
   "notes": {
-   "order_flow": "book imbalance -0.15, OI -0.68% (4h)",
+   "order_flow": "book imbalance -0.60, OI +0.05% (4h)",
    "atr": 470.4071428571427,
-   "funding": 5.47704558544e-05,
-   "oi": 2435979950.6061573
+   "funding": 5.04055748561e-05,
+   "oi": 2450509900.9573083
   }
  },
  "desk": {
-  "price": 82909.5,
+  "price": 83104.7,
   "atr1h": 470.4071428571427,
   "atr4h": 854.364285714284,
   "derivs": {
    "crowding": "balanced",
-   "quadrant": "short_covering",
-   "oi_change_4h": -0.68,
-   "oi_change_24h": -3.03,
-   "price_change_4h": 0.95,
-   "taker_delta": -0.28,
+   "quadrant": null,
+   "oi_change_4h": 0.05,
+   "oi_change_24h": -1.14,
+   "price_change_4h": 1.3,
+   "taker_delta": -0.309,
    "liquidations": {
     "long_usd": 1266651.0,
     "short_usd": 551150.0
    },
-   "bias": -0.54,
+   "bias": -0.93,
    "items": [
-    "Funding 0.0055% per 8h is normal: no obvious crowding",
-    "Price up but open interest down: the rise is short-covering, not new buying (weaker, can fade)",
-    "Taker flow (last ~1h of samples): sellers (-0.28)",
+    "Funding 0.0050% per 8h is normal: no obvious crowding",
+    "Open interest +0.05% over 4h with small price change: no clear signal",
+    "Taker flow (last ~1h of samples): sellers (-0.31)",
     "Recent liquidations: longs $1.3M, shorts $0.6M (forced closing can extend or end a move)"
    ]
   },
   "levels": {
-   "price": 82909.5,
+   "price": 83104.7,
    "resistance": [
     {
-     "price": 82971.7,
+     "price": 83169.3,
      "names": [
-      "Today's low",
-      "Previous day close",
-      "Today's high",
-      "Today's open",
-      "Round number"
+      "Swing high",
+      "Today's high"
      ],
-     "count": 5,
-     "strength": "strong",
-     "dist_pts": 62.2,
-     "dist_pct": 0.07,
-     "dist_atr1h": 0.13,
-     "side": "resistance"
-    },
-    {
-     "price": 83149.8,
-     "names": [
-      "Swing high"
-     ],
-     "count": 1,
-     "strength": "light",
-     "dist_pts": 240.3,
-     "dist_pct": 0.29,
-     "dist_atr1h": 0.51,
+     "count": 2,
+     "strength": "medium",
+     "dist_pts": 64.6,
+     "dist_pct": 0.08,
+     "dist_atr1h": 0.14,
      "side": "resistance"
     },
     {
@@ -11344,9 +11326,9 @@
      ],
      "count": 3,
      "strength": "strong",
-     "dist_pts": 548.4,
-     "dist_pct": 0.66,
-     "dist_atr1h": 1.17,
+     "dist_pts": 353.2,
+     "dist_pct": 0.43,
+     "dist_atr1h": 0.75,
      "side": "resistance"
     },
     {
@@ -11357,13 +11339,51 @@
      ],
      "count": 2,
      "strength": "strong",
-     "dist_pts": 1148.6,
-     "dist_pct": 1.39,
-     "dist_atr1h": 2.44,
+     "dist_pts": 953.4,
+     "dist_pct": 1.15,
+     "dist_atr1h": 2.03,
+     "side": "resistance"
+    },
+    {
+     "price": 84500.0,
+     "names": [
+      "Half-round number"
+     ],
+     "count": 1,
+     "strength": "light",
+     "dist_pts": 1395.3,
+     "dist_pct": 1.68,
+     "dist_atr1h": 2.97,
      "side": "resistance"
     }
    ],
    "support": [
+    {
+     "price": 82989.7,
+     "names": [
+      "Previous day close",
+      "Today's open",
+      "Round number"
+     ],
+     "count": 3,
+     "strength": "strong",
+     "dist_pts": -115.0,
+     "dist_pct": -0.14,
+     "dist_atr1h": -0.24,
+     "side": "support"
+    },
+    {
+     "price": 82830.0,
+     "names": [
+      "Today's low"
+     ],
+     "count": 1,
+     "strength": "light",
+     "dist_pts": -274.7,
+     "dist_pct": -0.33,
+     "dist_atr1h": -0.58,
+     "side": "support"
+    },
     {
      "price": 82500.0,
      "names": [
@@ -11371,9 +11391,9 @@
      ],
      "count": 1,
      "strength": "light",
-     "dist_pts": -409.5,
-     "dist_pct": -0.49,
-     "dist_atr1h": -0.87,
+     "dist_pts": -604.7,
+     "dist_pct": -0.73,
+     "dist_atr1h": -1.29,
      "side": "support"
     },
     {
@@ -11383,64 +11403,38 @@
      ],
      "count": 3,
      "strength": "strong",
-     "dist_pts": -659.1,
-     "dist_pct": -0.8,
-     "dist_atr1h": -1.4,
-     "side": "support"
-    },
-    {
-     "price": 81970.3,
-     "names": [
-      "7-day VWAP",
-      "Round number"
-     ],
-     "count": 2,
-     "strength": "medium",
-     "dist_pts": -939.2,
-     "dist_pct": -1.13,
-     "dist_atr1h": -2.0,
-     "side": "support"
-    },
-    {
-     "price": 81682.0,
-     "names": [
-      "Swing low"
-     ],
-     "count": 1,
-     "strength": "light",
-     "dist_pts": -1227.5,
-     "dist_pct": -1.48,
-     "dist_atr1h": -2.61,
+     "dist_pts": -854.3,
+     "dist_pct": -1.03,
+     "dist_atr1h": -1.82,
      "side": "support"
     }
    ],
    "vwap": null,
    "nearest_resistance": {
-    "price": 82971.7,
+    "price": 83169.3,
     "names": [
-     "Today's low",
-     "Previous day close",
-     "Today's high",
-     "Today's open",
-     "Round number"
+     "Swing high",
+     "Today's high"
     ],
-    "count": 5,
-    "strength": "strong",
-    "dist_pts": 62.2,
-    "dist_pct": 0.07,
-    "dist_atr1h": 0.13,
+    "count": 2,
+    "strength": "medium",
+    "dist_pts": 64.6,
+    "dist_pct": 0.08,
+    "dist_atr1h": 0.14,
     "side": "resistance"
    },
    "nearest_support": {
-    "price": 82500.0,
+    "price": 82989.7,
     "names": [
-     "Half-round number"
+     "Previous day close",
+     "Today's open",
+     "Round number"
     ],
-    "count": 1,
-    "strength": "light",
-    "dist_pts": -409.5,
-    "dist_pct": -0.49,
-    "dist_atr1h": -0.87,
+    "count": 3,
+    "strength": "strong",
+    "dist_pts": -115.0,
+    "dist_pct": -0.14,
+    "dist_atr1h": -0.24,
     "side": "support"
    }
   },
@@ -11455,19 +11449,19 @@
      "atr4h_multiple": 0.59,
      "size_class": "SMALL",
      "atr1h_multiple": 1.1,
-     "up_24h": 0.765,
+     "up_24h": 0.766,
      "dn_24h": 0.782,
      "up_72h": 0.868,
      "dn_72h": 0.879
     },
     {
      "points": 1000,
-     "pct": 1.21,
+     "pct": 1.2,
      "atr4h_multiple": 1.17,
      "size_class": "MEDIUM",
      "atr1h_multiple": 2.1,
-     "up_24h": 0.548,
-     "dn_24h": 0.581,
+     "up_24h": 0.549,
+     "dn_24h": 0.582,
      "up_72h": 0.738,
      "dn_72h": 0.753
     },
@@ -11477,25 +11471,25 @@
      "atr4h_multiple": 2.34,
      "size_class": "LARGE",
      "atr1h_multiple": 4.3,
-     "up_24h": 0.272,
-     "dn_24h": 0.297,
-     "up_72h": 0.514,
-     "dn_72h": 0.541
+     "up_24h": 0.273,
+     "dn_24h": 0.298,
+     "up_72h": 0.515,
+     "dn_72h": 0.542
     },
     {
      "points": 5000,
-     "pct": 6.03,
+     "pct": 6.02,
      "atr4h_multiple": 5.85,
      "size_class": "VERY LARGE / EXTENDED",
      "atr1h_multiple": 10.6,
      "up_24h": 0.035,
      "dn_24h": 0.041,
-     "up_72h": 0.148,
-     "dn_72h": 0.168
+     "up_72h": 0.149,
+     "dn_72h": 0.169
     },
     {
      "points": 10000,
-     "pct": 12.06,
+     "pct": 12.03,
      "atr4h_multiple": 11.7,
      "size_class": "VERY LARGE / EXTENDED",
      "atr1h_multiple": 21.3,
@@ -11507,16 +11501,16 @@
    ],
    "typical_24h_points": {
     "up": [
-     1135,
-     2115,
-     3447,
-     4520
+     1138,
+     2120,
+     3455,
+     4531
     ],
     "dn": [
-     1229,
-     2227,
-     3607,
-     4609
+     1232,
+     2232,
+     3615,
+     4620
     ]
    },
    "note": "Class is relative to the 4H ATR (SMALL <1x, MEDIUM 1-2x, LARGE 2-4x, VERY LARGE >4x). Probabilities are history, not forecasts."
@@ -11551,19 +11545,19 @@
      "tf": "30m",
      "role": "Setup context",
      "direction": "UP",
-     "strength": 0.3
+     "strength": 0.31
     },
     {
      "tf": "15m",
      "role": "Setup",
-     "direction": "UP",
-     "strength": 0.21
+     "direction": "FLAT",
+     "strength": 0.18
     },
     {
      "tf": "5m",
      "role": "Entry refinement",
      "direction": "FLAT",
-     "strength": 0.15
+     "strength": 0.09
     }
    ],
    "alignment": "MIXED (timeframes disagree: lower confidence)"
@@ -12115,10 +12109,17 @@
    "status": "NO TRADE",
    "regime": "RANGE",
    "price": 82909.5
+  },
+  {
+   "ts": "2026-10-21T00:38:30+00:00",
+   "stage": "Stage 0: no clear opportunity",
+   "status": "NO TRADE",
+   "regime": "RANGE",
+   "price": 83110.1
   }
  ],
  "alert_sent": {
-  "stage_ts": "2026-10-21T00:00:26+00:00",
+  "stage_ts": "2026-10-21T00:38:30+00:00",
   "stage-Stage 4-5: trade active>Stage 1: accumulation/distribution developing": "2026-10-19T07:37:20+00:00",
   "radar-SHORT": "2026-10-21T00:00:26+00:00",
   "stage-Stage 1: accumulation/distribution developing>Stage 4-5: trade active": "2026-10-19T18:53:33+00:00",
@@ -12133,15 +12134,15 @@
   "stage-Stage 2: early setup>Stage 4-5: trade active": "2026-10-20T10:44:20+00:00",
   "win-22": "2026-10-16T21:58:22+00:00",
   "stage-Stage 2: early setup>Stage 1: accumulation/distribution developing": "2026-10-17T15:18:05+00:00",
-  "win-1": "2026-10-20T00:53:53+00:00",
+  "win-1": "2026-10-21T00:38:30+00:00",
   "stage-Stage 1: accumulation/distribution developing>Stage 2: early setup": "2026-10-15T01:19:23+00:00",
   "flow-AGGRESSIVE BUYING": "2026-10-19T20:59:46+00:00",
-  "flow-AGGRESSIVE SELLING": "2026-10-20T22:14:40+00:00",
+  "flow-AGGRESSIVE SELLING": "2026-10-21T00:38:30+00:00",
   "stage-Stage 4-5: trade active>Stage 0: no clear opportunity": "2026-10-20T15:19:57+00:00",
   "methods-SHORT": "2026-10-20T08:38:41+00:00",
   "stage-Stage 0: no clear opportunity>Stage 1: accumulation/distribution developing": "2026-10-21T00:00:26+00:00",
   "move-fire": "2026-10-20T11:45:47+00:00",
-  "stage-Stage 1: accumulation/distribution developing>Stage 0: no clear opportunity": "2026-10-20T23:37:05+00:00",
+  "stage-Stage 1: accumulation/distribution developing>Stage 0: no clear opportunity": "2026-10-21T00:38:30+00:00",
   "stage-Stage 0: no clear opportunity>Stage 2: early setup": "2026-10-20T09:13:06+00:00",
   "stage-Stage 0: no clear opportunity>Stage 4-5: trade active": "2026-10-18T15:46:37+00:00",
   "win-0": "2026-10-20T23:37:05+00:00"
@@ -12164,7 +12165,7 @@
   "next_high": {
    "hr": 1,
    "ist": "06:30-07:30",
-   "in_min": 60,
+   "in_min": 22,
    "avg_range": 525.6,
    "avg_up": 270.1,
    "avg_down": 255.5
@@ -12199,164 +12200,164 @@
   "hist_days": 367
  },
  "sr": {
-  "px": 82909.5,
+  "px": 83110.1,
   "tf": {
    "5m": {
-    "atr": 68.4,
+    "atr": 80.1,
     "supports": [
      {
-      "price": 82899.0,
-      "touches": 14,
-      "recent": false,
-      "dist_pct": -0.01,
-      "dist_atr": -0.2
-     },
-     {
-      "price": 82839.9,
-      "touches": 10,
+      "price": 83044.2,
+      "touches": 8,
       "recent": true,
       "dist_pct": -0.08,
-      "dist_atr": -1.0
+      "dist_atr": -0.8
+     },
+     {
+      "price": 82984.5,
+      "touches": 13,
+      "recent": true,
+      "dist_pct": -0.15,
+      "dist_atr": -1.6
      }
     ],
     "resistances": [
      {
-      "price": 82955.2,
-      "touches": 16,
+      "price": 83136.7,
+      "touches": 5,
       "recent": true,
-      "dist_pct": 0.06,
-      "dist_atr": 0.7
+      "dist_pct": 0.03,
+      "dist_atr": 0.3
      },
      {
-      "price": 82984.5,
-      "touches": 10,
-      "recent": true,
-      "dist_pct": 0.09,
-      "dist_atr": 1.1
+      "price": 83333.0,
+      "touches": 1,
+      "recent": false,
+      "dist_pct": 0.27,
+      "dist_atr": 2.8
      }
     ]
    },
    "15m": {
-    "atr": 152.5,
+    "atr": 156.6,
     "supports": [
      {
-      "price": 82880.9,
-      "touches": 15,
-      "recent": true,
-      "dist_pct": -0.03,
-      "dist_atr": -0.2
+      "price": 83067.4,
+      "touches": 8,
+      "recent": false,
+      "dist_pct": -0.05,
+      "dist_atr": -0.3
      },
      {
-      "price": 82755.2,
-      "touches": 19,
-      "recent": false,
-      "dist_pct": -0.19,
-      "dist_atr": -1.0
+      "price": 82880.9,
+      "touches": 14,
+      "recent": true,
+      "dist_pct": -0.28,
+      "dist_atr": -1.5
      }
     ],
     "resistances": [
      {
-      "price": 83067.4,
-      "touches": 5,
-      "recent": false,
-      "dist_pct": 0.19,
-      "dist_atr": 1.0
+      "price": 83149.1,
+      "touches": 4,
+      "recent": true,
+      "dist_pct": 0.05,
+      "dist_atr": 0.2
      },
      {
-      "price": 83149.1,
-      "touches": 3,
+      "price": 83436.9,
+      "touches": 1,
       "recent": true,
-      "dist_pct": 0.29,
-      "dist_atr": 1.6
+      "dist_pct": 0.39,
+      "dist_atr": 2.1
      }
     ]
    },
    "1H": {
-    "atr": 384.0,
+    "atr": 404.0,
     "supports": [
      {
       "price": 82902.9,
-      "touches": 17,
+      "touches": 20,
       "recent": false,
-      "dist_pct": -0.01,
-      "dist_atr": -0.0
+      "dist_pct": -0.25,
+      "dist_atr": -0.5
      },
      {
       "price": 82624.9,
       "touches": 19,
       "recent": false,
-      "dist_pct": -0.34,
-      "dist_atr": -0.7
+      "dist_pct": -0.58,
+      "dist_atr": -1.2
      }
     ],
     "resistances": [
      {
       "price": 83128.2,
-      "touches": 29,
+      "touches": 30,
       "recent": true,
-      "dist_pct": 0.26,
-      "dist_atr": 0.6
+      "dist_pct": 0.02,
+      "dist_atr": 0.0
      },
      {
       "price": 83436.9,
-      "touches": 19,
+      "touches": 21,
       "recent": true,
-      "dist_pct": 0.64,
-      "dist_atr": 1.4
+      "dist_pct": 0.39,
+      "dist_atr": 0.8
      }
     ]
    },
    "4H": {
-    "atr": 768.4,
+    "atr": 788.3,
     "supports": [
      {
-      "price": 82844.2,
-      "touches": 28,
+      "price": 82951.5,
+      "touches": 35,
       "recent": true,
-      "dist_pct": -0.08,
-      "dist_atr": -0.1
+      "dist_pct": -0.19,
+      "dist_atr": -0.2
      },
      {
       "price": 82464.5,
-      "touches": 20,
+      "touches": 21,
       "recent": true,
-      "dist_pct": -0.54,
-      "dist_atr": -0.6
+      "dist_pct": -0.78,
+      "dist_atr": -0.8
      }
     ],
     "resistances": [
      {
-      "price": 83130.3,
-      "touches": 37,
-      "recent": true,
-      "dist_pct": 0.27,
-      "dist_atr": 0.3
-     },
-     {
       "price": 83458.4,
       "touches": 29,
       "recent": true,
-      "dist_pct": 0.66,
-      "dist_atr": 0.7
+      "dist_pct": 0.42,
+      "dist_atr": 0.4
+     },
+     {
+      "price": 83795.5,
+      "touches": 29,
+      "recent": false,
+      "dist_pct": 0.82,
+      "dist_atr": 0.9
      }
     ]
    },
    "1D": {
-    "atr": 2044.4,
+    "atr": 2047.3,
     "supports": [
      {
       "price": 82511.2,
       "touches": 17,
       "recent": true,
-      "dist_pct": -0.48,
-      "dist_atr": -0.2
+      "dist_pct": -0.72,
+      "dist_atr": -0.3
      },
      {
       "price": 81520.0,
       "touches": 14,
       "recent": false,
-      "dist_pct": -1.68,
-      "dist_atr": -0.7
+      "dist_pct": -1.91,
+      "dist_atr": -0.8
      }
     ],
     "resistances": [
@@ -12364,82 +12365,82 @@
       "price": 84348.2,
       "touches": 9,
       "recent": true,
-      "dist_pct": 1.74,
-      "dist_atr": 0.7
+      "dist_pct": 1.49,
+      "dist_atr": 0.6
      },
      {
       "price": 87306.6,
       "touches": 4,
       "recent": true,
-      "dist_pct": 5.3,
-      "dist_atr": 2.2
+      "dist_pct": 5.05,
+      "dist_atr": 2.0
      }
     ]
    }
   },
   "zones": [
    {
-    "lo": 82464.5,
-    "hi": 83149.1,
-    "mid": 82875.8,
+    "lo": 82880.9,
+    "hi": 83458.4,
+    "mid": 83147.0,
     "tfs": [
      "5m",
      "15m",
      "1H",
+     "4H"
+    ],
+    "score": 38.8,
+    "kind": "resistance"
+   },
+   {
+    "lo": 82464.5,
+    "hi": 82624.9,
+    "mid": 82533.5,
+    "tfs": [
+     "1H",
      "4H",
      "1D"
     ],
-    "score": 50.9,
+    "score": 13.5,
     "kind": "support"
-   },
-   {
-    "lo": 83436.9,
-    "hi": 83458.4,
-    "mid": 83447.6,
-    "tfs": [
-     "1H",
-     "4H"
-    ],
-    "score": 8.0,
-    "kind": "resistance"
    }
   ]
  },
  "orderflow": {
-  "ts": "2026-10-21T00:00:26+00:00",
-  "px": 82909.5,
+  "ts": "2026-10-21T00:38:30+00:00",
+  "px": 83110.1,
   "now": {
-   "state": "NORMAL / BALANCED",
-   "buy": 179.6,
-   "sell": 198.8,
-   "big_buy": 41.0,
+   "state": "AGGRESSIVE SELLING",
+   "buy": 131.0,
+   "sell": 218.5,
+   "big_buy": 24.1,
    "big_sell": 18.5,
-   "vol": 378.3,
-   "delta": -19.2,
-   "ratio": -0.051,
-   "big_share": 0.157
+   "vol": 349.5,
+   "delta": -87.5,
+   "ratio": -0.25,
+   "big_share": 0.122
   },
   "h4": {
    "state": "NORMAL / BALANCED",
-   "buy": 405.7,
-   "sell": 478.7,
-   "big_buy": 53.0,
-   "big_sell": 72.9,
-   "vol": 884.4,
-   "delta": -72.9,
-   "ratio": -0.082,
-   "big_share": 0.142
+   "buy": 409.5,
+   "sell": 458.2,
+   "big_buy": 55.0,
+   "big_sell": 54.5,
+   "vol": 867.7,
+   "delta": -48.6,
+   "ratio": -0.056,
+   "big_share": 0.126
   },
   "h24": {
    "state": "NORMAL / BALANCED",
-   "buy": 1625.1,
-   "sell": 1891.4,
-   "big_buy": 132.9,
+   "buy": 1606.4,
+   "sell": 1915.1,
+   "big_buy": 126.8,
    "big_sell": 237.4,
-   "vol": 3516.5,
-   "delta": -266.2,
-   "ratio": -0.076,
-   "big_share": 0.105
+   "vol": 3521.5,
+   "delta": -308.8,
+   "ratio": -0.088,
+   "big_share": 0.103
   },
   "buy_zones": [
    {
@@ -12454,15 +12455,6 @@
   ],
   "sell_zones": [
    {
-    "lo": 82550,
-    "hi": 82600,
-    "buy": 0.7,
-    "sell": 33.8,
-    "vol": 34.6,
-    "ratio": -0.96,
-    "big_share": 0.25
-   },
-   {
     "lo": 82800,
     "hi": 82850,
     "buy": 19.1,
@@ -12472,13 +12464,22 @@
     "big_share": 0.1
    },
    {
-    "lo": 82600,
-    "hi": 82650,
-    "buy": 15.9,
-    "sell": 40.7,
-    "vol": 56.7,
-    "ratio": -0.44,
-    "big_share": 0.17
+    "lo": 83050,
+    "hi": 83100,
+    "buy": 27.3,
+    "sell": 52.5,
+    "vol": 79.8,
+    "ratio": -0.32,
+    "big_share": 0.15
+   },
+   {
+    "lo": 83100,
+    "hi": 83150,
+    "buy": 17.9,
+    "sell": 38.4,
+    "vol": 56.2,
+    "ratio": -0.36,
+    "big_share": 0.04
    }
   ],
   "poc": {
