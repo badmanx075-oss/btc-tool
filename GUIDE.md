@@ -110,3 +110,22 @@ Files for this upgrade: `levels.py`, `moves.py`, `reversal.py`, `derivs.py`, `fl
 - Radar sambhavna batata hai, guarantee nahi. Backtest V10 (research workflow) aise napta hai: score 65+ ke baad agle 6 ghante mein badi move (2.5x ATR) ki dar, base rate se kitni zyada, aur unseen half par.
 - **Smart exit** (paper trades, default ON): trade tab band hota hai jab (1) +1R se zyada profit ho aur thakaan 70+ / profit-booking zone ho, (2) expected move poora ho jaye, ya (3) trade 10 ghante tak chala par kuch nahi hua (stall, aur confirm nahi hua). Ye trade ko lamba chalne se rokta hai.
 - Asli rule (stop/target) wali copy **shadow** mein chalti rehti hai. Review tab mein "Smart exit vs asli rule" dikhata hai ki smart exit sach mein behtar tha ya nahi. Band karna ho: `/set smart_exit off`. Settings: `exits` section (`/config`).
+
+## 💬 Ask: kuch bhi poochho (bina API key)
+Telegram par seedha sawaal bhejo (ya `/ask sawaal`), ya dashboard ke **💬 Ask** tab mein likho. Jawab tool ke apne live data aur lambi history se aata hai. Koi AI service, API key ya paisa nahi.
+- **Direction** (5 min, 15 min, 30 min, 1h, 2h, 4h, 1 din): "is jaisi halat ke baad history mein upar kitni baar gaya". Agar history mein koi stable edge nahi to seedha "50-50, koi edge nahi" likhta hai. Isme jhooth nahi.
+- **Kitna move**: abhi ki volatility ke hisaab se typical, 4 mein se 1 baar, 10 mein se 1 baar move (points mein).
+- **Level tak pahunchna**: "kya 90000 tak jayega aaj?" ya "1000 points neeche?" -> touch hone ki sambhavna.
+- **Kal ka move** (`/daily`): kal aur pichhle 6 din mein upar tak, neeche tak, range, % aur points. Stop-loss ka andaaza lene ke liye.
+- Market kaisa hai, trade lu?, support/resistance, wallet, position, win rate, risk, order flow, kab active, tool kaise kaam karta hai, aur 45+ trading/stock terms (RSI, stop-loss, leverage, option, Nifty...).
+- BTC ke alawa (Nifty, gold, ETH) ki direction nahi batata, kyunki uska data nahi hai. Concepts samjha deta hai.
+- `ye jawab kitne sahi hain` poochho: history ki jaanch + live andaazon ka sach-jhooth.
+- Pehli baar history stats (ask_stats.json) bante mein 1-2 min lagte hain, phir har 7 din mein apne aap refresh.
+
+## 🗂 Daily archive (hamesha ke liye saved)
+Har IST din (raat 12 se raat 12) ki ek row `daily_history.json` + `daily_history.csv` mein save hoti hai: open/high/low/close, upar-neeche points aur %, UP/DOWN din, din ka high-low kis ghante bana, Asia/Europe/US/Late session ka range, sabse bada 1H candle, volume, aur us din tool ke paper trade (kitne, net ₹).
+- Din poora hote hi row **freeze** ho jati hai: kabhi badalti ya delete nahi hoti. Aaj ki row har scan par refresh hoti hai.
+- Pehle scan par tool khud ~1 saal ka purana data bhar leta hai (OKX free data), isliye analysis pehle din se ho sakta hai.
+- Telegram: `/daily` (kal), `/daily 14` (pichhle 14 din), `/daily stats` (average, weekday, session, bade din), `/daily csv` (poori file, Excel ya mujhe bhejne ke liye).
+- Dashboard: Ask tab mein poori table, roz ka range chart aur CSV download.
+- Ask mein bhi poochho: "pichhle 10 din ka move", "kis din sabse zyada move hota hai", "weekday wise average range".

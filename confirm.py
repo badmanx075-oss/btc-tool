@@ -15,9 +15,9 @@ def checks(t, S, px):
     if lvl: out.append(["Confirm level toda", bool((px > lvl) if k == 1 else (px < lvl)), f"level ${lvl:,.0f}, ab ${px:,.0f}"])
     else: out.append(["Entry ke baad bhaav aage chala", uR > 0.25, f"{uR:+.2f}R"])
     out += [["Profit +0.5R se zyada", uR >= 0.5, f"{uR:+.2f}R"],
-            ["Momentum trade ke saath", (m.get("momentum_atr") or 0) * 1 > 0.3, f"{m.get('momentum_atr', 0):+.1f} ATR (3h)" if m else "n/a"],
+            ["Momentum trade ke saath", (m.get("momentum_atr") or 0) * 1 > 0.3, f"{(m.get('momentum_atr') or 0):+.1f} ATR (3h)" if m else "n/a"],
             ["15m aur 1H direction trade ke saath", rows.get("15m") == want and rows.get("1H") in (want, "FLAT"), f"15m {rows.get('15m', '?')}, 1H {rows.get('1H', '?')}"],
-            ["Order flow (taker) trade ke saath", (d.get("taker_delta") or 0) * k > 0.03, f"taker delta {d.get('taker_delta', 0):+.2f}"],
+            ["Order flow (taker) trade ke saath", (d.get("taker_delta") or 0) * k > 0.03, f"taker delta {(d.get('taker_delta') or 0):+.2f}"],
             ["Reversal ke sanket nahi", bool(m) and not any((m.get("reversal_flags") or {}).values()), "koi flag nahi" if m and not any((m.get("reversal_flags") or {}).values()) else "flag hai"]]
     return out
 

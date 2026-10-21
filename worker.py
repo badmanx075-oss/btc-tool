@@ -2,7 +2,7 @@
 import os, json, time, subprocess, requests, datetime as dt
 from zoneinfo import ZoneInfo
 import engine as E
-import paper, learn, config, wallet, analysis, history, stats, flow, desk, review as rvw, notify, timing, sr, orderflow
+import paper, learn, config, wallet, analysis, history, stats, flow, desk, review as rvw, notify, timing, sr, orderflow, ask, askstats, dailylog
 import pandas as pd
 import faulthandler; faulthandler.dump_traceback_later(330, exit=True)  # if stuck >5.5 min: print where, then exit
 
@@ -75,9 +75,31 @@ def review(t):
 HELP = ("📖 COMMANDS\n/status  wallet + position + radar\n/wallet /ledger /trades  money, every rupee movement, trade list\n/history [n]  last n trades (permanent record)\n/timeline ID  full story of one trade\n"
         "/stats  win rate, avg R, drawdown, streaks (+ honest verdict)\n/today  today's summary\n/analysis  market analysis\n/active  open early-signal alerts\n/review ID  review an alert\n"
         "/note ID text  add your remark | /myexit ID price  your own exit\n/pause  stop NEW trades and alerts (open trades keep being managed) | /resume\n"
-        "/config /set name value /notify name on|off  settings\n/lessons /approve N /revert N  what the tool learned\n/weekly  weekly report\n/radar  good move aane wala hai? | /flow  aggressive buy/sell kahan | /levels  timeframe-wise support/resistance | /methods  saare tareeke ka vote | /timing  kis samay kitni move hoti hai | /export  review pack (file) to send to Claude | /readiness  kitna data bacha\n/settings  notification ON/OFF buttons | /deliveries  last sends\n/demo  test the pipeline\n/ping  is the bot alive\n/resetwallet confirm")
+        "/config /set name value /notify name on|off  settings\n/lessons /approve N /revert N  what the tool learned\n/weekly  weekly report\n/ask sawaal  KOI BHI sawaal (ya seedha message bhejo) | /daily  kal kitna upar/neeche gaya | /daily 14, /daily stats, /daily csv  saved daily history\n/radar  good move aane wala hai? | /flow  aggressive buy/sell kahan | /levels  timeframe-wise support/resistance | /methods  saare tareeke ka vote | /timing  kis samay kitni move hoti hai | /export  review pack (file) to send to Claude | /readiness  kitna data bacha\n/settings  notification ON/OFF buttons | /deliveries  last sends\n/demo  test the pipeline\n/ping  is the bot alive\n/resetwallet confirm")
 MENU = [("status", "Wallet, position, radar"), ("history", "Last trades"), ("timeline", "One trade in detail"), ("stats", "Performance"), ("today", "Today's summary"), ("wallet", "Wallet"), ("analysis", "Market analysis"),
-        ("radar", "Good move radar"), ("flow", "Aggressive buy/sell"), ("levels", "Support/Resistance"), ("methods", "Multi-method check"), ("timing", "Active time windows"), ("export", "Review pack file"), ("readiness", "Data readiness"), ("settings", "Notification buttons"), ("pause", "Pause new trades"), ("resume", "Resume trades"), ("help", "All commands"), ("ping", "Is the bot alive")]
+        ("ask", "Kuch bhi poochho"), ("daily", "Kal kitna move hua"), ("radar", "Good move radar"), ("flow", "Aggressive buy/sell"), ("levels", "Support/Resistance"), ("methods", "Multi-method check"), ("timing", "Active time windows"), ("export", "Review pack file"), ("readiness", "Data readiness"), ("settings", "Notification buttons"), ("pause", "Pause new trades"), ("resume", "Resume trades"), ("help", "All commands"), ("ping", "Is the bot alive")]
+
+ASK_Q = {"5m": "5 min me kya hoga?", "1h": "1 ghante me upar ya neeche?", "4h": "4 ghante me upar ya neeche?", "mkt": "market kaisa hai?", "adv": "abhi trade lena chahiye?", "day": "kal kitna move hua?", "lvl": "support resistance kahan hai?"}
+def ask_kb():
+    b = [("⏱ 5 min", "ask|5m"), ("⏱ 1 ghanta", "ask|1h"), ("⏱ 4 ghante", "ask|4h"), ("📊 Market kaisa", "ask|mkt"), ("🎯 Trade lu?", "ask|adv"), ("📆 Kal ka move", "ask|day"), ("🧭 Levels", "ask|lvl")]
+    return {"inline_keyboard": [[{"text": t, "callback_data": d} for t, d in b[i:i + 2]] for i in range(0, len(b), 2)]}
+def send_doc(path, caption):
+    try:
+        with open(path, "rb") as fh: r = requests.post(API + "sendDocument", data=dict(chat_id=CHAT, caption=HEADER + caption), files=dict(document=fh), timeout=60)
+        if not r.ok: S.setdefault("telegram", {})["api_error"] = f"sendDocument: {r.status_code} {r.text[:100]}"
+        return r.ok
+    except Exception as e: S.setdefault("telegram", {})["api_error"] = f"sendDocument: {type(e).__name__}"; return False
+def daily_cmd(args):
+    arc = dailylog.load(); a = (args[0].lower() if args else "")
+    if a in ("csv", "file", "export"):
+        if not os.path.exists(dailylog.CSVF): return send("Daily archive abhi khaali hai.")
+        return send_doc(dailylog.CSVF, f"Daily archive: {len(arc['days'])} din (Excel mein khulega, ya mujhe bhejo analysis ke liye)") or send("File bhejne mein dikkat aayi. Dashboard ke Ask tab se download karo.")
+    if a in ("stats", "analysis", "analyze"): return send(dailylog.text_stats(arc))
+    if a.isdigit(): return send(dailylog.text_days(arc, max(1, min(int(a), 30))))
+    send(askstats.daily_text(S.get("daily")) + f"\n\n🗂 {len(arc['days'])} din hamesha ke liye saved hain. /daily 14 (pichhle din) | /daily stats (analysis) | /daily csv (poori file)")
+def answer_q(q):
+    try: send(ask.answer(q, S, config.load(), askstats.load(), log=True, arc=dailylog.load()))
+    except Exception as e: send(f"Ask mein dikkat aayi ({type(e).__name__}). Dobara try karo.")
 
 def today_text():
     P_ = S.get("paper") or {}; d = (now + dt.timedelta(hours=5, minutes=30)).strftime("%Y-%m-%d")
@@ -102,6 +124,8 @@ def handle_updates(timeout=0):
                 cur = config.load()["alerts"].get(tid, True); config.set_notify(tid, "off" if cur else "on")
                 tg("answerCallbackQuery", callback_query_id=cb["id"], text=f"{tid}: {'OFF' if cur else 'ON'}")
                 tg("editMessageReplyMarkup", chat_id=CHAT, message_id=src.get("message_id"), reply_markup=settings_kb()); continue
+            if act == "ask":
+                tg("answerCallbackQuery", callback_query_id=cb["id"], text="Soch raha hu…"); answer_q(ASK_Q.get(tid, tid)); continue
             if act in ("fbgood", "fbbad"):
                 rep = paper.user_event(S, act, tid, now); tg("answerCallbackQuery", callback_query_id=cb["id"], text=rep[:180]); send(rep); continue
             t = S["trades"].get(tid)
@@ -130,6 +154,8 @@ def handle_updates(timeout=0):
         elif c in ("/levels", "/sr"): send(sr.text(S.get("sr")))
         elif c == "/methods": send(__import__("methods").text((S.get("paper") or {}).get("methods")))
         elif c == "/timing": send(timing.text(S.get("timing") or timing.now_context(timing.load(), now)))
+        elif c == "/ask": qtxt = " ".join(txt[1:]); (answer_q(qtxt) if qtxt else tg("sendMessage", chat_id=CHAT, text=HEADER + "🤖 ASK: sawaal likho (jaise /ask 1 ghante me upar ya neeche?) ya seedha message bhejo. Ya button dabao:", reply_markup=ask_kb()))
+        elif c == "/daily": daily_cmd(txt[1:])
         elif c in ("/help", "/start"): send(HELP)
         elif c == "/history": send(stats.history_text(history.load()["records"].values(), int(txt[1]) if len(txt) > 1 and txt[1].isdigit() else 5))
         elif c == "/timeline" and len(txt) > 1: rec = history.load()["records"].get(txt[1]); send(stats.timeline_text(rec) if rec else "Trade ID nahi mila. /history se ID dekho.")
@@ -150,6 +176,7 @@ def handle_updates(timeout=0):
         elif c == "/note" and len(txt) > 2: send(paper.add_note(S, txt[1], " ".join(txt[2:])))
         elif c == "/myexit" and len(txt) > 2: send(paper.my_exit(S, txt[1], txt[2], " ".join(txt[3:]), now))
         elif c == "/resetwallet": send(paper.reset_wallet(S, now) if txt[1:2] == ["confirm"] else "Wallet reset karne par purani history archive ho jati hai. Pakka ho to bhejo: /resetwallet confirm")
+        elif not c.startswith("/"): answer_q(" ".join(txt))            # koi bhi seedha sawaal -> Ask
         else: send(HELP)
     return len(r["result"])
 
@@ -212,6 +239,11 @@ def scan_cycle():
     except Exception as e: print("sr/orderflow error", e)
     try: S["timing"] = timing.now_context(timing.ensure(now), now)        # when does BTC usually move? (rebuilt every ~3 days from 1 year of 1H data)
     except Exception as e: print("timing error", e)
+    try:                                                                # Ask: live state for every question + yesterday/today move table + outcome of earlier forecasts
+        S["ask_state"] = askstats.live_state(m5, h1); S["daily"] = askstats.daily(h1, now); askstats.resolve(S, m5, h1, now)
+    except Exception as e: print("ask state error", e)
+    try: dailylog.backfill(now, S); dailylog.update(h1, now, S)        # permanent daily archive (never deleted)
+    except Exception as e: print("dailylog error", e)
     try: m30 = E.candles("30m")
     except Exception: m30 = None
     for t in S["trades"].values():
@@ -254,6 +286,8 @@ def scan_cycle():
     except Exception as e: print("desk error", e)
     try: paper.run(S, send, now, scan=r)
     except Exception as e: print("paper error", e)
+    try: askstats.ensure(now)                                           # history stats for Ask (rebuilt weekly, ~1-2 min only when due)
+    except Exception as e: print("ask stats error", e)
     try: notify.setup_alerts(S, send, now); notify.milestone_alert(S, send, send_file, now)
     except Exception as e: print("notify error", e)
     loc = now.astimezone(TZ); key = loc.strftime("%Y-%m-%d"); CF = dict(config.load()["schedule"])
@@ -282,7 +316,7 @@ def publish():  # push state to GitHub right away so the dashboard shows new tra
         if os.path.exists("market_log.csv"): run("git", "add", "market_log.csv")
         if os.path.exists("trade_history.json"): run("git", "add", "trade_history.json")
         if os.path.exists("time_stats.json"): run("git", "add", "time_stats.json")
-        for fn_ in ("orderflow_profile.json", "chart_data.json"):
+        for fn_ in ("orderflow_profile.json", "chart_data.json", "ask_stats.json", "daily_history.json", "daily_history.csv"):
             if os.path.exists(fn_): run("git", "add", fn_)
         if os.path.exists("flow_log.csv"): run("git", "add", "flow_log.csv")
         if run("git", "diff", "--cached", "--quiet").returncode: run("git", "commit", "-m", "state"); run("git", "pull", "--rebase"); run("git", "push")
