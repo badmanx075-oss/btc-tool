@@ -49,6 +49,13 @@ def nearest(Z, idx, z, k=K, space=SPACE):
     return np.array(out, int)
 
 
+def spearman(a, b):
+    """Rank correlation without scipy (the GitHub runner only has numpy/pandas)."""
+    a, b = pd.Series(a).rank().values, pd.Series(b).rank().values
+    if len(a) < 3 or a.std() == 0 or b.std() == 0: return 0.0
+    return float(np.corrcoef(a, b)[0, 1])
+
+
 def wilson(p, n, z=1.96):
     if n <= 0: return 0.0, 1.0
     den = 1 + z * z / n; c = (p + z * z / (2 * n)) / den; m = z * math.sqrt(p * (1 - p) / n + z * z / (4 * n * n)) / den; return c - m, c + m
@@ -85,7 +92,7 @@ def _validate(F, T, I, step=3):
         P, A, PM, P90, AT = map(np.array, (P, A, PM, P90, AT)); base = float(np.nanmean((T[WARM:t0 - 25, a, 0] > 0))); lean = np.abs(P - 0.5) >= 0.05
         hit = float(((P > 0.5) == (A > 0.5))[lean].mean() * 100) if lean.sum() >= 30 else None
         brier, brier0 = float(np.mean((P - A) ** 2)), float(np.mean((base - A) ** 2)); ap = atrp[t0:n - 25:step][:len(P)]
-        corr = float(pd.Series(PM).corr(pd.Series(AT), method="spearman")); corr0 = float(pd.Series(ap).corr(pd.Series(AT), method="spearman")) if len(ap) == len(AT) else None
+        corr = spearman(PM, AT); corr0 = spearman(ap, AT) if len(ap) == len(AT) else None
         out[str(H)] = dict(tests=int(len(P)), lean_n=int(lean.sum()), hit_pct=None if hit is None else round(hit, 1), brier=round(brier, 4), brier_base=round(brier0, 4), range_corr=round(corr, 3), range_corr_atr=None if corr0 is None else round(corr0, 3), p90_coverage=round(float((AT <= P90).mean() * 100), 1))
     return out
 
@@ -95,7 +102,9 @@ def build(df):
     if ok.sum() < 1500: return None
     mu, sd = np.nanmean(F[ok], axis=0), np.nanstd(F[ok], axis=0) + 1e-9; Z = zscore(F, mu, sd)
     np.savez_compressed(LIB, Z=np.nan_to_num(Z, nan=99).astype(np.float16), T=T.astype(np.float16), mu=mu, sd=sd, ts=np.array([float(df.ts.iloc[0]), float(df.ts.iloc[-1])]))
-    val = _validate(F, T, I); meta = dict(built=dt.datetime.now(dt.timezone.utc).isoformat(timespec="seconds"), rows=int(ok.sum()), days=int((df.ts.iloc[-1] - df.ts.iloc[0]) / 86400000), val=val)
+    try: val = _validate(F, T, I)
+    except Exception as e: print("analog validation error", e); val = {}
+    meta = dict(built=dt.datetime.now(dt.timezone.utc).isoformat(timespec="seconds"), rows=int(ok.sum()), days=int((df.ts.iloc[-1] - df.ts.iloc[0]) / 86400000), val=val)
     json.dump(meta, open(META, "w"), separators=(",", ":")); _CACHE.clear(); return meta
 
 
