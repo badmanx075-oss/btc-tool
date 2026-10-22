@@ -458,6 +458,13 @@ with tB:
         st.markdown(f"**Move radar (V10): {V10['verdict']}** (agle {V10['forward_hours']} ghante mein {V10['big_move_atr']}x ATR se badi move)")
         _u = V10["buckets"]["unseen_second_half"]; st.dataframe(pd.DataFrame({k: {"signals": v.get("n"), "badi move %": v.get("big_rate"), "avg move pts": v.get("avg_move_pts"), "lean sahi %": v.get("lean_right_pct")} for k, v in _u.items()}).T)
     else: st.caption("Move radar (V10) ka backtest abhi nahi chala: GitHub Actions > research > Run workflow.")
+    V11 = load("backtest_v11_results.json")
+    if V11:
+        st.markdown(f"**Analog engine strategy (V11): {V11['verdict']}** ({V11['signals']} signal, walk-forward: engine sirf purana data dekhta hai)")
+        st.dataframe(pd.DataFrame({k: V11[k] for k in ("all", "first_half", "second_half", "long", "short") if k in V11}).T, use_container_width=True)
+        ec = V11.get("engine_check") or {}
+        if ec: st.caption("Engine ki unseen-data jaanch (direction hit% sikka=50, range ranking-score vs sirf ATR): " + " | ".join(f"{h}h: hit {v.get('hit_pct')}%, range {v.get('range_corr')} vs ATR {v.get('range_corr_atr')}" for h, v in ec.items()))
+    else: st.caption("Analog engine (V11) ka backtest abhi nahi chala: GitHub Actions > research > Run workflow.")
     V9 = load("backtest_v9_results.json")
     if V9:
         st.markdown(f"**Multi-method Confluence (V9): {V9['verdict']}** (koi parameter fit nahi kiya; 3 fixed strictness levels)")
@@ -470,7 +477,7 @@ with tB:
     else: st.caption("Session Breakout (V8) ka backtest abhi nahi chala: GitHub Actions > research > Run workflow.")
 
 with tAsk:
-    import ask as ASK, askstats as ASS
+    import ask as ASK, askstats as ASS, dailylog as DLG0
     st.subheader("💬 Kuch bhi poochho (bina API key, tool ke apne data se)")
     st.caption("Market, trade, wallet, points ya trading ke sawaal likho. Jawab tool ke live data aur lambi history se aata hai. Jahan edge nahi hota wahan seedha '50-50' likhta hai.")
     D_ = S.get("daily")
@@ -484,7 +491,7 @@ with tAsk:
         if tod_: t_ = tod_[-1]; st.caption(f"Aaj abhi tak: upar +{t_['up']:,.0f} pts ({t_['up_pct']:.2f}%), neeche -{t_['dn']:,.0f} pts ({t_['dn_pct']:.2f}%), range {t_['rng']:,.0f} pts")
         a_ = D_.get("avg7")
         if a_: st.info(f"Pichhle {a_['n']} din ka average: upar +{a_['up']:,.0f} pts, neeche -{a_['dn']:,.0f} pts, range {a_['rng']:,.0f} pts ({a_['rng_pct']:.1f}%). Sabse chhota din {a_['min_rng']:,.0f}, sabse bada {a_['max_rng']:,.0f} pts. Stop-loss is range se bahut chhota rakhoge to normal halchal mein kat sakta hai; stop apne setup ke swing/ATR se tay karo.")
-        df_ = pd.DataFrame([dict(Din=r["day"] + (" (aaj)" if r["today"] else ""), **{"Upar pts": r["up"], "Upar %": r["up_pct"], "Neeche pts": r["dn"], "Neeche %": r["dn_pct"], "Range pts": r["rng"], "Range %": r["rng_pct"], "Close-Open pts": r["chg"], "Close-Open %": r["chg_pct"]}) for r in D_["rows"][::-1]])
+        df_ = pd.DataFrame([dict(Din=DLG0.daylabel(r["day"]) + (" (aaj)" if r["today"] else ""), **{"Upar pts": r["up"], "Upar %": r["up_pct"], "Neeche pts": r["dn"], "Neeche %": r["dn_pct"], "Range pts": r["rng"], "Range %": r["rng_pct"], "Close-Open pts": r["chg"], "Close-Open %": r["chg_pct"]}) for r in D_["rows"][::-1]])
         st.dataframe(df_, hide_index=True, use_container_width=True)
         st.caption("Din = IST ke hisaab se raat 12 se raat 12. 'Upar' = us din ke open se sabse upar tak, 'Neeche' = open se sabse neeche tak.")
     else: st.info("Daily move data agle scan ke baad aa jayega.")
@@ -494,8 +501,8 @@ with tAsk:
         rows_ = [ARC_["days"][k] for k in sorted(ARC_["days"])]; fin_ = [r for r in rows_ if r.get("final")]
         st.caption(f"{len(fin_)} poore din saved (sabse purana {fin_[0]['day'] if fin_ else '-'}). Poora din khatam hote hi row freeze ho jati hai, kabhi delete ya badalti nahi.")
         st.text(DLG.text_stats(ARC_))
-        T_ = pd.DataFrame(rows_[::-1]); T_["weekday"] = T_["weekday"].map(lambda i: DLG.WD[int(i)])
-        show_ = T_[["day", "weekday", "open", "high", "low", "close", "up", "dn", "rng", "rng_pct", "chg", "chg_pct", "direction", "high_hr_ist", "low_hr_ist", "rng_asia", "rng_europe", "rng_us", "rng_late", "paper_trades", "paper_pnl_inr", "final"]]
+        T_ = pd.DataFrame(rows_[::-1]); T_["weekday"] = T_["weekday"].map(lambda i: DLG.WD[int(i)]); T_["din"] = T_["day"].map(DLG.daylabel)
+        show_ = T_[["din", "open", "high", "low", "close", "up", "dn", "rng", "rng_pct", "chg", "chg_pct", "direction", "high_hr_ist", "low_hr_ist", "rng_asia", "rng_europe", "rng_us", "rng_late", "paper_trades", "paper_pnl_inr", "final"]]
         st.dataframe(show_, hide_index=True, use_container_width=True, height=320)
         fn_ = [r for r in rows_ if r.get("final")][-120:]
         if fn_: st.caption("Roz ka range (points), pichhle 120 din"); st.bar_chart(pd.DataFrame({"range pts": [r["rng"] for r in fn_]}, index=[r["day"] for r in fn_]))
@@ -503,7 +510,7 @@ with tAsk:
         if csv_: st.download_button("⬇️ Poori daily history CSV download", csv_, "daily_history.csv", "text/csv")
     else: st.info("Daily archive pehle scan ke baad bharna shuru hoga (pehli baar ek saal ka data khud laata hai).")
     st.markdown("##### ❓ Sawaal")
-    QS_ = [("⏱ 5 min", "5 min me kya hoga?"), ("⏱ 1 ghanta", "1 ghante me upar ya neeche?"), ("⏱ 4 ghante", "4 ghante me upar ya neeche?"), ("📊 Market kaisa", "market kaisa hai?"), ("🎯 Trade lu?", "abhi trade lena chahiye?"), ("📆 Kal ka move", "kal kitna move hua?"), ("🧭 Levels", "support resistance kahan hai?")]
+    QS_ = [("⏱ 5 min", "5 min me kya hoga?"), ("⏱ 1 ghanta", "1 ghante me upar ya neeche?"), ("⏱ 4 ghante", "4 ghante me upar ya neeche?"), ("📊 Market kaisa", "market kaisa hai?"), ("🎯 Trade lu?", "abhi trade lena chahiye?"), ("📆 Kal ka move", "kal kitna move hua?"), ("🧭 Levels", "support resistance kahan hai?"), ("🛑 Stop-loss", "stop loss kitna door rakhu?")]
     cols_ = st.columns(len(QS_)); picked_ = None
     for col_, (lab_, q_) in zip(cols_, QS_):
         if col_.button(lab_, use_container_width=True, key="askq_" + lab_): picked_ = q_
@@ -512,7 +519,8 @@ with tAsk:
         go_ = st.form_submit_button("Poochho")
     q_final = picked_ or (typed_ if go_ else "")
     if q_final:
-        ans_ = ASK.answer(q_final, S, CFG, load("ask_stats.json"), log=False, arc=load("daily_history.json"))
+        S_ = dict(S); S_["ask_ctx"] = st.session_state.get("ask_ctx")
+        ans_ = ASK.answer(q_final, S_, CFG, load("ask_stats.json"), log=False, arc=load("daily_history.json")); st.session_state["ask_ctx"] = S_.get("ask_ctx")
         st.markdown("**Sawaal:** " + q_final.replace("$", "\\$")); st.markdown(ans_.replace("$", "\\$").replace("*", "\\*").replace("_", "\\_").replace("\n", "  \n"))
     with st.expander("Kya kya poochh sakte ho"): st.text(ASK.EXAMPLES)
 

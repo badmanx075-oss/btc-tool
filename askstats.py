@@ -152,15 +152,20 @@ def daily(h1, now, n_days=10):
     return dict(rows=rows, avg7=avg, ts=now.isoformat(timespec="seconds"))
 
 
+def _dl(day):
+    import dailylog as DL
+    return DL.daylabel(day)
+
+
 def daily_text(D, px=None):
     if not D or not D.get("rows"): return "Daily move data abhi ready nahi (agle scan ke baad aa jayega)."
     R = D["rows"]; full = [r for r in R if not r["today"]]; L = ["📆 DIN-WAR MOVE (IST din: raat 12 se raat 12)"]
     if full:
-        y = full[-1]; L.append(f"KAL ({y['day']}): open ${y['open']:,.0f} → close ${y['close']:,.0f} ({y['chg']:+,.0f} pts, {y['chg_pct']:+.2f}%)\n   Upar tak gaya: +{y['up']:,.0f} pts (+{y['up_pct']:.2f}%) | Neeche tak gaya: -{y['dn']:,.0f} pts (-{y['dn_pct']:.2f}%) | Poora range {y['rng']:,.0f} pts ({y['rng_pct']:.2f}%)")
+        y = full[-1]; L.append(f"KAL ({_dl(y['day'])}): open ${y['open']:,.0f} → close ${y['close']:,.0f} ({y['chg']:+,.0f} pts, {y['chg_pct']:+.2f}%)\n   Upar tak gaya: +{y['up']:,.0f} pts (+{y['up_pct']:.2f}%) | Neeche tak gaya: -{y['dn']:,.0f} pts (-{y['dn_pct']:.2f}%) | Poora range {y['rng']:,.0f} pts ({y['rng_pct']:.2f}%)")
     t = [r for r in R if r["today"]]
-    if t: r = t[-1]; L.append(f"AAJ ABHI TAK: upar +{r['up']:,.0f} pts ({r['up_pct']:.2f}%), neeche -{r['dn']:,.0f} pts ({r['dn_pct']:.2f}%), range {r['rng']:,.0f} pts")
+    if t: r = t[-1]; L.append(f"AAJ ABHI TAK ({_dl(r['day'])}): upar +{r['up']:,.0f} pts ({r['up_pct']:.2f}%), neeche -{r['dn']:,.0f} pts ({r['dn_pct']:.2f}%), range {r['rng']:,.0f} pts")
     L.append("Pichhle dinon ka (upar / neeche / range, points):")
-    for r in full[-6:][::-1]: L.append(f"  {r['day'][5:]}: +{r['up']:,.0f} / -{r['dn']:,.0f} / {r['rng']:,.0f}  ({r['rng_pct']:.1f}%)")
+    for r in full[-6:][::-1]: L.append(f"  {_dl(r['day'])}: +{r['up']:,.0f} / -{r['dn']:,.0f} / {r['rng']:,.0f}  ({r['rng_pct']:.1f}%)")
     a = D.get("avg7")
     if a: L.append(f"Pichhle {a['n']} din ka average: upar +{a['up']:,.0f}, neeche -{a['dn']:,.0f} pts, range {a['rng']:,.0f} pts ({a['rng_pct']:.1f}%). Sabse chhota din {a['min_rng']:,.0f}, sabse bada {a['max_rng']:,.0f} pts.")
     if a: L.append(f"Stop-loss ke liye: ek din mein aam tor par {a['rng']:,.0f} pts ghoom jata hai, isliye bahut chhota stop (jaise {a['rng'] * 0.1:,.0f} pts) normal halchal mein hi kat sakta hai. Stop apne setup ke swing/ATR ke hisaab se rakho; ye range sirf ek andaaza hai.")

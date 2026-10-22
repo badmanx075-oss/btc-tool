@@ -7,16 +7,17 @@ DEFAULTS = {
                "learning": True, "setup": True, "move": True, "flow": True, "confirm": True, "timing": True, "milestone": True, "morning": True, "evening": True, "weekly": True},
     "schedule": {"morning_hour": 8, "evening_hour": 20, "listen_seconds": 210},
     "timing": {"skip_low_activity": False, "window_alerts": True},
-    "risk": {"max_daily_loss_pct": 3.0, "min_methods_agree": 0},
-    "exits": {"smart_exit": True, "min_profit_R": 1.0, "exhaustion_min": 70, "stall_hours": 10, "stall_band_R": 0.3, "use_expected_move": True},
+    "risk": {"max_daily_loss_pct": 3.0, "min_methods_agree": 0, "min_stop_pct": 0.5},
+    "exits": {"smart_exit": True, "min_profit_R": 1.0, "exhaustion_min": 70, "stall_hours": 10, "stall_band_R": 0.3, "use_expected_move": False},
     "strategies": {
         "trend_pullback": {"enabled": True, "label": "Trend Pullback", "risk_pct": 1.0, "stop_atr": 3.0, "target_r": 4.0, "expiry_hours": 120, "cooldown_hours": 24},
         "early_signal": {"enabled": True, "label": "Early Signal (experimental)", "risk_pct": 0.5, "min_score": 65, "partial_pct": 50, "expiry_hours": 72, "cooldown_hours": 1},
         "session_breakout": {"enabled": True, "label": "Session Breakout (experimental)", "risk_pct": 0.3, "box_hours": 6, "vol_mult": 1.3, "stop_min_atr": 1.0, "stop_max_atr": 2.5, "target_r": 2.0, "expiry_hours": 24, "cooldown_hours": 6},
-        "confluence": {"enabled": True, "label": "Multi-Method Confluence (experimental)", "risk_pct": 0.4, "need": 4, "net_min": 35, "stop_min_atr": 1.2, "stop_max_atr": 3.0, "target_r": 2.0, "expiry_hours": 48, "cooldown_hours": 12}}}
+        "confluence": {"enabled": False, "label": "Multi-Method Confluence (experimental)", "risk_pct": 0.4, "need": 4, "net_min": 35, "stop_min_atr": 1.2, "stop_max_atr": 3.0, "target_r": 2.0, "expiry_hours": 48, "cooldown_hours": 12},
+        "analog_edge": {"enabled": False, "label": "Analog Engine (experimental)", "risk_pct": 0.3, "stop_atr": 1.5, "target_r": 1.5, "expiry_hours": 12, "cooldown_hours": 4, "require_validated": True}}}
 LIMITS = {"start_inr": (1000, 10000000), "leverage": (1, 20), "fee_rate_per_side": (0, 0.005), "max_open_positions": (1, 10), "qty_step": (0.00001, 0.01), "risk_pct": (0.05, 5),
           "stop_atr": (0.5, 10), "target_r": (0.5, 20), "expiry_hours": (1, 720), "cooldown_hours": (0, 168), "partial_pct": (10, 90), "min_score": (40, 95),
-          "max_daily_loss_pct": (0.5, 50), "min_methods_agree": (0, 7), "exhaustion_min": (30, 100), "min_profit_R": (0.2, 10), "stall_hours": (2, 120), "stall_band_R": (0.05, 1.5), "need": (2, 7), "net_min": (10, 90), "box_hours": (3, 24), "vol_mult": (1, 5), "stop_min_atr": (0.3, 5), "stop_max_atr": (0.5, 10), "morning_hour": (0, 23), "evening_hour": (0, 23), "listen_seconds": (0, 250)}
+          "max_daily_loss_pct": (0.5, 50), "min_methods_agree": (0, 7), "min_stop_pct": (0, 5), "exhaustion_min": (30, 100), "min_profit_R": (0.2, 10), "stall_hours": (2, 120), "stall_band_R": (0.05, 1.5), "need": (2, 7), "net_min": (10, 90), "box_hours": (3, 24), "vol_mult": (1, 5), "stop_min_atr": (0.3, 5), "stop_max_atr": (0.5, 10), "morning_hour": (0, 23), "evening_hour": (0, 23), "listen_seconds": (0, 250)}
 
 def _merge(a, b):
     out = copy.deepcopy(a)

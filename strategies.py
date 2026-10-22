@@ -77,4 +77,19 @@ def confluence(env, sc):
            + f". Stop aakhri swing ke us paar, target {sc.get('target_r', 2)}R. Ye experimental hai: backtest (V9) se pehle isse sabit nahi maana jaata.")
     return dict(side=k, entry=e, sl=e - k * risk, tp=e + k * sc.get("target_r", 2.0) * risk, confirm=e + k * 0.5 * a, risk=risk, mode="fixed", ctx=ctx, why=why)
 
-SIGNALS = {"trend_pullback": trend_pullback, "early_signal": early_signal, "session_breakout": session_breakout, "confluence": confluence}
+def analog_edge(env, sc):
+    """Nearest-neighbour ('analog') engine: trades only when the engine finds a clear, statistically supported lean at the 4h horizon
+    AND (live) the engine passed its own unseen-data check. Disabled by default until backtest V11 shows a real edge."""
+    h1, i, now = env["h1"], env["i"], env["now"]
+    A = env.get("analog") or (env["S"].get("analog") or {})
+    if now.timestamp() - (float(h1.ts.iloc[i]) / 1000 + 3600) > 1800: return None              # candle closed >30 min ago: too late
+    if A.get("signal") not in ("LONG", "SHORT"): return None
+    if sc.get("require_validated", True) and not A.get("validated"): return None
+    k = 1 if A["signal"] == "LONG" else -1; I = env.get("mI") or MT.prepare(h1.reset_index(drop=True)); a = float(I["atr"][i]); e = float(I["c"][i])
+    risk = max(sc.get("stop_atr", 1.5) * a, e * 0.005)
+    ctx = dict(side_n=k, side=A["signal"], hour=now.hour, wd=now.weekday(), atr_pct=round(a / e * 100, 3), p4=A.get("p4"), tcls=env.get("tcls"), regime=(env["S"].get("market") or {}).get("regime"), funding=float((env["S"].get("market") or {}).get("funding", 0)))
+    why = (f"Analog engine: pichhle saal ki sabse milti-julti 150 halat mein se {A.get('p4', 0) * 100:.0f}% mein agle 4 ghante mein bhaav upar gaya, jo normal se saaf alag hai, isliye {'BUY' if k == 1 else 'SELL'}. "
+           f"Stop 1.5 ATR, target {sc.get('target_r', 1.5)}R. Ye experimental hai: backtest V11 se pehle isse sabit nahi maana jaata.")
+    return dict(side=k, entry=e, sl=e - k * risk, tp=e + k * sc.get("target_r", 1.5) * risk, confirm=e + k * 0.5 * a, risk=risk, mode="fixed", ctx=ctx, why=why)
+
+SIGNALS = {"trend_pullback": trend_pullback, "early_signal": early_signal, "session_breakout": session_breakout, "confluence": confluence, "analog_edge": analog_edge}

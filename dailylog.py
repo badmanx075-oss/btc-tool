@@ -13,6 +13,11 @@ COLS = ["day", "weekday", "open", "high", "low", "close", "up", "dn", "rng", "up
         "rng_asia", "rng_europe", "rng_us", "rng_late", "max_1h_rng", "volume", "bars", "final", "paper_trades", "paper_pnl_inr", "src", "saved_at"]
 
 
+def daylabel(day):
+    """'2026-10-20' -> '20 Oct, Mangalvar (Tue)'"""
+    t = pd.Timestamp(day); return f"{t.day:02d} {t.strftime('%b')}, {WD[t.weekday()]}"
+
+
 def load():
     try:
         a = json.load(open(FILE)); a.setdefault("days", {}); a.setdefault("meta", {}); return a
@@ -130,7 +135,7 @@ def text_stats(arc):
     L.append("Din ka high aksar IST ghante: " + ", ".join(f"{h:02d}:00 ({p}%)" for h, p in s["high_hours"]) + " | low: " + ", ".join(f"{h:02d}:00 ({p}%)" for h, p in s["low_hours"]))
     if s["sessions"]: L.append("Session ka average range (pts): " + ", ".join(f"{k} {v:,}" for k, v in s["sessions"].items()))
     if s.get("cluster"): c = s["cluster"]; L.append(f"Bade din ke baad agla din: average {c['after_big']:,} pts, baaki dinon ke baad {c['after_other']:,} pts (volatility clustering: bada din aksar bade din ke baad aata hai)" if c["after_big"] > c["after_other"] * 1.1 else f"Bade din ke baad agla din: {c['after_big']:,} pts vs baaki {c['after_other']:,} pts (koi saaf fark nahi)")
-    L.append(f"Sabse bade din: " + "; ".join(f"{d[5:]} {r:,.0f} pts ({p:.1f}%, {dr})" for d, r, p, dr in s["biggest"]) + f" | sabse lambi streak: {s['streak_up']} UP din, {s['streak_down']} DOWN din")
+    L.append(f"Sabse bade din: " + "; ".join(f"{daylabel(d)} {r:,.0f} pts ({p:.1f}%, {dr})" for d, r, p, dr in s["biggest"]) + f" | sabse lambi streak: {s['streak_up']} UP din, {s['streak_down']} DOWN din")
     if s["n"] < 90: L.append(f"Dhyan: abhi sirf {s['n']} din hain. Weekday aur ghante ke pattern ke liye kam se kam 90 din chahiye, tab tak inhe pakka mat maano.")
     if s.get("today_rank") is not None: L.append(f"Aaj abhi tak range {s['today_rng']:,.0f} pts: itihaas ke {s['today_rank']}% dinon se bada ya barabar (din abhi chal raha hai).")
     return "\n".join(L)
@@ -140,5 +145,5 @@ def text_days(arc, n=14):
     rows = [arc["days"][k] for k in sorted(arc["days"])][-n:][::-1]
     if not rows: return "Daily archive abhi khaali hai (pehle scan ke baad bharega)."
     L = [f"📒 PICHHLE {len(rows)} DIN (saved, IST) | din: upar / neeche / range pts | close-open"]
-    for r in rows: L.append(f"{r['day'][5:]} {WD[int(r['weekday'])].split(' ')[1].strip('()')}{' (aaj)' if not r.get('final') else ''}: +{r['up']:,.0f} / -{r['dn']:,.0f} / {r['rng']:,.0f} ({r['rng_pct']:.1f}%) | {r['chg']:+,.0f} {r['direction']}" + (f" | tool: {r['paper_trades']} trade, ₹{r['paper_pnl_inr']:+,.0f}" if r.get("paper_trades") else ""))
+    for r in rows: L.append(f"{daylabel(r['day'])}{' (aaj)' if not r.get('final') else ''}: +{r['up']:,.0f} / -{r['dn']:,.0f} / {r['rng']:,.0f} ({r['rng_pct']:.1f}%) | {r['chg']:+,.0f} {r['direction']}" + (f" | tool: {r['paper_trades']} trade, ₹{r['paper_pnl_inr']:+,.0f}" if r.get("paper_trades") else ""))
     return "\n".join(L)

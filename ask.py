@@ -12,7 +12,7 @@ P_ = lambda x: f"${x:,.0f}"
 INR = lambda x: ("-" if x < 0 else "") + f"₹{abs(x):,.0f}"
 DIS = "⚠️ Ye history ke aadhaar par sambhavna hai, guarantee ya paisa-salah nahi. Tool sirf paper (nakli) trading karta hai."
 EXAMPLES = ("Aise poochho:\n• 1 ghante me upar jayega ya neeche?\n• 5 min me kya hoga?\n• market kaisa hai?\n• abhi trade lena chahiye?\n• kya 90000 tak jayega aaj?\n• 1000 points move hoga kya?\n"
-            "• support resistance kahan hai?\n• kab sabse zyada move hota hai?\n• mera wallet / meri position?\n• tool ka win rate kaisa hai?\n• RSI kya hai? / stop loss kya hota hai?\n• ye tool kaise kaam karta hai?")
+            "• support resistance kahan hai?\n• kab sabse zyada move hota hai?\n• mera wallet / meri position?\n• tool ka win rate kaisa hai?\n• stop loss kitna door rakhu?\n• RSI kya hai? / stop loss kya hota hai?\n• ye tool kaise kaam karta hai?")
 
 # ---------------------------------------------------------------- glossary (plain Hinglish)
 GLOSS = {
@@ -129,10 +129,47 @@ INTENTS = [
     ("daily", r"(kal|yesterday|pichhle din|pichle din|last day|daily|din (bhar|me|mein)|ek din|1 din|ek din me).{0,40}(kitna|kitne|move|gaya|gira|badha|range|points?|pts|%|percent|percentage)|(kitna|kitne).{0,30}(kal|din|daily)|(?<!\w)(daily range|din ka range|day range|roz)(?!\w)"),
     ("timing", r"(?<!\w)(kab|kis (samay|time|waqt)|best time|konsa (time|samay)|session|active (window|time|hour)|peak hour|volatile (time|hour|samay)|trading hours?)(?!\w)"),
     ("radar", r"(radar|good move|achha move|accha move|move aane|move coming|big move|bada move)"),
+    ("stoploss", r"(stop\s*loss|stoploss|(?<!\w)sl(?!\w)).{0,30}(kitna|kitne|kahan|kaha|door|rakhu|rakhun|lagau|lagaun|lagana|rakhna|set|points?|pts|kaise|decide|tay|guide|suggest)|(kitna|kitne|kahan|kaha).{0,20}(stop\s*loss|stoploss|(?<!\w)sl(?!\w))"),
     ("risk", r"(?<!\w)(risk|leverage|position size|drawdown|loss limit|daily loss|kitna lagau|kitna lagana|kitna invest)(?!\w)"),
     ("tool", r"(?<!\w)(tool|bot|system|strateg\w*|confluence|early signal|pullback|kaise (kaam|chalta|chal)|how (does|do)|kya karta|kya kar raha|health|working|alive|delay|last scan|smart exit)(?!\w)"),
 ]
 GLOSS_Q = r"(kya hai|kya hota|kya hoti|kya hote|kise kehte|meaning|matlab|explain|what is|what are|samjhao|samjha|define|difference|farak|batao.{0,12}(kya|about))"
+
+
+SEM = {"direction": ["upar jayega ya neeche", "market girega ya badhega", "agle ghante direction kya hogi", "bitcoin upar ya niche jayega", "price badhega kya", "market tutega kya", "kya hoga aage"],
+       "market": ["market kaisa hai", "abhi halat kya hai", "bazaar ka mood kaisa", "current situation batao", "overall analysis do"],
+       "stoploss": ["stop loss kitna rakhu", "sl kahan lagau", "stop kitna door rakhna chahiye", "stoploss kitne points"],
+       "advice": ["abhi trade lu kya", "entry lena chahiye", "buy karu ya sell", "long ya short lu"],
+       "levels": ["support resistance kahan hai", "kaunsa level important hai", "price kahan rukega"],
+       "daily": ["kal kitna move hua", "kal ka high low kya tha", "pichhle din kitna upar neeche gaya"],
+       "size": ["kitna move ho sakta hai", "kitne points hilega", "range kitni hogi"],
+       "performance": ["tool ka win rate", "kitne trade jeete", "strategy kaisi chal rahi hai"],
+       "wallet": ["mera wallet kitna hai", "balance kitna bacha", "kitna paisa kamaya"],
+       "position": ["meri position kaisi hai", "mera trade abhi kaisa chal raha hai", "open trade ka pnl"],
+       "flow": ["buyers ya sellers kaun zyada", "order flow kaisa hai", "aggressive buying chal rahi hai kya"],
+       "timing": ["kab sabse zyada move hota hai", "kis time market active rehta hai", "best trading time"],
+       "tool": ["tool kaise kaam karta hai", "ye bot kya karta hai", "kaunsi strategy chal rahi hai"]}
+_SEM = {}
+
+
+def _grams(s):
+    s = " " + re.sub(r"\s+", " ", re.sub(r"[^\w ]", " ", s.lower())).strip() + " "; c = {}
+    for i in range(len(s) - 2): c[s[i:i + 3]] = c.get(s[i:i + 3], 0) + 1
+    return c
+
+
+def _semantic(n, thr=0.42):
+    """Typo-tolerant intent guess: character-3-gram TF-IDF cosine against example questions (no API, no model download)."""
+    if not _SEM:
+        docs = [(k, _grams(e)) for k, v in SEM.items() for e in v]; df = {}
+        for _, g in docs:
+            for t in g: df[t] = df.get(t, 0) + 1
+        idf = {t: math.log(1 + len(docs) / c) for t, c in df.items()}; _SEM.update(docs=docs, idf=idf)
+    idf = _SEM["idf"]; qg = _grams(n); vec = lambda g: {t: c * idf.get(t, 1.0) for t, c in g.items()}; nq = vec(qg); nrm = lambda v: math.sqrt(sum(x * x for x in v.values())) or 1.0; qn = nrm(nq); best = (0.0, None)
+    for k, g in _SEM["docs"]:
+        v = vec(g); s = sum(x * v.get(t, 0) for t, x in nq.items()) / (qn * nrm(v))
+        if s > best[0]: best = (s, k)
+    return best[1] if best[0] >= thr else None
 
 
 def understand(q, S):
@@ -143,17 +180,28 @@ def understand(q, S):
     out = []
     if "accuracy" in hit: out.append("accuracy")
     if (pr or pts) and _has(n, r"(tak|touch|reach|cross|pahunch|pahuch|hit|jayega|jaega|tutega|toot|break|upar|neeche|up|down|agar|if|hoga|ho jayega|chhu|chu)"): out.append("target")
-    for k in ("dailyhist", "daily", "direction", "size", "market", "advice", "levels", "position", "wallet", "performance", "flow", "timing", "radar", "risk", "tool"):
+    for k in ("dailyhist", "daily", "stoploss", "direction", "size", "market", "advice", "levels", "position", "wallet", "performance", "flow", "timing", "radar", "risk", "tool"):
         if k in hit and not (k == "size" and ("direction" in out or "target" in out)) and not (k == "market" and "direction" in out): out.append(k)
     if "daily" in out and not _has(n, r"(hoga|hogi|jayega|jaega|jayegi|will|expect|aaj|aane wale|aage|next)"): out = [x for x in out if x not in ("direction", "size", "market")]
     if "dailyhist" in out: out = [x for x in out if x not in ("daily", "direction", "size", "market", "timing")]
     if "target" in out: out = [x for x in out if x != "direction"]
     if "performance" in out: out = [x for x in out if x != "tool"]
+    if "stoploss" in out: out = [x for x in out if x not in ("risk", "advice", "size", "direction", "market")]
     if "risk" in out and "advice" in out and not _has(n, r"(trade|entry|buy|sell|long|short)"): out = [x for x in out if x != "advice"]
     if _has(n, OTHER) and not _has(n, r"(btc|bitcoin)"): out = ["other"] + (["glossary"] if g and False else [])
+    ctx = (S or {}).get("ask_ctx") or {}; fresh = False
+    try: fresh = (dt.datetime.now(dt.timezone.utc) - dt.datetime.fromisoformat(ctx["ts"])).total_seconds() < 900
+    except Exception: pass
+    follow = _has(n, r"(?<!\w)(aur|phir|and|also|same|isi|uska|iska|us ke|us ka|ye wala|aur kya|ab|then)(?!\w)") or (hz is not None and len(n.split()) <= 5)
+    if not out and fresh and follow and ctx.get("intents"):                              # follow-up like 'aur 4 ghante me?' keeps the previous topic
+        out = [x for x in ctx["intents"] if x in ("direction", "size", "stoploss", "target", "market", "advice")][:2] or []
+        if hz is None: hz = ctx.get("hz")
     if not out and hz: out.append("direction")
     if not out and g: out.append("glossary")
     if not out and _has(n, OTHER): out.append("other")
+    if not out:                                                                           # typo-tolerant fallback: text similarity with example questions
+        s_ = _semantic(n)
+        if s_: out.append(s_)
     return dict(n=n, hz=hz, intents=out[:3], gloss=g, prices=pr, pts=pts)
 
 
@@ -264,6 +312,8 @@ def sec_direction(S, stats, hz, log):
         V = o.get("V"); mv = f", typical ±{V['absq'][1] / 100 * px:,.0f} pts" if V else ""
         L.append(f"• {AS.HZ_NAME[m]}: upar {(o['p'] if o['lean_ok'] else o['base']) * 100:.0f}% / neeche {100 - (o['p'] if o['lean_ok'] else o['base']) * 100:.0f}% ({'jhukaav ' + ('upar' if o['p'] > o['base'] else 'neeche') if o['lean_ok'] else 'koi edge nahi'}){mv}")
         if log and not hz and m == 60: _log(S, 60, o["p"], px)
+    an = sec_analog(S, hz)
+    if an: L += ["", an]
     h = _levels_hint(S)
     if h: L += ["", h]
     return "\n".join(x for x in L if x is not None)
@@ -285,6 +335,8 @@ def sec_size(S, stats, hz):
         L.append(f"{AS.HZ_NAME[m]}:\n" + move_line(o))
     T = S.get("timing")
     if T and T.get("next_high"): n = T["next_high"]; L.append(f"⏰ Agla active window: {n['ist']} IST ({n['in_min']} min baad), typical range {n['avg_range']:,.0f} pts.")
+    an = sec_analog(S, hz)
+    if an: L += ["", an]
     return "\n".join(L) if len(L) > 1 else "Move-size stats abhi bani nahi."
 
 
@@ -410,7 +462,7 @@ def sec_tool(S, cfg):
     M = S.get("market") or {}; ts = M.get("ts"); L = ["🤖 YE TOOL KAISE KAAM KARTA HAI"]
     L.append("Har 5 min GitHub par scan chalta hai: OKX ka free public data (price, funding, OI, trades) leta hai, 7 tareeke se market padhta hai, nakli ₹20,000 wallet se paper trade kholta/band karta hai. Koi asli order nahi, koi API key nahi.")
     L.append("Strategies: Trend Pullback (4H trend ke saath, pullback ke baad), Early Signal (range edge par sweep + palatna), Session Breakout (6h tight box se volume ke saath), Confluence (7 mein se 4+ tareeke ek taraf).")
-    L.append("Extra: Move radar (bada move banne se pehle chetavni), Smart exit (move poora hone par trade band, lamba nahi chalta), Doosri raay (har trade par baaki tareeke kya bolte hain), Review pack (30+ trade ke baad mujhe bhejne ke liye).")
+    L.append("Analog engine (AI jaisa, bina API): pichhle saal ki milti-julti halat dhoondh kar upar/neeche, range aur stop-loss ka andaaza deta hai aur apni jaanch unseen data par dikhata hai. Extra: Move radar (bada move banne se pehle chetavni), Smart exit (move poora hone par trade band, lamba nahi chalta), Doosri raay (har trade par baaki tareeke kya bolte hain), Review pack (30+ trade ke baad mujhe bhejne ke liye).")
     if ts:
         try: L.append(f"Last scan: {(dt.datetime.now(dt.timezone.utc) - dt.datetime.fromisoformat(ts)).total_seconds() / 60:.0f} min pehle." + (" ⏸ PAUSED." if S.get("paused") else ""))
         except Exception: pass
@@ -446,6 +498,44 @@ def sec_dailyhist(arc, n):
     return DL.text_stats(arc) + "\n\n" + DL.text_days(arc, 7)
 
 
+def _hkey(hz): return "4" if hz is None else "1" if hz <= 90 else "4" if hz <= 480 else "24"
+HK_NAME = {"1": "1 ghanta", "4": "4 ghante", "24": "24 ghante (1 din)"}
+
+
+def sec_analog(S, hz=None):
+    A = S.get("analog"); px = S.get("last_price")
+    if not A or not A.get("hz") or not px: return ""
+    key = _hkey(hz); st = A["hz"].get(key)
+    if not st: return ""
+    v = (A.get("val") or {}).get(key) or {}; pt = lambda x: f"{x / 100 * px:,.0f}"; p = st["p_up"]; clear = st["lo"] > 0.5 or st["hi"] < 0.5
+    dir_ok = bool(v.get("hit_pct") and v["hit_pct"] >= 53 and v.get("lean_n", 0) >= 300 and v.get("brier", 1) < v.get("brier_base", 0))
+    L = [f"🔬 ANALOG ENGINE (AI jaisa, bina API): pichhle {A.get('days', '?')} din mein abhi jaisi sabse milti-julti {st['n']} halat dhoondhi. Unke baad {HK_NAME[key]} mein:",
+         f"• Upar {p * 100:.0f}% / neeche {100 - p * 100:.0f}% (95% daayra {st['lo'] * 100:.0f}-{st['hi'] * 100:.0f}%, normal din {st['base'] * 100:.0f}%)"]
+    L.append("• " + (f"Jhukaav {'UPAR' if p > 0.5 else 'NEECHE'} dikh raha hai" + (" aur engine ki unseen-data jaanch bhi pass hai." if dir_ok else ", par engine ki direction wali jaanch pass nahi hui (unseen data par bharosa nahi), isliye ise pakka mat maano.") if clear else "koi saaf jhukaav nahi: lagbhag 50-50."))
+    L.append(f"• Range ({HK_NAME[key]}): aksar {pt(st['rng'][0])} pts; 4 mein 1 baar {pt(st['rng'][1])}+; 10 mein 1 baar {pt(st['rng'][2])}+. Beech mein upar tak aksar +{pt(st['up50'])}, neeche tak -{pt(st['dn50'])} pts.")
+    if v: L.append(f"• Engine ki apni jaanch (unseen data, {v.get('tests', 0)} test): direction sahi {v.get('hit_pct', 'n/a')}% (sikka = 50%), range ka ranking-score {v.get('range_corr', 'n/a')} (sirf ATR se {v.get('range_corr_atr', 'n/a')}), 90% sima {v.get('p90_coverage', 'n/a')}% baar sahi.")
+    return "\n".join(L)
+
+
+def sec_stoploss(S, hz):
+    A = S.get("analog"); px = S.get("last_price"); M = S.get("market") or {}; key = _hkey(hz); L = ["🛑 STOP-LOSS KITNA DOOR RAKHO? (andaaza, guarantee nahi)"]
+    st = ((A or {}).get("hz") or {}).get(key)
+    if st and px:
+        import analog as AN
+        L.append(f"Analog engine: abhi jaisi halat mein position {HK_NAME[key]} rakhne par stop kitni baar chhu jata hai (beech mein ek baar bhi wahan pahunchna):")
+        for g, tu, td in zip(AN.GRID, st["touch_up"], st["touch_dn"]):
+            if g in (0.3, 0.5, 0.75, 1.0, 1.5, 2.0, 3.0): L.append(f"  stop {g}% ({g / 100 * px:,.0f} pts) door: BUY ka stop chhuega {td * 100:.0f}% | SELL ka stop chhuega {tu * 100:.0f}%")
+        L.append("Chhota stop zyada baar kat-ta hai; bada stop kam kat-ta hai par ek haar badi hoti hai (position chhoti rakhni padti hai).")
+    else: L.append("Analog engine ka data abhi bana nahi (scanner ka agla run), isliye neeche ka ATR aur daily range dekho.")
+    a1, a4 = M.get("atr1h"), M.get("atr4h")
+    if a1: L.append(f"ATR: 1H {a1:,.0f} pts, 4H {(a4 or 0):,.0f} pts. Aam niyam: stop 1.5 se 2.5 ATR door rakho taaki normal halchal se na kate.")
+    D = (S.get("daily") or {}).get("avg7")
+    if D: L.append(f"Daily range (pichhle {D['n']} din ka average): {D['rng']:,.0f} pts ({D['rng_pct']}%), upar +{D['up']:,.0f} / neeche -{D['dn']:,.0f}.")
+    L.append("Fees: aana-jaana ~0.1%, isliye stop 0.5% se chhota ho to akele fees 0.2R se zyada kha jati hain. Tool 0.5% se tight stop wale trade nahi leta (31 trade ke review ke baad).")
+    L.append("Stop wahan rakho jahan trade ka idea galat sabit ho (swing low/high ke us paar), sirf 'itne points' dekh kar nahi.")
+    return "\n".join(L)
+
+
 def sec_gloss(g): return f"📖 {g[0]}\n{g[1]}"
 
 
@@ -460,17 +550,18 @@ def answer(q, S, cfg=None, stats=None, log=False, max_len=3800, arc=None):
     S = S or {}; q = (q or "").strip()
     if not q: return "Sawaal likho. " + EXAMPLES
     u = understand(q, S); it = u["intents"]; px = S.get("last_price"); out = []
-    needs_px = {"direction", "size", "market", "advice", "levels", "target"}
+    needs_px = {"direction", "size", "market", "advice", "levels", "target", "stoploss"}
     if not it: return "Ye sawaal main samajh nahi paya. " + EXAMPLES
+    S["ask_ctx"] = dict(intents=it, hz=u["hz"], ts=dt.datetime.now(dt.timezone.utc).isoformat(timespec="seconds"))
     if "hello" in it: return "Namaste 👋 Main BTC tool ka 'Ask' hu. Market, trade, wallet ya trading ke kisi bhi sawaal par bina API key ke tool ke apne data se jawab deta hu.\n" + EXAMPLES
     if px is None and set(it) & needs_px: return "Market data abhi state mein nahi aaya (scanner ka pehla run chalne do), isliye abhi analysis nahi de sakta."
     for k in it:
         try:
-            out.append({"direction": lambda: sec_direction(S, stats, u["hz"], log), "size": lambda: sec_size(S, stats, u["hz"]), "daily": lambda: AS.daily_text(S.get("daily"), px), "dailyhist": lambda: sec_dailyhist(arc, u["n"]), "market": lambda: sec_market(S, stats), "advice": lambda: sec_advice(S, stats, u["hz"], cfg),
+            out.append({"direction": lambda: sec_direction(S, stats, u["hz"], log), "size": lambda: sec_size(S, stats, u["hz"]), "daily": lambda: AS.daily_text(S.get("daily"), px), "stoploss": lambda: sec_stoploss(S, u["hz"]), "dailyhist": lambda: sec_dailyhist(arc, u["n"]), "market": lambda: sec_market(S, stats), "advice": lambda: sec_advice(S, stats, u["hz"], cfg),
                         "levels": lambda: sec_levels(S), "position": lambda: sec_position(S), "wallet": lambda: sec_wallet(S), "performance": lambda: sec_performance(S), "flow": lambda: sec_flow(S), "timing": lambda: sec_timing(S),
                         "radar": lambda: sec_radar(S), "risk": lambda: sec_risk(S, cfg), "tool": lambda: sec_tool(S, cfg), "accuracy": lambda: sec_accuracy(S, stats), "target": lambda: sec_target(S, stats, u["prices"], u["pts"], u["n"]),
                         "glossary": lambda: sec_gloss(u["gloss"]), "other": lambda: sec_other(u["n"])}[k]())
         except Exception as e: out.append(f"({k} wala hissa abhi bana nahi paya: {type(e).__name__})")
     text = "\n\n".join(x for x in out if x)
-    if set(it) & {"direction", "target", "size", "advice"}: text += "\n\n" + DIS
+    if set(it) & {"direction", "target", "size", "advice", "stoploss"}: text += "\n\n" + DIS
     return text[:max_len] + ("…" if len(text) > max_len else "")

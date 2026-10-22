@@ -129,3 +129,18 @@ Har IST din (raat 12 se raat 12) ki ek row `daily_history.json` + `daily_history
 - Telegram: `/daily` (kal), `/daily 14` (pichhle 14 din), `/daily stats` (average, weekday, session, bade din), `/daily csv` (poori file, Excel ya mujhe bhejne ke liye).
 - Dashboard: Ask tab mein poori table, roz ka range chart aur CSV download.
 - Ask mein bhi poochho: "pichhle 10 din ka move", "kis din sabse zyada move hota hai", "weekday wise average range".
+
+## 🔧 31-trade review ke baad badlaav (22 Oct)
+31 band trade ka review: win 29%, average -0.41R, net -₹1,168. Jeet ka average +1.31R aur haar ka -1.11R hai, isliye breakeven ke liye ~46% win rate chahiye. Teen chhote badlaav:
+1. **Confluence strategy band** (default). Live 9 mein 1 jeeta, aur 5.5 saal ka backtest (V9) bhi -0.06R (NOT PROVEN). Wapas chalu: `/set confluence enabled on` (ya config mein enabled).
+2. **Smart exit ka 'expected move poora hua' hissa band** (`use_expected_move` off). Shadow mein 3 baar ye jeet kaat gaya (fixed rule ne +2.07, +1.91, +2.07R diye, smart ne +1.58, +0.83, +1.57R). 'Trade kuch nahi kar raha (stall)' wala hissa chalu hai, usne 2 trade ko -1.1R se -0.2R/+0.1R par bachaya.
+3. **Tight stop rule** (`min_stop_pct` = 0.5): jis setup ka stop entry se 0.5% se kam door ho wo trade nahi hota, shadow mein track hota hai. Wajah: fees 31 trade ke kul nuksaan ka 41% (5.2R of 12.7R) thi, aur tight stop mein akele fees 0.2 se 0.46R kha jati hain. Badalne ke liye: `/set min_stop_pct 0.4`.
+Ye sab 31 trade dekh kar kiya gaya hai (in-sample), isliye saboot nahi. Naye niyam ke 100 trade tak naya data dekhenge.
+
+## 🔬 Analog engine (AI bina API) + stop-loss guide
+Ye ek nearest-neighbour machine-learning model hai (koi API key ya paid service nahi). Pichhle 1 saal ke har ghante ko 10 sankhyaon se naapta hai (trend ki doori ATR mein, RSI, MACD, 6 ghante ka momentum, volatility rank, volume, 48h range mein jagah, bands). Abhi ke ghante jaisi sabse milti-julti 150 purani halat dhoondhta hai aur dekhta hai ki unke baad 1 ghante, 4 ghante, 24 ghante mein kya hua: upar/neeche, range kitni, stop kitni baar chhua.
+- **Ask mein**: "1 ghante me upar ya neeche?", "kitna move hoga?" ke jawab mein 🔬 ANALOG ENGINE ka hissa aata hai. **"stop loss kitna door rakhu?"** poochho to table milti hai: stop 0.5%, 1%, 1.5%... door rakhne par BUY aur SELL ka stop kitni baar chhuega.
+- **Sachchai saath mein**: engine ki apni jaanch unseen data par (walk-forward) har jawab ke saath dikhti hai. Direction aksar sikke jaisi (50%) rehti hai, range ka andaaza kaam ka hota hai par sirf ATR se zyada behtar nahi. Isliye engine seedha "upar jayega" tabhi bolta hai jab statistics saaf ho aur jaanch pass ho.
+- **Samajh**: typing galtiyan (upr, nichhe) chalti hain, aur follow-up sawaal ("aur 4 ghante me?") pichhla topic yaad rakhta hai.
+- **Naya optional strategy 'Analog Engine'** (default BAND): sirf tab trade jab 4h lean saaf ho aur engine ki jaanch pass ho. Pehle research workflow chalao (V11 walk-forward backtest). Dashboard ke Backtests tab mein verdict dikhega. PROMISING aaye tabhi `/set analog_edge enabled on` (config mein) karo.
+- Library `analog_lib.npz` har 7 din mein khud banti hai (~1 min).

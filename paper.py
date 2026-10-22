@@ -157,7 +157,7 @@ def open_position(P, C, name, sg, now, h15, fxr, send):
     qty = (Wl["cash"] + Wl["margin"]) * sc["risk_pct"] / 100 / (sg["risk"] * fxr); cap = Wl["cash"] * 0.99 / (e * fxr * (1 / lev + fee)); capped = qty > cap; qty = min(qty, cap)
     step = C["wallet"].get("qty_step", 0.0001); qty = round(int(qty / step) * step, 6)
     if qty < step: jlog(P, now, "SKIPPED", f"{name} {'LONG' if k == 1 else 'SHORT'} signal skipped: not enough free balance"); return False
-    P["n"][name] = P["n"].get(name, 0) + 1; side = "LONG" if k == 1 else "SHORT"; tid = f"{ {'trend_pullback': 'TP', 'session_breakout': 'SB', 'confluence': 'CF'}.get(name, 'ES') }-{side}-{now.strftime('%Y%m%d')}-{P['n'][name]:03d}"
+    P["n"][name] = P["n"].get(name, 0) + 1; side = "LONG" if k == 1 else "SHORT"; tid = f"{ {'trend_pullback': 'TP', 'session_breakout': 'SB', 'confluence': 'CF', 'analog_edge': 'AE'}.get(name, 'ES') }-{side}-{now.strftime('%Y%m%d')}-{P['n'][name]:03d}"
     notional = qty * e; margin = notional * fxr / lev; fee_usd = fee * notional
     t = dict(id=tid, strategy=name, label=sc.get("label", name), side=k, entry=e, sl0=sg["sl"], sl=sg["sl"], risk=sg["risk"], mode=sg["mode"], tp=sg.get("tp"), t1=sg.get("t1"), t2=sg.get("t2"), t3=sg.get("t3"),
              partial=sc.get("partial_pct", 50) / 100, qty=qty, qty_btc=qty, notional_usd=round(notional, 2), margin_inr=round(margin, 2), margin_released=0.0, rem_wallet=1.0, leverage=lev, fx=fxr,
@@ -250,11 +250,15 @@ def run(S, send, now, scan=None):
         sg = ST.SIGNALS[name](dict(h1=h1, i=i, S=S, scan=scan, now=now, tcls=tcls, mI=mI), sc)
         if not sg: continue
         P["last_entry"][name] = now.timestamp() * 1000; blk = learn.blocked_by(P, sg["ctx"], name)
+        msp = C.get("risk", {}).get("min_stop_pct", 0); spct = abs(sg["entry"] - sg["sl"]) / sg["entry"] * 100
+        if msp and spct < msp - 1e-6 and not blk:                                    # stop too tight: round-trip fees alone would eat 0.1%/stop% of the risk (31-trade review: fees = 41% of all losses)
+            fee_r = 2 * C["wallet"]["fee_rate_per_side"] * 100 / max(spct, 1e-9)
+            blk = dict(id="stop", text=f"stop sirf {spct:.2f}% door (minimum {msp}%): fees akele ~{fee_r:.2f}R kha jati")
         if blk:
             sh = lifecycle.new_state(sg["side"], sg["entry"], sg["sl"], sg["mode"], sg.get("tp"), sg.get("t1"), sg.get("t2"), sc.get("partial_pct", 50) / 100)
             sh.update(id=f"SHADOW-{name[:2].upper()}-{now.strftime('%Y%m%d%H%M')}", strategy=name, filter=blk["text"], ctx=sg["ctx"], exits=[], last_ts=float(h15.ts.iloc[-1]), created=iso(now), expiry_h=sc["expiry_hours"])
             P["shadow"].append(sh); jlog(P, now, "FILTERED", f"{name} signal skipped by filter #{blk['id']}")
-            send(f"🧠 Signal skipped by learned filter #{blk['id']}: {blk['text']}\nIt is tracked as a shadow trade to check whether the filter really helps."); continue
+            send(f"🧠 Signal skipped by {'tight-stop rule' if blk['id'] == 'stop' else 'learned filter #' + str(blk['id'])}: {blk['text']}\nIt is tracked as a shadow trade to check whether the filter really helps.", cat="setup"); continue
         try: sg["entry_ctx"] = review.entry_ctx(S, now)
         except Exception as e: print("ctx error", e)
         if mres and mres.get("votes"):

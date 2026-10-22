@@ -27,7 +27,7 @@ def setup_alerts(S, send, now):
         send(f"{'🟢🔥' if 'BUY' in st_ else '🔴🔥'} {st_} (pichle 60 min)\n" + __import__("orderflow").text(OFA) + "\nMatlab: market order wale (taker) ek taraf zyada dabaav daal rahe hain. Ye jaankari hai, trade ka signal nahi.", cat="flow")
     R = P.get("methods") or {}
     if R.get("verdict") in ("LONG", "SHORT") and not any((P.get("pos") or {}).values()) and _due(S, "methods-" + R["verdict"], 3, now):
-        send("🧩 TAREEKE EK SAATH AAYE\n" + __import__("methods").text(R) + "\nAbhi trade tabhi khulega jab 'confluence' strategy ki baaki shartein (candle abhi band hui ho) poori hon. Nazar rakho.", cat="setup")
+        send("🧩 TAREEKE EK SAATH AAYE\n" + __import__("methods").text(R) + ("\nAbhi trade tabhi khulega jab 'confluence' strategy ki baaki shartein (candle abhi band hui ho) poori hon. Nazar rakho." if config.load()["strategies"]["confluence"].get("enabled") else "\nConfluence strategy abhi band hai (31 trade ke review mein kamzor nikli), isliye ye sirf jaankari hai, trade nahi khulega."), cat="setup")
     T = S.get("timing") or {}; nh = T.get("next_high")
     if config.load()["timing"].get("window_alerts") and nh and 0 < nh["in_min"] <= 30 and _due(S, f"win-{nh['hr']}", 20, now):
         send(f"⏰ ACTIVE WINDOW SHURU HONE WALI HAI ({nh['in_min']} min baad)\nSamay: {nh['ist']} IST. History mein is ghante ki typical range {nh['avg_range']:,.0f} pts (upar {nh['avg_up']:,.0f} / neeche {nh['avg_down']:,.0f} pts).\nAbhi: {T.get('ist')} ({T.get('cls')} activity). Tool is window mein breakout setups par zyada nazar rakhta hai.", cat="timing")
