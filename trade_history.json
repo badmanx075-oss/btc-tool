@@ -14526,7 +14526,7 @@
     "move_class": "LARGE",
     "risk": "Medium",
     "created": "2026-10-21T16:51:19+00:00",
-    "last_ts": 1792843200000.0,
+    "last_ts": 1792845300000.0,
     "mfe": 4159.100000000006,
     "mae": 284.09999999999127,
     "status": "EXHAUSTION WATCH",
@@ -16423,20 +16423,28 @@
     "methods_text": "1/7 methods trade ke saath, 5 khilaaf (consensus: SHORT)"
    },
    "grade": "B",
-   "status": "OPEN",
-   "outcome": "",
-   "closed": null,
-   "closed_ist": "",
-   "exit": null,
-   "R": null,
-   "pnl_inr": null,
-   "fees_usd": 0.084857535,
-   "hold_h": null,
-   "best_R": 0.5339796745432988,
-   "worst_R": 0.9300455140594812,
-   "exits": [],
-   "lesson": "",
-   "auto_feedback": "",
+   "status": "CLOSED",
+   "outcome": "SMART EXIT",
+   "closed": "2026-10-24T12:35:02+00:00",
+   "closed_ist": "24 Oct 2026, 06:05 PM IST",
+   "exit": 80775.0,
+   "R": -0.267,
+   "pnl_inr": -24.45,
+   "fees_usd": 0.17,
+   "hold_h": 11.3,
+   "best_R": 0.53,
+   "worst_R": 0.93,
+   "exits": [
+    {
+     "ts": "2026-10-24T12:35:02+00:00",
+     "kind": "SMART EXIT",
+     "price": 80775.0,
+     "frac": 1.0,
+     "pnl_inr": -8.32
+    }
+   ],
+   "lesson": "Smart exit (11 ghante mein trade ne kuch nahi kiya (stall, -0.1R)): -0.3R par band kiya, taaki trade lamba na chale. Fixed rule se tulna review pack mein hoti hai.",
+   "auto_feedback": "\ud83d\udfe1 Normal haar: sirf tay risk (-0.3R) gaya. Is tarah ki strategy mein aksar 3 mein 2 trade harte hain.",
    "user_rating": "",
    "user_note": "",
    "user_feedback_ist": "",
@@ -16447,6 +16455,18 @@
      "type": "OPENED",
      "price": 80816.7,
      "note": "qty 0.0021 BTC, margin \u20b95,376"
+    },
+    {
+     "time_ist": "24 Oct 2026, 06:05 PM IST",
+     "type": "SMART EXIT",
+     "price": 80775.0,
+     "note": "100% of position, P/L -\u20b98"
+    },
+    {
+     "time_ist": "24 Oct 2026, 06:05 PM IST",
+     "type": "CLOSED",
+     "price": 80775.0,
+     "note": "SMART EXIT"
     }
    ],
    "raw": {
@@ -16468,28 +16488,48 @@
     "qty_btc": 0.0021,
     "notional_usd": 169.72,
     "margin_inr": 5376.37,
-    "margin_released": 0.0,
-    "rem_wallet": 1.0,
+    "margin_released": 5376.37,
+    "rem_wallet": 0.0,
     "leverage": 3,
     "fx": 95.036492,
     "risk_inr": 91.46,
-    "fees_usd": 0.084857535,
-    "realized_usd": 0.0,
+    "fees_usd": 0.17,
+    "realized_usd": -0.08756999999999389,
     "stage": 0,
-    "remaining": 1.0,
-    "mfe_R": 0.5339796745432988,
-    "mae_R": 0.9300455140594812,
-    "exits": [],
+    "remaining": 0,
+    "mfe_R": 0.53,
+    "mae_R": 0.93,
+    "exits": [
+     {
+      "ts": "2026-10-24T12:35:02+00:00",
+      "kind": "SMART EXIT",
+      "price": 80775.0,
+      "frac": 1.0,
+      "pnl_inr": -8.32
+     }
+    ],
     "events": [
      {
       "ts": "2026-10-24T01:19:48+00:00",
       "type": "OPENED",
       "price": 80816.7,
       "note": "qty 0.0021 BTC, margin \u20b95,376"
+     },
+     {
+      "ts": "2026-10-24T12:35:02+00:00",
+      "type": "SMART EXIT",
+      "price": 80775.0,
+      "note": "100% of position, P/L -\u20b98"
+     },
+     {
+      "ts": "2026-10-24T12:35:02+00:00",
+      "type": "CLOSED",
+      "price": 80775.0,
+      "note": "SMART EXIT"
      }
     ],
     "created": "2026-10-24T01:19:48+00:00",
-    "last_ts": 1792842300000.0,
+    "last_ts": 1792844100000.0,
     "expiry_h": 72,
     "cfg": {
      "enabled": true,
@@ -16609,22 +16649,21 @@
     "mgmt": {
      "status": "\ud83d\udfe2 HOLD: THESIS INTACT",
      "stage": "ENTRY",
-     "uR": -0.61,
+     "uR": -0.09,
      "mfe_R": 0.53,
      "exhaustion": 25,
      "reversal_flags": {
       "structure_break": false,
       "momentum_negative": false,
-      "gave_back": true
+      "gave_back": false
      },
      "reasons": [
       "Momentum dheema pad raha hai (pichle 3 ghante -0.4 ATR)",
-      "Volume kam ho raha hai (normal ka 0.6 guna)",
-      "Trade +0.5R tak gaya tha, ab 1.1R wapas de diya"
+      "Volume kam ho raha hai (normal ka 0.6 guna)"
      ],
      "stop_advice": "Stop jaisa hai waisa rakho",
      "suggested_sl": 80358.4,
-     "hold_vs_book": "Hold: target 3.6R door, stop tak 0.4R (R/R 9.2). Abhi book karo to +-0.6R pakka.",
+     "hold_vs_book": "Hold: target 3.1R door, stop tak 0.9R (R/R 3.4). Abhi book karo to +-0.1R pakka.",
      "next_zone": 81847.8,
      "momentum_atr": -0.35,
      "volume_ratio": 0.59
@@ -16669,9 +16708,29 @@
      ],
      "ts": "2026-10-24T12:02:38+00:00",
      "first": null
+    },
+    "smart_reason": "11 ghante mein trade ne kuch nahi kiya (stall, -0.1R)",
+    "closed": "2026-10-24T12:35:02+00:00",
+    "outcome": "SMART EXIT",
+    "exit": 80775.0,
+    "R": -0.267,
+    "pnl_inr": -24.45,
+    "net_usd": -0.26,
+    "gross_usd": -0.09,
+    "hold_h": 11.3,
+    "lesson": "Smart exit (11 ghante mein trade ne kuch nahi kiya (stall, -0.1R)): -0.3R par band kiya, taaki trade lamba na chale. Fixed rule se tulna review pack mein hoti hai.",
+    "feedback": {
+     "auto": {
+      "result": "LOSS",
+      "verdict": "\ud83d\udfe1 Normal haar: sirf tay risk (-0.3R) gaya. Is tarah ki strategy mein aksar 3 mein 2 trade harte hain.",
+      "plan_followed": true,
+      "best_R": 0.53,
+      "worst_R": 0.93
+     },
+     "user": null
     }
    }
   }
  },
- "updated": "2026-10-24T12:02:50+00:00"
+ "updated": "2026-10-24T12:35:17+00:00"
 }
