@@ -11,7 +11,7 @@ DEFAULTS = {
     "exits": {"smart_exit": True, "min_profit_R": 1.0, "exhaustion_min": 70, "stall_hours": 10, "stall_band_R": 0.3, "use_expected_move": False},
     "strategies": {
         "trend_pullback": {"enabled": True, "label": "Trend Pullback", "risk_pct": 1.0, "stop_atr": 3.0, "target_r": 4.0, "expiry_hours": 120, "cooldown_hours": 24},
-        "early_signal": {"enabled": True, "label": "Early Signal (experimental)", "risk_pct": 0.5, "min_score": 65, "partial_pct": 50, "expiry_hours": 72, "cooldown_hours": 1},
+        "early_signal": {"enabled": True, "label": "Early Signal (experimental)", "risk_pct": 0.25, "block_hours_utc": [1, 2, 3, 4, 5, 6, 7], "min_score": 65, "partial_pct": 50, "expiry_hours": 72, "cooldown_hours": 1},
         "session_breakout": {"enabled": True, "label": "Session Breakout (experimental)", "risk_pct": 0.3, "box_hours": 6, "vol_mult": 1.3, "stop_min_atr": 1.0, "stop_max_atr": 2.5, "target_r": 2.0, "expiry_hours": 24, "cooldown_hours": 6},
         "confluence": {"enabled": False, "label": "Multi-Method Confluence (experimental)", "risk_pct": 0.4, "need": 4, "net_min": 35, "stop_min_atr": 1.2, "stop_max_atr": 3.0, "target_r": 2.0, "expiry_hours": 48, "cooldown_hours": 12},
         "analog_edge": {"enabled": False, "label": "Analog Engine (experimental)", "risk_pct": 0.3, "stop_atr": 1.5, "target_r": 1.5, "expiry_hours": 12, "cooldown_hours": 4, "require_validated": True}}}

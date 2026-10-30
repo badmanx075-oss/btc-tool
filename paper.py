@@ -254,11 +254,14 @@ def run(S, send, now, scan=None):
         if msp and spct < msp - 1e-6 and not blk:                                    # stop too tight: round-trip fees alone would eat 0.1%/stop% of the risk (31-trade review: fees = 41% of all losses)
             fee_r = 2 * C["wallet"]["fee_rate_per_side"] * 100 / max(spct, 1e-9)
             blk = dict(id="stop", text=f"stop sirf {spct:.2f}% door (minimum {msp}%): fees akele ~{fee_r:.2f}R kha jati")
+        bh = (sc.get("block_hours_utc") or []) if name == "early_signal" else []
+        if bh and not blk and now.hour in bh:                                         # 30 Oct review: early_signal in 01-07 UTC (Asia) won 1/13 paper + 2/12 alerts; blocked trades are tracked as shadows so the data keeps coming
+            blk = dict(id="hour", text=f"{now.hour:02d}:00 UTC (Asia ghante): is strategy ne in ghanto mein ~15% trade jite (50 mein se ~10 nahi)")
         if blk:
             sh = lifecycle.new_state(sg["side"], sg["entry"], sg["sl"], sg["mode"], sg.get("tp"), sg.get("t1"), sg.get("t2"), sc.get("partial_pct", 50) / 100)
             sh.update(id=f"SHADOW-{name[:2].upper()}-{now.strftime('%Y%m%d%H%M')}", strategy=name, filter=blk["text"], ctx=sg["ctx"], exits=[], last_ts=float(h15.ts.iloc[-1]), created=iso(now), expiry_h=sc["expiry_hours"])
             P["shadow"].append(sh); jlog(P, now, "FILTERED", f"{name} signal skipped by filter #{blk['id']}")
-            send(f"🧠 Signal skipped by {'tight-stop rule' if blk['id'] == 'stop' else 'learned filter #' + str(blk['id'])}: {blk['text']}\nIt is tracked as a shadow trade to check whether the filter really helps.", cat="setup"); continue
+            send(f"🧠 Signal skipped by {'tight-stop rule' if blk['id'] == 'stop' else 'hour rule' if blk['id'] == 'hour' else 'learned filter #' + str(blk['id'])}: {blk['text']}\nIt is tracked as a shadow trade to check whether the filter really helps.", cat="setup"); continue
         try: sg["entry_ctx"] = review.entry_ctx(S, now)
         except Exception as e: print("ctx error", e)
         if mres and mres.get("votes"):

@@ -144,3 +144,10 @@ Ye ek nearest-neighbour machine-learning model hai (koi API key ya paid service 
 - **Samajh**: typing galtiyan (upr, nichhe) chalti hain, aur follow-up sawaal ("aur 4 ghante me?") pichhla topic yaad rakhta hai.
 - **Naya optional strategy 'Analog Engine'** (default BAND): sirf tab trade jab 4h lean saaf ho aur engine ki jaanch pass ho. Pehle research workflow chalao (V11 walk-forward backtest). Dashboard ke Backtests tab mein verdict dikhega. PROMISING aaye tabhi `/set analog_edge enabled on` (config mein) karo.
 - Library `analog_lib.npz` har 7 din mein khud banti hai (~1 min).
+
+## 30 Oct update (tool check)
+- **Scan cadence fix:** GitHub ne cron throttle kar diya (28 Oct se ~100 runs/din -> ~5/din). Ab `scan.yml` har 15 min trigger karta hai aur ek run ~5.5 ghante zinda rehkar khud har 5 min scan karta hai (`LOOP_MINUTES=330`). Concurrency group se runs overlap nahi karte.
+- **Performance review (37 trades):** win 24%, mean -0.48R, net -Rs1606. RANGE regime mein 29 trades -0.72R. Edge abhi proven nahi.
+- **Change:** early_signal risk_pct 0.5 -> 0.25 (R-statistics same rehti hain, loss aadha). Baaki rules wahi; 100 trades tak zyada badlav nahi.
+- analog_edge disabled hi rahega (V11 NOT PROVEN).
+- **Trade History (70 records) analysis:** 70 = 37 paper trades + 32 purane alert-signals + 1 open. Early-signal family (54 closed): ~33% win. Asia ghante 01-07 UTC mein 1/13 (paper) aur 2/12 (alerts) jite. Isliye early_signal in ghanto mein ab shadow trade banta hai (`block_hours_utc`), asli paper trade nahi. Shadow result se check hota rahega ki filter sach mein madad karta hai ya nahi; setting se list khali karke band kar sakte ho.

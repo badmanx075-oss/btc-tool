@@ -339,6 +339,17 @@ def main():
     ST = S.setdefault("telegram", {}); ST["chat_mask"] = "…" + CHAT[-4:]
     tg("setMyCommands", commands=[dict(command=a, description=b) for a, b in MENU])
     me = tg("getMe"); ST["token_ok"] = bool(me and me.get("ok")); ST["bot"] = ((me or {}).get("result") or {}).get("username", "")
-    scan_cycle(); publish(); listen(int(os.environ.get("LISTEN_SECONDS", config.load()["schedule"]["listen_seconds"]))); ST["last_run"] = dt.datetime.now(dt.timezone.utc).isoformat(timespec="seconds"); json.dump(S, open("state.json", "w"), indent=1)
+    # GitHub throttles cron (28 Oct: ~100 runs/day -> ~5/day). So ONE run now stays alive LOOP_MINUTES and scans every ~5 min itself.
+    loop_s = int(float(os.environ.get("LOOP_MINUTES", 0)) * 60); t_start = time.time(); lis = int(os.environ.get("LISTEN_SECONDS", config.load()["schedule"]["listen_seconds"]))
+    while True:
+        t_cycle = time.time(); globals()["now"] = dt.datetime.now(dt.timezone.utc)
+        try: scan_cycle()
+        except Exception as e: print("scan_cycle error", e)
+        publish()
+        if loop_s <= 0: listen(lis); break
+        listen(max(30, 300 - (time.time() - t_cycle)))                    # answers Telegram until the next 5-min slot
+        ST["last_run"] = dt.datetime.now(dt.timezone.utc).isoformat(timespec="seconds")
+        if time.time() - t_start + 320 > loop_s: break
+    ST["last_run"] = dt.datetime.now(dt.timezone.utc).isoformat(timespec="seconds"); json.dump(S, open("state.json", "w"), indent=1)
 
 main()
