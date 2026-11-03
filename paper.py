@@ -28,6 +28,18 @@ def radar(h1, i):  # live checklist for trend_pullback: how close are we to a tr
                      ["Bounce candle", bounce, "last 1H candle closed with the trend" if bounce else "last 1H candle closed against the trend"]]
     return out
 
+def coin_text(S):
+    """Indication of every coin (BTC / ETH / SOL) in one message."""
+    P = S.get("paper") or {}; L = ["🪙 INDICATION (BTC / ETH / SOL)"]
+    rows = [("BTC", S.get("last_price"), P.get("methods"), P.get("radar"))] + [(k, v.get("price"), v.get("methods"), v.get("radar")) for k, v in (P.get("coins") or {}).items()]
+    for sy, px, m, r in rows:
+        if not m or not m.get("votes"): L.append(f"{sy}: data abhi nahi"); continue
+        rd = " | ".join(f"{'BUY' if s == 'LONG' else 'SELL'} {sum(c[1] for c in r[s])}/4" for s in ("LONG", "SHORT")) if r else "-"
+        op = [t for t in positions(P) if SY(t) == sy]
+        L.append(f"{sy} ${px:,.{0 if (px or 0) >= 1000 else 2}f}: tareeke {m['verdict']} (LONG {m['long']} / SHORT {m['short']} of {m['total']}, net {m['net']:+.0f}) | setup radar {rd}" + (f" | open: {', '.join(t['id'] for t in op)}" if op else ""))
+    L.append("Ye jaankari hai, guarantee nahi. Trade tool tabhi kholta hai jab uski shartein poori hon.")
+    return "\n".join(L)
+
 def radar_line(P):
     r = P.get("radar")
     return "Setup radar: " + " | ".join(f"{'BUY' if s == 'LONG' else 'SELL'} {sum(c[1] for c in r[s])}/4" for s in ("LONG", "SHORT")) if r else "Setup radar: not computed yet"
@@ -216,6 +228,11 @@ def run(S, send, now, scan=None):
             a15, a1 = E.candles_sym(sy, "15m", 300), E.candles_sym(sy, "1H", 300); XA[sy] = dict(h15=a15, hr=a1, px=float(a15.c.iloc[-1]), h1=W4.prep(a1))
         except Exception as ex: print("extra coin data error", sy, ex)
     H15 = {"BTC": h15, **{k: v["h15"] for k, v in XA.items()}}
+    P.setdefault("coins", {})
+    for sy, v in XA.items():                                     # indication for ETH / SOL, same checklist + 7-method vote as BTC (shown on the dashboard, alerts via notify)
+        try:
+            h1c = v["h1"]; ic = len(h1c) - 2; mrc = MT.consensus(MT.votes(MT.prepare(h1c.reset_index(drop=True)), ic)); P["coins"][sy] = dict(ts=iso(now), price=v["px"], methods=mrc, radar=radar(h1c, ic))
+        except Exception as ex: print("coin indication error", sy, ex)
     def feed(t):                                                 # candles/price of the coin this trade is in (None if its data failed this scan)
         sy = SY(t)
         return (h15, hr, px) if sy == "BTC" else ((XA[sy]["h15"], XA[sy]["hr"], XA[sy]["px"]) if sy in XA else None)

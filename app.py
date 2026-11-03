@@ -1,6 +1,6 @@
 import json, os, io, datetime as dt, requests, pandas as pd, streamlit as st
 import streamlit.components.v1 as components
-import config, history, stats, decision, review, timing, moveradar as MRD, sr as SRM, orderflow as OFM
+import livechart as LC, config, history, stats, decision, review, timing, moveradar as MRD, sr as SRM, orderflow as OFM
 try:
     import chart as CH, engine as ENG
 except Exception as _e: CH = None; _CH_ERR = str(_e)
@@ -43,6 +43,10 @@ function go(){const s=SRC[n%SRC.length]; $("src").textContent="("+s[0]+")"; let 
 go();
 setInterval(()=>{if(Date.now()-seen<8000) return; fetch("https://fapi.binance.com/fapi/v1/ticker/price?symbol=BTCUSDT").then(r=>r.json()).then(j=>{last=0; show(+j.price); $("src").textContent="(Binance REST, ~3s)";}).catch(()=>{});},3000);
 </script>"""
+def embed(html, h):
+    if hasattr(st, "iframe"): st.iframe(html, height=h)
+    else: components.html(html, height=h)
+
 def live_widget(o):
     pos = {"entry": o["entry"], "side": o["side"], "qty": o.get("qty", 0) * o.get("remaining", 1), "fx": o.get("fx", 88), "risk": o["risk"], "sl": o["sl"], "tp": o.get("tp") or o.get("t2") or o["entry"] + o["side"] * 4 * o["risk"]} if o else {}
     html = LIVE.replace("__POS__", json.dumps(pos))
@@ -92,6 +96,18 @@ def position_card(t):
 
 with tH_:
     live_widget(next((t for t in POS if t.get("sym", "BTC") == "BTC"), None))
+    st.markdown("**ETH / SOL live**"); embed(LC.ticker_html(POS), 120)
+    with st.expander("🪙 Indication: BTC / ETH / SOL (7 tareeke + setup radar)", expanded=True):
+        _rows = [("BTC", lp, P.get("methods"), P.get("radar"))] + [(k, v.get("price"), v.get("methods"), v.get("radar")) for k, v in (P.get("coins") or {}).items()]
+        _tb = []
+        for sy_, px_, m_, r_ in _rows:
+            if not m_ or not m_.get("votes"): _tb.append({"Coin": sy_, "Price $": px_, "Tareeke": "data nahi"}); continue
+            _tb.append({"Coin": sy_, "Price $": round(px_, 1 if (px_ or 0) >= 1000 else 3), "Tareeke (verdict)": m_["verdict"], "LONG": m_["long"], "SHORT": m_["short"], "Net": m_["net"], "Setup radar BUY": f"{sum(c[1] for c in r_['LONG'])}/4" if r_ else "-", "Setup radar SELL": f"{sum(c[1] for c in r_['SHORT'])}/4" if r_ else "-",
+                        "Open trade": ", ".join(t["id"] for t in POS if t.get("sym", "BTC") == sy_) or "-"})
+        st.dataframe(pd.DataFrame(_tb), hide_index=True, use_container_width=True); st.caption("Ye 'indication' hai, guarantee nahi. Telegram par bhi aata hai: setup 3/4 hone par aur jab tareeke ek taraf ho jaayein. Trade tool tabhi kholta hai jab uski shartein poori hon (abhi ETH/SOL par trend_pullback aur session_breakout).")
+        _pick = st.selectbox("Kis coin ke tareeke dekhne hain", [r[0] for r in _rows], key="ind_coin"); _m = next((r[2] for r in _rows if r[0] == _pick), None)
+        if _m and _m.get("votes"):
+            for v_ in _m["votes"]: st.markdown(f"{'🟢' if v_['dir'] == 1 else '🔴' if v_['dir'] == -1 else '⚪'} **{v_['name']}**: {v_['why']}")
     c = st.columns(4); c[0].metric("Wallet equity", inr(eq), f"{(eq / start - 1) * 100:+.1f}% since start"); c[1].metric("Free cash", inr(W.get("cash", 0))); c[2].metric("In open trades", inr(W.get("margin", 0)))
     c[3].metric("Open positions", len(POS))
     if POS: st.info("Paper position(s) OPEN. Nothing to do: the tool closes them at stop, target or expiry.")
@@ -294,15 +310,17 @@ with tTH:
 with tCH:
     st.caption("Price action chart: candles, EMA20/50, swing points, candle patterns (▲ bullish / ▼ bearish, sirf support/resistance ke paas wale), support/resistance, trade ki entry/stop/target, aur daayen taraf har price par buy (hara) vs sell (laal) volume.")
     TVX = {"OKX": "OKX:{c}USDT.P", "BINANCE": "BINANCE:{c}USDT.P", "BYBIT": "BYBIT:{c}USDT.P"}
-    t1_, t2_, t3_ = st.columns([3, 2, 2]); cmode = t1_.radio("Chart", ["📊 TradingView (indicators add karo)", "🧭 Tool chart (levels + trades)"], horizontal=True); tv = cmode.startswith("📊")
+    t1_, t2_, t3_ = st.columns([3, 2, 2]); cmode = t1_.radio("Chart", ["📈 Live chart (indicators save rehte hain)", "📊 TradingView", "🧭 Tool chart (levels + trades)"], horizontal=True); lc = cmode.startswith("📈"); tv = cmode.startswith("📊"); tool = cmode.startswith("🧭")
+    if lc:
+        embed(LC.ticker_html(POS), 120); embed(LC.chart_html(POS), 720)
     if tv:
         coin_ = t2_.radio("Coin", ["BTC", "ETH", "SOL"], horizontal=True); exch_ = t3_.radio("Data", list(TVX), horizontal=True)
         components.html("""<div class="tradingview-widget-container" style="height:100%;width:100%"><div id="tvchart" style="height:680px"></div></div><script src="https://s3.tradingview.com/tv.js"></script>
 <script>new TradingView.widget({autosize:true,symbol:"__SYM__",interval:"60",timezone:"Asia/Kolkata",theme:"dark",style:"1",locale:"en",toolbar_bg:"#131722",enable_publishing:false,allow_symbol_change:true,hide_side_toolbar:false,withdateranges:true,details:false,studies:["Volume@tv-basicstudies","RSI@tv-basicstudies"],container_id:"tvchart"});</script>""".replace("__SYM__", TVX[exch_].format(c=coin_)), height=700)
         st.caption("Ye asli TradingView chart hai: upar 'Indicators' se koi bhi indicator (EMA, MACD, Bollinger, VWAP...), left side se drawing tools. Chart na khule to 'Data' mein BINANCE ya BYBIT chuno. Is chart par tool ke trade levels nahi dikhte: unke liye '🧭 Tool chart' chuno.")
-    if CH is None and not tv: st.error("Chart ke liye 'plotly' chahiye. GitHub par requirements.txt upload karo (usme plotly likha hai), phir app Reboot karo. Detail: " + _CH_ERR)
+    if CH is None and tool: st.error("Chart ke liye 'plotly' chahiye. GitHub par requirements.txt upload karo (usme plotly likha hai), phir app Reboot karo. Detail: " + _CH_ERR)
     else:
-        if not tv:
+        if tool:
             @st.cache_data(ttl=60)
             def candles_for(tf):
                 try: return ENG.candles(tf, 300), "live"

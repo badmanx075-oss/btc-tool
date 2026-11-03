@@ -25,6 +25,19 @@ def setup_alerts(S, send, now):
     OFA = S.get("orderflow") or {}; st_ = (OFA.get("now") or {}).get("state", "")
     if st_.startswith("AGGRESSIVE") and OFA.get("history_h", 0) >= 1 and _due(S, "flow-" + st_, 2, now):
         send(f"{'🟢🔥' if 'BUY' in st_ else '🔴🔥'} {st_} (pichle 60 min)\n" + __import__("orderflow").text(OFA) + "\nMatlab: market order wale (taker) ek taraf zyada dabaav daal rahe hain. Ye jaankari hai, trade ka signal nahi.", cat="flow")
+    for sy, c in (P.get("coins") or {}).items():                         # ETH / SOL indications (same rules as BTC)
+        try:
+            if (now - dt.datetime.fromisoformat(c["ts"])).total_seconds() > 900: continue
+            px_ = c["price"]; dp = 0 if px_ >= 1000 else 2; held = (P.get("pos") or {}).get(f"trend_pullback@{sy}")
+            for side in ("LONG", "SHORT"):
+                rows = (c.get("radar") or {}).get(side) or []
+                if sum(x[1] for x in rows) == 3 and not held and _due(S, f"radar-{sy}-{side}", COOLDOWN_H["radar"], now):
+                    miss = [x for x in rows if not x[1]]
+                    send(f"👀 {sy}: SETUP BAN RAHA HAI ({'BUY' if side == 'LONG' else 'SELL'}) 3/4\n{sy} ${px_:,.{dp}f}\nBaaki ek shart: {miss[0][0]} ({miss[0][2]}).\nPoori ho gayi to paper trade khud khulega. Abhi kuch karna nahi hai, bas nazar rakho.", cat="setup")
+            Rc = c.get("methods") or {}
+            if Rc.get("verdict") in ("LONG", "SHORT") and not held and _due(S, f"methods-{sy}-{Rc['verdict']}", 3, now):
+                send(f"🧩 {sy}: TAREEKE EK SAATH AAYE\n" + __import__("methods").text(Rc) + "\nYe jaankari hai, guarantee nahi.", cat="setup")
+        except Exception as e: print("coin alert error", sy, e)
     R = P.get("methods") or {}
     if R.get("verdict") in ("LONG", "SHORT") and not any((P.get("pos") or {}).values()) and _due(S, "methods-" + R["verdict"], 3, now):
         send("🧩 TAREEKE EK SAATH AAYE\n" + __import__("methods").text(R) + ("\nAbhi trade tabhi khulega jab 'confluence' strategy ki baaki shartein (candle abhi band hui ho) poori hon. Nazar rakho." if config.load()["strategies"]["confluence"].get("enabled") else "\nConfluence strategy abhi band hai (31 trade ke review mein kamzor nikli), isliye ye sirf jaankari hai, trade nahi khulega."), cat="setup")
