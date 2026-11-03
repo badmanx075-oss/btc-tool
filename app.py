@@ -293,25 +293,33 @@ with tTH:
 
 with tCH:
     st.caption("Price action chart: candles, EMA20/50, swing points, candle patterns (▲ bullish / ▼ bearish, sirf support/resistance ke paas wale), support/resistance, trade ki entry/stop/target, aur daayen taraf har price par buy (hara) vs sell (laal) volume.")
-    if CH is None: st.error("Chart ke liye 'plotly' chahiye. GitHub par requirements.txt upload karo (usme plotly likha hai), phir app Reboot karo. Detail: " + _CH_ERR)
+    TVX = {"OKX": "OKX:{c}USDT.P", "BINANCE": "BINANCE:{c}USDT.P", "BYBIT": "BYBIT:{c}USDT.P"}
+    t1_, t2_, t3_ = st.columns([3, 2, 2]); cmode = t1_.radio("Chart", ["📊 TradingView (indicators add karo)", "🧭 Tool chart (levels + trades)"], horizontal=True); tv = cmode.startswith("📊")
+    if tv:
+        coin_ = t2_.radio("Coin", ["BTC", "ETH", "SOL"], horizontal=True); exch_ = t3_.radio("Data", list(TVX), horizontal=True)
+        components.html("""<div class="tradingview-widget-container" style="height:100%;width:100%"><div id="tvchart" style="height:680px"></div></div><script src="https://s3.tradingview.com/tv.js"></script>
+<script>new TradingView.widget({autosize:true,symbol:"__SYM__",interval:"60",timezone:"Asia/Kolkata",theme:"dark",style:"1",locale:"en",toolbar_bg:"#131722",enable_publishing:false,allow_symbol_change:true,hide_side_toolbar:false,withdateranges:true,details:false,studies:["Volume@tv-basicstudies","RSI@tv-basicstudies"],container_id:"tvchart"});</script>""".replace("__SYM__", TVX[exch_].format(c=coin_)), height=700)
+        st.caption("Ye asli TradingView chart hai: upar 'Indicators' se koi bhi indicator (EMA, MACD, Bollinger, VWAP...), left side se drawing tools. Chart na khule to 'Data' mein BINANCE ya BYBIT chuno. Is chart par tool ke trade levels nahi dikhte: unke liye '🧭 Tool chart' chuno.")
+    if CH is None and not tv: st.error("Chart ke liye 'plotly' chahiye. GitHub par requirements.txt upload karo (usme plotly likha hai), phir app Reboot karo. Detail: " + _CH_ERR)
     else:
-        @st.cache_data(ttl=60)
-        def candles_for(tf):
-            try: return ENG.candles(tf, 300), "live"
-            except Exception: pass
-            cd = load("chart_data.json")
-            if cd and cd.get(tf): return pd.DataFrame(cd[tf], columns=["ts", "o", "h", "l", "c", "v"]), "saved " + str(cd.get("built", ""))[:16] + " UTC"
-            return None, "no data"
-        c1, c2, c3 = st.columns([3, 2, 2]); tf = c1.radio("Timeframe", ["5m", "15m", "1H", "4H"], index=2, horizontal=True); nb = c2.selectbox("Candles", [60, 100, 150, 220], index=1); pw = c3.selectbox("Order-flow window", ["4 ghante", "24 ghante", "off"])
-        o1, o2, o3 = st.columns(3); sp = o1.checkbox("Candle patterns", True); ss = o2.checkbox("Sirf mazboot patterns", True); sw = o3.checkbox("Swing points", True)
-        dfc, srcn = candles_for(tf)
-        if dfc is None or len(dfc) < 100: st.warning("Candle data nahi mil raha (exchange block ya data nahi). Thodi der baad Refresh karo.")
-        else:
-            px_ = float(dfc.c.iloc[-1]); lv_ = SRM.levels_for(dfc, px_); zones_ = ((S.get("sr") or {}).get("zones")) or []
-            OP = load("orderflow_profile.json"); prof_ = OFM.profile_rows(OP, dt.datetime.now(dt.timezone.utc), 240 if pw.startswith("4") else 1440) if (OP and pw != "off") else None
-            closed_ = [r for r in ((load("trade_history.json") or {}).get("records") or {}).values() if r.get("source") == "PAPER" and r.get("entry")][-12:]
-            fig_ = CH.make_figure(dfc, tf, lv_, zones_, POS, closed_, prof_, bars=nb, show_patterns=sp, show_swings=sw, strong_only=ss, height=620)
-            st.plotly_chart(fig_, use_container_width=True, config=dict(displayModeBar=False, scrollZoom=False)); st.caption(f"Candle data: {srcn} | time IST | blue = entry, red dashed = stop, green dashed = target, shaded = kai timeframe ke saath wali zone")
+        if not tv:
+            @st.cache_data(ttl=60)
+            def candles_for(tf):
+                try: return ENG.candles(tf, 300), "live"
+                except Exception: pass
+                cd = load("chart_data.json")
+                if cd and cd.get(tf): return pd.DataFrame(cd[tf], columns=["ts", "o", "h", "l", "c", "v"]), "saved " + str(cd.get("built", ""))[:16] + " UTC"
+                return None, "no data"
+            c1, c2, c3 = st.columns([3, 2, 2]); tf = c1.radio("Timeframe", ["5m", "15m", "1H", "4H"], index=2, horizontal=True); nb = c2.selectbox("Candles", [60, 100, 150, 220], index=1); pw = c3.selectbox("Order-flow window", ["4 ghante", "24 ghante", "off"])
+            o1, o2, o3 = st.columns(3); sp = o1.checkbox("Candle patterns", True); ss = o2.checkbox("Sirf mazboot patterns", True); sw = o3.checkbox("Swing points", True)
+            dfc, srcn = candles_for(tf)
+            if dfc is None or len(dfc) < 100: st.warning("Candle data nahi mil raha (exchange block ya data nahi). Thodi der baad Refresh karo.")
+            else:
+                px_ = float(dfc.c.iloc[-1]); lv_ = SRM.levels_for(dfc, px_); zones_ = ((S.get("sr") or {}).get("zones")) or []
+                OP = load("orderflow_profile.json"); prof_ = OFM.profile_rows(OP, dt.datetime.now(dt.timezone.utc), 240 if pw.startswith("4") else 1440) if (OP and pw != "off") else None
+                closed_ = [r for r in ((load("trade_history.json") or {}).get("records") or {}).values() if r.get("source") == "PAPER" and r.get("entry")][-12:]
+                fig_ = CH.make_figure(dfc, tf, lv_, zones_, POS, closed_, prof_, bars=nb, show_patterns=sp, show_swings=sw, strong_only=ss, height=620)
+                st.plotly_chart(fig_, use_container_width=True, config=dict(displayModeBar=False, scrollZoom=False)); st.caption(f"Candle data: {srcn} | time IST | blue = entry, red dashed = stop, green dashed = target, shaded = kai timeframe ke saath wali zone")
         OFA = S.get("orderflow")
         if OFA and OFA.get("now"):
             st.subheader("🌊 Kahan aggressive buying / selling ho rahi hai")

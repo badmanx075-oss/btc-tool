@@ -164,3 +164,8 @@ Ye ek nearest-neighbour machine-learning model hai (koi API key ya paid service 
 - Dhyan: BTC, ETH, SOL aksar ek saath chalte hain, isliye ek hi direction ke 3 trades ek hi bet jaisa hai.
 - **Coin-wise result (alag-alag):** Dashboard ke Trade History tab mein sabse upar "Coin-wise scorecard" hai: BTC, ETH, SOL ka alag win %, avg R, net Rs, open trades. Neeche "Show details for" se ek coin chuno to uska poora performance/table alag dikhta hai. Telegram: `/coins` (alag win rate) aur `/stats` ke neeche bhi. Ask mein "performance" poochne par coin-wise line aati hai.
 - ETH/SOL position ka P/L unke apne price se banta hai (BTC price se nahi).
+
+## 3 Nov update
+- **Loop-run watchdog fix:** purana 5.5 minute ka watchdog loop-mode run ko beech mein maar deta tha ("Timeout (0:05:30)"). Ab har 5-min cycle par watchdog dobara lagta hai (ek cycle 7 min se zyada atke to hi kill).
+- **Wallet Rs50,000:** config default `start_inr` 20000 -> 50000. Chalte hue wallet mein Rs30,000 ka DEPOSIT (TOPUP) ledger mein judta hai; trades, history aur P&L waise hi rehte hain. Dhyan: risk % equity ka hota hai, isliye ab har trade ka rupee-risk ~2.5 guna hoga. Wapas 20000 karne ke liye wallet reset karna padega (config se auto-ghatega nahi).
+- **Chart tab:** upar "TradingView" (asli TradingView chart: Indicators button se koi bhi indicator, drawing tools, BTC/ETH/SOL, OKX/BINANCE/BYBIT data) ya "Tool chart" (support/resistance + trade levels). Live price wala widget (Home) bilkul nahi chheda.

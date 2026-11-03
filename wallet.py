@@ -12,6 +12,8 @@ def init(P, C, now):
         _add(W, now, "DEPOSIT", "", base, "Virtual wallet created")
     elif not W["touched"] and abs(W["start"] - start) > 1e-9:   # start amount changed in config before any trade
         W.update(start=start, cash=0.0, margin=0.0, ledger=[]); _add(W, now, "DEPOSIT", "", start, "Wallet reset to the start amount in config.json")
+    elif W["touched"] and start > W["start"] + 1e-9:            # config start amount RAISED later: top up (history, trades and P&L are kept)
+        add = round(start - W["start"], 2); W["start"] = start; _add(W, now, "DEPOSIT", "TOPUP", add, f"Wallet top-up +{add:,.0f} (start amount raised to {start:,.0f} in config)")
     sync(P); return W
 
 def sync(P): W = P["wallet"]; P["balance"] = round(W["cash"] + W["margin"], 2); P["start"] = W["start"]

@@ -2,7 +2,7 @@
 import json, os, copy, datetime as dt
 PATH = os.environ.get("BTC_CONFIG") or os.path.join(os.path.dirname(os.path.abspath(__file__)), "config.json")
 DEFAULTS = {
-    "wallet": {"start_inr": 20000, "leverage": 3, "fee_rate_per_side": 0.0005, "max_open_positions": 5, "qty_step": 0.0001},
+    "wallet": {"start_inr": 50000, "leverage": 3, "fee_rate_per_side": 0.0005, "max_open_positions": 5, "qty_step": 0.0001},
     "alerts": {"paper_open": True, "paper_close": True, "stage_alerts": True, "feedback_buttons": True, "advice": True, "signals": True, "reversal": True,
                "learning": True, "setup": True, "move": True, "flow": True, "confirm": True, "timing": True, "milestone": True, "morning": True, "evening": True, "weekly": True},
     "assets": {"extra": ["ETH", "SOL"], "strategies": ["trend_pullback", "session_breakout"]},      # extra coins traded from the SAME wallet (data: OKX/Bybit public, no key)

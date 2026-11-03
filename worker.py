@@ -344,6 +344,7 @@ def main():
     loop_s = int(float(os.environ.get("LOOP_MINUTES", 0)) * 60); t_start = time.time(); lis = int(os.environ.get("LISTEN_SECONDS", config.load()["schedule"]["listen_seconds"]))
     while True:
         t_cycle = time.time(); globals()["now"] = dt.datetime.now(dt.timezone.utc)
+        faulthandler.cancel_dump_traceback_later(); faulthandler.dump_traceback_later(420 if loop_s else 330, exit=True)       # watchdog is re-armed EVERY cycle (a loop run lives ~5.5h; one stuck cycle >7 min is killed)
         try: scan_cycle()
         except Exception as e: print("scan_cycle error", e)
         publish()
