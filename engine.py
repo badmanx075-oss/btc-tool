@@ -17,6 +17,15 @@ def candles(bar, limit=300):
     df = pd.DataFrame(rows, columns=["ts", "o", "h", "l", "c", "v"]).astype(float)
     return df.sort_values("ts").reset_index(drop=True)
 
+def candles_sym(sym, bar, limit=300):
+    """Same as candles() for another coin (ETH, SOL...): OKX {sym}-USDT-SWAP, Bybit fallback. No API key."""
+    try: rows = [x[:6] for x in _get("market/candles", instId=f"{sym}-USDT-SWAP", bar=bar, limit=limit)]
+    except Exception:
+        r = requests.get(BY + "kline", params=dict(category="linear", symbol=f"{sym}USDT", interval=IV[bar], limit=limit), timeout=15)
+        r.raise_for_status(); rows = [x[:6] for x in r.json()["result"]["list"]]
+    df = pd.DataFrame(rows, columns=["ts", "o", "h", "l", "c", "v"]).astype(float)
+    return df.sort_values("ts").reset_index(drop=True)
+
 def _tick():
     r = requests.get(BY + "tickers", params=dict(category="linear", symbol="BTCUSDT"), timeout=15); r.raise_for_status()
     return r.json()["result"]["list"][0]

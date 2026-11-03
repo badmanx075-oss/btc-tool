@@ -402,7 +402,7 @@ def sec_position(S):
     if not pos: return "📭 Abhi koi paper position khuli nahi hai. Tool naya setup milne par khud kholega."
     L = ["📌 KHULI PAPER POSITION"]
     for t in pos:
-        u = (px - t["entry"]) * t["side"]; r = u / t["risk"] if t.get("risk") else 0; inr = u * t.get("qty", 0) * t.get("remaining", 1) * t.get("fx", 88)
+        u = ((px if t.get("sym", "BTC") == "BTC" else (t.get("last_px") or t["entry"])) - t["entry"]) * t["side"]; r = u / t["risk"] if t.get("risk") else 0; inr = u * t.get("qty", 0) * t.get("remaining", 1) * t.get("fx", 88)
         L.append(f"{t.get('label', t.get('strategy'))}: {'BUY' if t['side'] == 1 else 'SELL'} entry {P_(t['entry'])} | stop {P_(t['sl'])} | target {P_(t.get('tp') or t.get('t2') or t['entry'])} | abhi {r:+.2f}R ({INR(inr)})")
         m = t.get("mgmt") or {}
         if m: L.append(f"   Status: {m.get('status', '')}. {m.get('hold_vs_book', '')}")
@@ -426,6 +426,9 @@ def sec_performance(S):
     by = {}
     for t in C: by.setdefault(t.get("label") or t.get("strategy", "?"), []).append(t)
     for k, v in by.items(): L.append(f"• {k}: {len(v)} trade, {sum((x.get('pnl_inr') or 0) > 0 for x in v)} jeete, {sum(x['R'] for x in v) / len(v):+.2f}R avg")
+    cb = {}
+    for t in C: cb.setdefault(t.get("sym", "BTC"), []).append(t)
+    for k in sorted(cb): v = cb[k]; L.append(f"🪙 {k}: {len(v)} trade, win {sum((x.get('pnl_inr') or 0) > 0 for x in v) / len(v) * 100:.0f}%, {sum(x['R'] for x in v) / len(v):+.2f}R avg, net {INR(sum(x.get('pnl_inr') or 0 for x in v))}")
     L.append(f"Sachchai: {n} trade bahut kam hain (kam se kam 30, behtar 100 chahiye) isliye ye number kuch SABIT nahi karta. Abhi tak koi backtest bhi pakka edge sabit nahi kar paya.")
     return "\n".join(L)
 

@@ -34,6 +34,6 @@ def summary(P):
             f"Open positions: {len(op)} | closed: {len(P.get('closed', []))} | max drawdown {P.get('max_dd_pct', 0)}%")
 
 def trades_text(P, n=6):
-    L = ["📒 OPEN"] + ([f"{t['id']} {'BUY' if t['side'] == 1 else 'SELL'} {t['qty']} BTC @ ${t['entry']:,.0f} stop ${t['sl']:,.0f}" for t in (P.get("pos") or {}).values() if t] or ["none"])
+    L = ["📒 OPEN"] + ([f"{t['id']} {'BUY' if t['side'] == 1 else 'SELL'} {t['qty']} {t.get('sym', 'BTC')} @ ${t['entry']:,.{0 if t['entry'] >= 1000 else 2}f} stop ${t['sl']:,.{0 if t['entry'] >= 1000 else 2}f}" for t in (P.get("pos") or {}).values() if t] or ["none"])
     L += ["", "📕 LAST CLOSED"] + [f"{t['id']} {t['outcome']} {t['R']:+.2f}R ₹{t['pnl_inr']:,.0f}" for t in P.get("closed", [])[-n:]]
     return "\n".join(L)

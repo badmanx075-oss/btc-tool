@@ -80,7 +80,7 @@ def calibration(rows):
     ctxof = lambda r: (r.get("raw") or {}).get("entry_ctx") or r.get("context") or {}
     sc = lambda r: ((r.get("raw") or {}).get("ctx") or {}).get("score")
     return dict(
-        by_strategy=_groups(rows, lambda r: r.get("strategy")), by_side=_groups(rows, lambda r: r.get("side")),
+        by_strategy=_groups(rows, lambda r: r.get("strategy")), by_asset=_groups(rows, lambda r: r.get("sym") or (r.get("raw") or {}).get("sym") or "BTC"), by_side=_groups(rows, lambda r: r.get("side")),
         by_grade=_groups(rows, lambda r: grade(r.get("strategy"), (r.get("raw") or {}).get("ctx"))),
         by_score_bucket=_groups([r for r in rows if sc(r) is not None], lambda r: _bucket_score(sc(r))),
         by_session=_groups(rows, lambda r: ctxof(r).get("session") or (session(r["raw"]["ctx"]["hour"]) if ((r.get("raw") or {}).get("ctx") or {}).get("hour") is not None else "n/a")), by_regime=_groups(rows, lambda r: ((r.get("raw") or {}).get("ctx") or {}).get("regime") or ctxof(r).get("regime") or "n/a"),

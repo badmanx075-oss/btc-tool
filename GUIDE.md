@@ -151,3 +151,16 @@ Ye ek nearest-neighbour machine-learning model hai (koi API key ya paid service 
 - **Change:** early_signal risk_pct 0.5 -> 0.25 (R-statistics same rehti hain, loss aadha). Baaki rules wahi; 100 trades tak zyada badlav nahi.
 - analog_edge disabled hi rahega (V11 NOT PROVEN).
 - **Trade History (70 records) analysis:** 70 = 37 paper trades + 32 purane alert-signals + 1 open. Early-signal family (54 closed): ~33% win. Asia ghante 01-07 UTC mein 1/13 (paper) aur 2/12 (alerts) jite. Isliye early_signal in ghanto mein ab shadow trade banta hai (`block_hours_utc`), asli paper trade nahi. Shadow result se check hota rahega ki filter sach mein madad karta hai ya nahi; setting se list khali karke band kar sakte ho.
+
+## V12 (win rate + profit dono)
+`backtest_v12.py`: 240 rule combos (pullback-resume aur 24/48h breakout, sirf bade trend ke saath; stop 1.5/2/3 ATR, target 1-3R, Asia ghante ke saath/bina) 5 saal ke 1H data par. Pehle 60% par chuna jata hai, baaki 40% par (unseen) judge hota hai. Result `backtest_v12_results.json` mein: win%, mean R, profit factor. Verdict tabhi PROMISING jab test mean R 95% par > 0 aur dono test-halves positive. Research workflow (Actions -> research -> Run workflow) se chalta hai.
+
+## Multi-asset (ETH + SOL), shared wallet
+- Ab `trend_pullback` aur `session_breakout` BTC ke saath **ETH aur SOL** par bhi chalte hain, **ek hi Rs20,000 wallet** se (max 5 open positions, daily loss limit sab par ek saath). Data: OKX `{COIN}-USDT-SWAP` (fallback Bybit), free, no key.
+- `early_signal`, `confluence`, `analog_edge` abhi sirf BTC (ye BTC ke order-flow/analysis par bane hain). Ask, analog, daily archive bhi BTC ke hi hain.
+- Trade ID: `TP-ETH-LONG-...`, `SB-SOL-SHORT-...`. Telegram alert mein label "Trend Pullback · ETH".
+- Review pack mein `by_asset` hai, taaki BTC/ETH/SOL ka result alag dikhe. Ye strategies abhi proven nahi hain: ETH/SOL par bhi result alag-alag dekho.
+- Setting: `config.json` mein `{"assets": {"extra": ["ETH", "SOL"]}}`. Khali list `[]` = sirf BTC. Aur coin (jaise XRP, DOGE, ya gold token XAUT) ka naam list mein jodo; coin ka OKX par `-USDT-SWAP` perpetual hona chahiye. (Gold maine default mein nahi joda: tum ne ETH+SOL chuna tha.)
+- Dhyan: BTC, ETH, SOL aksar ek saath chalte hain, isliye ek hi direction ke 3 trades ek hi bet jaisa hai.
+- **Coin-wise result (alag-alag):** Dashboard ke Trade History tab mein sabse upar "Coin-wise scorecard" hai: BTC, ETH, SOL ka alag win %, avg R, net Rs, open trades. Neeche "Show details for" se ek coin chuno to uska poora performance/table alag dikhta hai. Telegram: `/coins` (alag win rate) aur `/stats` ke neeche bhi. Ask mein "performance" poochne par coin-wise line aati hai.
+- ETH/SOL position ka P/L unke apne price se banta hai (BTC price se nahi).

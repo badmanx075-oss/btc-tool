@@ -65,7 +65,7 @@ def from_paper(t, closed):
     fb = t.get("feedback") or {}; u = fb.get("user") or {}; a = fb.get("auto") or {}
     tgt = [x for x in (t.get("tp"), t.get("t1"), t.get("t2"), t.get("t3")) if x]
     return dict(
-        id=t["id"], source="PAPER", strategy=t.get("strategy", ""), label=t.get("label", ""), side=_side(t.get("side")),
+        id=t["id"], source="PAPER", sym=t.get("sym", "BTC"), strategy=t.get("strategy", ""), label=t.get("label", ""), side=_side(t.get("side")),
         opened=t.get("created"), opened_ist=ist(t.get("created")), entry=t.get("entry"), stop=t.get("sl0") or t.get("sl"), targets=tgt,
         qty_btc=t.get("qty"), margin_inr=t.get("margin_inr"), leverage=t.get("leverage"), risk_inr=t.get("risk_inr"),
         why=t.get("why", ""), context=t.get("ctx", {}), entry_context=t.get("entry_ctx"), grade=t.get("grade"), status="CLOSED" if closed else "OPEN",

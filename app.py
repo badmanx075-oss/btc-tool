@@ -72,17 +72,18 @@ st.caption("⚠️ Informational and statistical only. Virtual money, no real or
 tH_, tAsk, tCH, tDD, tA, tW, tTH, tRV, tTM, tL, tHl, tS, tO, tB, tG = st.tabs(["🏠 Home", "💬 Ask", "📈 Chart", "🧭 Decision Desk", "📋 Analysis", "💰 Wallet", "📒 Trade History", "📦 Review", "🕒 Time", "🧠 Learning", "🩺 Health", "⚙️ Settings", "📡 Old signals", "📊 Backtests", "📘 Guide"])
 
 def position_card(t):
-    px = lp or t["entry"]; ur = (px - t["entry"]) * t["side"] / t["risk"]; usd = pl_usd(t, px) + t.get("realized_usd", 0); m = t.get("mgmt")
+    px = (lp or t["entry"]) if t.get("sym", "BTC") == "BTC" else (t.get("last_px") or t["entry"]); ur = (px - t["entry"]) * t["side"] / t["risk"]; usd = pl_usd(t, px) + t.get("realized_usd", 0); m = t.get("mgmt")
+    dd = 0 if t["entry"] >= 1000 else 2
     hrs = (now - dt.datetime.fromisoformat(t["created"])).total_seconds() / 3600; tgt = t.get("tp") or t.get("t2")
-    st.markdown(f"### {t['label']}: {side_txt(t['side'])} {t['qty']} BTC"); st.caption(f"{t['id']} | stage {t['stage']} | open {hrs:.0f} h of {t['expiry_h']} h | leverage {t.get('leverage')}x")
+    st.markdown(f"### {t['label']}: {side_txt(t['side'])} {t['qty']} {t.get('sym', 'BTC')}"); st.caption(f"{t['id']} | stage {t['stage']} | open {hrs:.0f} h of {t['expiry_h']} h | leverage {t.get('leverage')}x")
     if m: st.markdown(f"**{m['status']}**  (stage: {m['stage']}, exhaustion {m['exhaustion']}/100)")
     ci = t.get("confirm_info")
     if ci:
         (st.success if ci["state"] == "CONFIRMED" else st.warning if ci["state"] == "LOST" else st.info)(f"{'✅ CONFIRMED' if ci['state'] == 'CONFIRMED' else '⚠️ CONFIRMATION KAMZOR' if ci['state'] == 'LOST' else '⏳ Confirmation ka intezaar'}: {ci['score']}/{ci['total']} checks")
         with st.expander("Confirmation checks"):
             for c_ in ci["checks"]: st.markdown(f"{'✅' if c_[1] else '❌'} {c_[0]}: {c_[2]}")
-    st.progress(float(min(max((px - t["sl"]) / (tgt - t["sl"]), 0), 1)), text=f"Stop ${t['sl']:,.0f}  ←  now ${px:,.0f}  →  Target ${tgt:,.0f}")
-    st.table(pd.DataFrame([{"Entry": round(t["entry"]), "Now": round(px), "Open P/L": inr(usd * t.get("fx", 88)), "R": f"{ur:+.2f}", "Stop": round(t["sl"]), "Target": round(tgt), "Margin": inr(t["margin_inr"]), "Booked": ", ".join(e["kind"] for e in t.get("exits", [])) or "-"}]))
+    st.progress(float(min(max((px - t["sl"]) / (tgt - t["sl"]), 0), 1)), text=f"Stop ${t['sl']:,.{dd}f}  ←  now ${px:,.{dd}f}  →  Target ${tgt:,.{dd}f}")
+    st.table(pd.DataFrame([{"Entry": round(t["entry"], dd), "Now": round(px, dd), "Open P/L": inr(usd * t.get("fx", 88)), "R": f"{ur:+.2f}", "Stop": round(t["sl"], dd), "Target": round(tgt, dd), "Margin": inr(t["margin_inr"]), "Booked": ", ".join(e["kind"] for e in t.get("exits", [])) or "-"}]))
     if t.get("why"): st.info("💬 **Kyun liya:** " + t["why"])
     if (t.get("entry_ctx") or {}).get("methods_text"): st.caption("🧩 Doosri raay (entry ke waqt): " + t["entry_ctx"]["methods_text"])
     if m:
@@ -90,7 +91,7 @@ def position_card(t):
         st.markdown(m["hold_vs_book"]); st.markdown("🔧 " + m["stop_advice"] + "  (salah hai, paper rule nahi badalta)"); st.caption(f"Agla decision zone ${m['next_zone']:,.0f}")
 
 with tH_:
-    live_widget(POS[0] if POS else None)
+    live_widget(next((t for t in POS if t.get("sym", "BTC") == "BTC"), None))
     c = st.columns(4); c[0].metric("Wallet equity", inr(eq), f"{(eq / start - 1) * 100:+.1f}% since start"); c[1].metric("Free cash", inr(W.get("cash", 0))); c[2].metric("In open trades", inr(W.get("margin", 0)))
     c[3].metric("Open positions", len(POS))
     if POS: st.info("Paper position(s) OPEN. Nothing to do: the tool closes them at stop, target or expiry.")
@@ -247,6 +248,15 @@ with tTH:
     rows_ = sorted(rec.values(), key=lambda r: r.get("opened") or "", reverse=True)
     if not rows_: st.info("No trades recorded yet. The first one will appear here as soon as the tool takes or alerts a trade.")
     else:
+        _cp = [r for r in rows_ if r["source"] == "PAPER" and r["status"] == "CLOSED"]; _coins = sorted({stats.coin_of(r) for r in rows_} | {"BTC", "ETH", "SOL"})
+        st.markdown("#### 🪙 Coin-wise scorecard (paper trades, each coin separate)")
+        _sc = []
+        for c_ in _coins:
+            b_ = stats._block([r for r in _cp if stats.coin_of(r) == c_]); op_ = sum(1 for r in rows_ if r["source"] == "PAPER" and r["status"] == "OPEN" and stats.coin_of(r) == c_)
+            _sc.append({"Coin": c_, "Closed": b_.get("n", 0), "Win %": b_.get("win_pct"), "Wins": b_.get("wins", 0), "Losses": b_.get("losses", 0), "Avg R": b_.get("mean_R"), "Net ₹": b_.get("net_inr"), "Profit factor": b_.get("profit_factor"), "Open now": op_})
+        st.dataframe(pd.DataFrame(_sc), hide_index=True, use_container_width=True); st.caption("Under 30 trades per coin = noise: do not judge a coin by a few trades.")
+        coin_sel = st.radio("Show details for", ["All"] + _coins, horizontal=True)
+        if coin_sel != "All": rows_ = [r for r in rows_ if stats.coin_of(r) == coin_sel]; rec = {r["id"]: r for r in rows_}
         cl = [r for r in rows_ if r["source"] == "PAPER" and r["status"] == "CLOSED"]; wins = sum(1 for r in cl if (r.get("pnl_inr") or 0) > 0); net = sum(r.get("pnl_inr") or 0 for r in cl)
         m = st.columns(5); m[0].metric("All trades", len(rows_)); m[1].metric("Open now", sum(r["status"] == "OPEN" for r in rows_)); m[2].metric("Paper closed", len(cl), f"{wins} win / {len(cl) - wins} loss"); m[3].metric("Paper net P/L", inr(net)); m[4].metric("Alert signals", sum(r["source"] == "SIGNAL" for r in rows_))
         with st.expander("📊 Performance (paper-wallet closed trades)", expanded=len(cl) > 0):
@@ -263,7 +273,7 @@ with tTH:
         fst = f2.multiselect("Status", ["OPEN", "CLOSED"], default=["OPEN", "CLOSED"]); fsd = f3.multiselect("Side", ["LONG", "SHORT"], default=["LONG", "SHORT"]); q = f4.text_input("Search (ID, reason, outcome)").strip().lower()
         sel = [r for r in rows_ if r["source"] in fs and r["status"] in fst and r.get("side") in fsd and (not q or q in json.dumps({k: r.get(k) for k in ("id", "why", "outcome", "label", "user_note", "lesson")}, default=str).lower())]
         fbtxt = lambda r: {"good": "👍 good", "bad": "👎 bad"}.get(r.get("user_rating"), "") + (" " + r["user_note"] if r.get("user_note") else "")
-        tbl = pd.DataFrame([{"Trade ID": r["id"], "Type": "Paper" if r["source"] == "PAPER" else "Alert", "Strategy": r.get("label") or r.get("strategy"), "Side": r.get("side"), "Opened (IST)": r.get("opened_ist"), "Closed (IST)": r.get("closed_ist") or "-",
+        tbl = pd.DataFrame([{"Trade ID": r["id"], "Coin": stats.coin_of(r), "Type": "Paper" if r["source"] == "PAPER" else "Alert", "Strategy": r.get("label") or r.get("strategy"), "Side": r.get("side"), "Opened (IST)": r.get("opened_ist"), "Closed (IST)": r.get("closed_ist") or "-",
                              "Entry": round(r["entry"]) if r.get("entry") else None, "Exit": round(r["exit"]) if r.get("exit") else None, "Status": r["status"], "Outcome": r.get("outcome") or "-", "R": r.get("R"),
                              "P/L ₹": r.get("pnl_inr"), "Your feedback": fbtxt(r), "Why taken": r.get("why", "")} for r in sel])
         st.dataframe(tbl, hide_index=True, use_container_width=True); st.download_button("⬇️ Download full history (CSV)", tbl.to_csv(index=False).encode(), "trade_history.csv", "text/csv")

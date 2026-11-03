@@ -51,10 +51,24 @@ def breakdown(rows, keyfn):
     return {k: _block(v) for k, v in sorted(g.items(), key=lambda kv: str(kv[0]))}
 
 
+def coin_of(r): return r.get("sym") or (r.get("raw") or {}).get("sym") or "BTC"
+
+
+def coin_text(records):
+    """Win rate etc. for each coin SEPARATELY (BTC / ETH / SOL)."""
+    rows = closed_paper(records); g = {}
+    for r in rows: g.setdefault(coin_of(r), []).append(r)
+    if not g: return "🪙 COIN-WISE: abhi koi band paper trade nahi."
+    L = ["🪙 COIN-WISE RESULT (paper, band trades)"]
+    for k in sorted(g):
+        b = _block(g[k]); L.append(f"{k}: {b['n']} trade | win {b['win_pct']}% ({b['wins']}W/{b['losses']}L) | avg {b['mean_R']:+.2f}R | net ₹{b['net_inr']:,.0f}" + (" | (kam trade: sirf andaaza)" if b["n"] < 30 else ""))
+    return "\n".join(L)
+
+
 def analyse(records, start=20000.0):
     rows = closed_paper(records); mdd, curve = drawdown(rows, start)
     out = dict(overall=_block(rows), streaks=streaks(rows), max_drawdown_pct=mdd, curve=curve, rows=rows,
-               by_side=breakdown(rows, lambda r: r.get("side")), by_strategy=breakdown(rows, lambda r: r.get("label") or r.get("strategy")),
+               by_coin=breakdown(rows, coin_of), by_side=breakdown(rows, lambda r: r.get("side")), by_strategy=breakdown(rows, lambda r: r.get("label") or r.get("strategy")),
                by_outcome=breakdown(rows, lambda r: r.get("outcome")),
                by_weekday=breakdown(rows, lambda r: (_ist_dt(r).strftime("%a") if _ist_dt(r) else None)),
                by_hour_block=breakdown(rows, lambda r: (f"{_ist_dt(r).hour // 6 * 6:02d}-{_ist_dt(r).hour // 6 * 6 + 6:02d}h IST" if _ist_dt(r) else None)))
