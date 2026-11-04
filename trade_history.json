@@ -19520,20 +19520,28 @@
    },
    "entry_context": null,
    "grade": "B",
-   "status": "OPEN",
-   "outcome": "",
-   "closed": null,
-   "closed_ist": "",
-   "exit": null,
-   "R": null,
-   "pnl_inr": null,
-   "fees_usd": 0.11565781000000001,
-   "hold_h": null,
-   "best_R": 0.014721345951630415,
-   "worst_R": 0.7311601822642804,
-   "exits": [],
-   "lesson": "",
-   "auto_feedback": "",
+   "status": "CLOSED",
+   "outcome": "SMART EXIT",
+   "closed": "2026-11-04T01:04:41+00:00",
+   "closed_ist": "04 Nov 2026, 06:34 AM IST",
+   "exit": 91.95,
+   "R": 0.156,
+   "pnl_inr": 75.57,
+   "fees_usd": 0.23,
+   "hold_h": 14.0,
+   "best_R": 0.39,
+   "worst_R": 0.76,
+   "exits": [
+    {
+     "ts": "2026-11-04T01:04:41+00:00",
+     "kind": "SMART EXIT",
+     "price": 91.95,
+     "frac": 1.0,
+     "pnl_inr": 97.48
+    }
+   ],
+   "lesson": "Smart exit (14 ghante mein trade ne kuch nahi kiya (stall, +0.2R)): +0.2R par band kiya, taaki trade lamba na chale. Fixed rule se tulna review pack mein hoti hai.",
+   "auto_feedback": "\u26aa Lagbhag barabari: fees ke baad profit/loss ~0.",
    "user_rating": "",
    "user_note": "",
    "user_feedback_ist": "",
@@ -19544,6 +19552,18 @@
      "type": "OPENED",
      "price": 92.4,
      "note": "qty 2.5045 SOL, margin \u20b97,319"
+    },
+    {
+     "time_ist": "04 Nov 2026, 06:34 AM IST",
+     "type": "SMART EXIT",
+     "price": 92.0,
+     "note": "100% of position, P/L \u20b997"
+    },
+    {
+     "time_ist": "04 Nov 2026, 06:34 AM IST",
+     "type": "CLOSED",
+     "price": 92.0,
+     "note": "SMART EXIT"
     }
    ],
    "raw": {
@@ -19567,28 +19587,48 @@
     "qty_btc": 2.5045,
     "notional_usd": 231.32,
     "margin_inr": 7319.48,
-    "margin_released": 0.0,
-    "rem_wallet": 1.0,
+    "margin_released": 7319.48,
+    "rem_wallet": 0.0,
     "leverage": 3,
     "fx": 94.928524,
     "risk_inr": 484.5,
-    "fees_usd": 0.11565781000000001,
-    "realized_usd": 0.0,
+    "fees_usd": 0.23,
+    "realized_usd": 1.0268449999999916,
     "stage": 0,
-    "remaining": 1.0,
-    "mfe_R": 0.014721345951630415,
-    "mae_R": 0.7311601822642804,
-    "exits": [],
+    "remaining": 0,
+    "mfe_R": 0.39,
+    "mae_R": 0.76,
+    "exits": [
+     {
+      "ts": "2026-11-04T01:04:41+00:00",
+      "kind": "SMART EXIT",
+      "price": 91.95,
+      "frac": 1.0,
+      "pnl_inr": 97.48
+     }
+    ],
     "events": [
      {
       "ts": "2026-11-03T11:02:10+00:00",
       "type": "OPENED",
       "price": 92.4,
       "note": "qty 2.5045 SOL, margin \u20b97,319"
+     },
+     {
+      "ts": "2026-11-04T01:04:41+00:00",
+      "type": "SMART EXIT",
+      "price": 92.0,
+      "note": "100% of position, P/L \u20b997"
+     },
+     {
+      "ts": "2026-11-04T01:04:41+00:00",
+      "type": "CLOSED",
+      "price": 92.0,
+      "note": "SMART EXIT"
      }
     ],
     "created": "2026-11-03T11:02:10+00:00",
-    "last_ts": 1793726100000.0,
+    "last_ts": 1793753100000.0,
     "expiry_h": 120,
     "cfg": {
      "enabled": true,
@@ -19617,12 +19657,12 @@
     "grade": "B",
     "why": "Bade (4H) chart pe BTC ka trend neeche hai (taakat 0.31, kam se kam 0.30 chahiye thi). Us trend ke beech bhaav thoda upar chadha (2.3 ATR ki halchal) aur ab trend ki taraf palat raha hai (pichli 1H candle trend ke saath band hui). Isliye trend ke saath SELL liya. Stop-loss 3.0\u00d7ATR door rakha taaki chhoti uthal-puthal se na toote, target risk ka 4.0 guna. Backtest mein har 3 mein ~2 trade harte hain, isliye loss normal hai.",
     "capped": false,
-    "last_px": 93.32,
+    "last_px": 91.95,
     "mgmt": {
-     "status": "\ud83d\udfe2 HOLD: THESIS INTACT",
+     "status": "\ud83d\udfe2 HOLD: MORE UPSIDE POSSIBLE",
      "stage": "ENTRY",
-     "uR": -0.47,
-     "mfe_R": 0.01,
+     "uR": 0.2,
+     "mfe_R": 0.39,
      "exhaustion": 20,
      "reversal_flags": {
       "structure_break": false,
@@ -19630,19 +19670,39 @@
       "gave_back": false
      },
      "reasons": [
-      "Momentum dheema pad raha hai (pichle 3 ghante -0.4 ATR)",
+      "Momentum trend ke saath chal raha hai (pichle 3 ghante +1.6 ATR)",
       "Volume theek hai (normal ka 1.1 guna)",
       "Pichli candle mein upar (trend ki taraf) se rejection wick hai: bhaav wahan tik nahi paya"
      ],
      "stop_advice": "Stop jaisa hai waisa rakho",
      "suggested_sl": 94.4,
-     "hold_vs_book": "Hold: target 4.5R door, stop tak 0.5R (R/R 8.5). Abhi book karo to +-0.5R pakka.",
+     "hold_vs_book": "Hold: target 3.8R door, stop tak 1.2R (R/R 3.2). Abhi book karo to +0.2R pakka.",
      "next_zone": 86.2,
-     "momentum_atr": -0.37,
-     "volume_ratio": 1.12
+     "momentum_atr": 1.62,
+     "volume_ratio": 1.08
     },
-    "mstatus": "\ud83d\udfe2 HOLD: THESIS INTACT",
-    "mts": "2026-11-03T14:02:41+00:00"
+    "mstatus": "\ud83d\udfe2 HOLD: MORE UPSIDE POSSIBLE",
+    "mts": "2026-11-04T01:04:41+00:00",
+    "smart_reason": "14 ghante mein trade ne kuch nahi kiya (stall, +0.2R)",
+    "closed": "2026-11-04T01:04:41+00:00",
+    "outcome": "SMART EXIT",
+    "exit": 91.95,
+    "R": 0.156,
+    "pnl_inr": 75.57,
+    "net_usd": 0.8,
+    "gross_usd": 1.03,
+    "hold_h": 14.0,
+    "lesson": "Smart exit (14 ghante mein trade ne kuch nahi kiya (stall, +0.2R)): +0.2R par band kiya, taaki trade lamba na chale. Fixed rule se tulna review pack mein hoti hai.",
+    "feedback": {
+     "auto": {
+      "result": "FLAT",
+      "verdict": "\u26aa Lagbhag barabari: fees ke baad profit/loss ~0.",
+      "plan_followed": true,
+      "best_R": 0.39,
+      "worst_R": 0.76
+     },
+     "user": null
+    }
    }
   },
   "BTC-SHORT-20261103-001": {
@@ -19758,12 +19818,12 @@
    "score": 65,
    "regime": "RANGE",
    "why": "For: price near range high, lower high forming, buying volume fading, momentum turning down | Against: no sweep of prior highs, no compression",
-   "status": "OPEN",
-   "outcome": "",
-   "closed": null,
-   "closed_ist": "",
-   "best_move_pts": 0,
-   "worst_dip_pts": 0,
+   "status": "CLOSED",
+   "outcome": "SL HIT",
+   "closed": "2026-11-04T01:04:41+00:00",
+   "closed_ist": "04 Nov 2026, 06:34 AM IST",
+   "best_move_pts": 161.59999999999127,
+   "worst_dip_pts": 275.1000000000058,
    "user_rating": "",
    "user_note": "",
    "timeline": [
@@ -19771,6 +19831,12 @@
      "time_ist": "03 Nov 2026, 11:01 PM IST",
      "type": "EARLY SHORT SETUP",
      "price": 77652.2,
+     "note": ""
+    },
+    {
+     "time_ist": "04 Nov 2026, 06:34 AM IST",
+     "type": "SL HIT",
+     "price": 77879.95142857142,
      "note": ""
     }
    ],
@@ -19805,11 +19871,11 @@
     "move_class": "MEDIUM",
     "risk": "Medium",
     "created": "2026-11-03T17:31:19+00:00",
-    "last_ts": 1793727000000.0,
-    "mfe": 0,
-    "mae": 0,
-    "status": "EARLY SETUP",
-    "outcome": "",
+    "last_ts": 1793739300000.0,
+    "mfe": 161.59999999999127,
+    "mae": 275.1000000000058,
+    "status": "CLOSED",
+    "outcome": "SL HIT",
     "events": [
      {
       "id": "BTC-SHORT-20261103-002-1",
@@ -19817,11 +19883,776 @@
       "ts": "2026-11-03T17:31:19+00:00",
       "price": 77652.2,
       "note": ""
+     },
+     {
+      "id": "BTC-SHORT-20261103-002-2",
+      "type": "SL HIT",
+      "ts": "2026-11-04T01:04:41+00:00",
+      "price": 77879.95142857142,
+      "note": ""
      }
     ],
     "user": {}
    }
+  },
+  "ES-SHORT-20261103-025": {
+   "id": "ES-SHORT-20261103-025",
+   "source": "PAPER",
+   "sym": "BTC",
+   "strategy": "early_signal",
+   "label": "Early Signal (experimental)",
+   "side": "SHORT",
+   "opened": "2026-11-03T19:36:42+00:00",
+   "opened_ist": "04 Nov 2026, 01:06 AM IST",
+   "entry": 77537.4,
+   "stop": 77956.67142857143,
+   "targets": [
+    76279.5857142857,
+    76908.49285714285,
+    76279.5857142857,
+    75441.04285714283
+   ],
+   "qty_btc": 0.003,
+   "margin_inr": 7360.51,
+   "leverage": 3,
+   "risk_inr": 119.4,
+   "why": "Bhaav range ke upar (resistance) ke paas tha aur ye cheezein ek saath mili: bhaav range ke upar (resistance ke paas) hai; upar nikalne ki koshish fail hui aur bhaav wapas neeche aaya; kharidne wala volume ghat raha hai; volatility sikud rahi hai (badi move se pehle ki shaanti); momentum neeche mudne laga hai. Setup score 85/100 (kam se kam 65 chahiye). Kamzor pehlu: lower-high abhi nahi bana. Ye 'early' signal hai (palatne se pehle pakadne ki koshish), isliye risk kam rakha aur aadha profit T1 par book hota hai. Iska pichla backtest record negative tha, to ise experiment samjho.",
+   "context": {
+    "score": 85,
+    "regime": "RANGE",
+    "side_n": -1,
+    "side": "SHORT",
+    "hour": 19,
+    "wd": 1,
+    "funding": 0.0001,
+    "atr_pct": 0.503
+   },
+   "entry_context": {
+    "time_utc": "2026-11-03T19:36:42+00:00",
+    "session": "US (13-21 UTC)",
+    "weekday": "Tue",
+    "regime": "RANGE",
+    "stage": "Stage 4-5: trade active",
+    "stage_status": "TRADE ACTIVE (see Home)",
+    "direction": "NONE",
+    "scores": {
+     "structure": 50.0,
+     "volume": 49.2,
+     "momentum": 47.0,
+     "order_flow": 42.2,
+     "liquidity": 47.4,
+     "htf": 31.7,
+     "accumulation": 40.0,
+     "distribution": 85.0,
+     "volatility_pct": 48.5,
+     "large_move_potential": 38.0,
+     "continuation": 42.6,
+     "exhaustion_risk": 25.3,
+     "setup": 0.0
+    },
+    "false_signal_risk": "n/a",
+    "range": {
+     "high": 78831.1,
+     "low": 76300.0,
+     "mid": 77565.55,
+     "position_pct": 48.883884477104814
+    },
+    "expected_move": [
+     771.4961350000001,
+     1487.165414
+    ],
+    "mtf": [
+     [
+      "4H",
+      "DOWN",
+      0.31
+     ],
+     [
+      "1H",
+      "FLAT",
+      0.07
+     ],
+     [
+      "30m",
+      "FLAT",
+      0.17
+     ],
+     [
+      "15m",
+      "FLAT",
+      0.15
+     ],
+     [
+      "5m",
+      "FLAT",
+      0.14
+     ]
+    ],
+    "move_radar": 37,
+    "aggression": "NORMAL / BALANCED",
+    "hour_class": "MEDIUM",
+    "hour_activity": 93,
+    "crowding": "balanced",
+    "oi_quadrant": "short_covering",
+    "taker_delta": 0.028,
+    "liquidations": null,
+    "funding": 0.0001,
+    "radar": {
+     "LONG": 1,
+     "SHORT": 4
+    },
+    "reversal": "none",
+    "methods": {
+     "verdict": "WAIT",
+     "net": -22.7,
+     "agree": 2,
+     "against": 0,
+     "total": 7,
+     "keys": [
+      "candles",
+      "sr"
+     ]
+    },
+    "methods_text": "2/7 methods trade ke saath, 0 khilaaf (consensus: WAIT)"
+   },
+   "grade": "A",
+   "status": "CLOSED",
+   "outcome": "STOP-LOSS",
+   "closed": "2026-11-04T01:04:41+00:00",
+   "closed_ist": "04 Nov 2026, 06:34 AM IST",
+   "exit": 77956.67142857143,
+   "R": -1.185,
+   "pnl_inr": -141.54,
+   "fees_usd": 0.23,
+   "hold_h": 5.5,
+   "best_R": 0.1,
+   "worst_R": 1.19,
+   "exits": [
+    {
+     "ts": "2026-11-04T01:04:41+00:00",
+     "kind": "STOP-LOSS",
+     "price": 77956.67142857143,
+     "frac": 1.0,
+     "pnl_inr": -119.4
+    }
+   ],
+   "lesson": "Jaldi haar (6 ghante, best +0.1R): entry ka timing theek nahi tha ya achanak volatility ne stop tod diya.",
+   "auto_feedback": "\ud83d\udfe1 Normal haar: sirf tay risk (-1.2R) gaya. Is tarah ki strategy mein aksar 3 mein 2 trade harte hain.",
+   "user_rating": "",
+   "user_note": "",
+   "user_feedback_ist": "",
+   "user_exit": null,
+   "timeline": [
+    {
+     "time_ist": "04 Nov 2026, 01:06 AM IST",
+     "type": "OPENED",
+     "price": 77537.4,
+     "note": "qty 0.003 BTC, margin \u20b97,361"
+    },
+    {
+     "time_ist": "04 Nov 2026, 06:34 AM IST",
+     "type": "STOP-LOSS",
+     "price": 77956.7,
+     "note": "100% of position, P/L -\u20b9119"
+    },
+    {
+     "time_ist": "04 Nov 2026, 06:34 AM IST",
+     "type": "CLOSED",
+     "price": 77956.7,
+     "note": "STOP-LOSS"
+    }
+   ],
+   "raw": {
+    "id": "ES-SHORT-20261103-025",
+    "strategy": "early_signal",
+    "sym": "BTC",
+    "key": "early_signal",
+    "label": "Early Signal (experimental)",
+    "side": -1,
+    "entry": 77537.4,
+    "sl0": 77956.67142857143,
+    "sl": 77956.67142857143,
+    "risk": 419.2714285714319,
+    "mode": "staged",
+    "tp": 76279.5857142857,
+    "t1": 76908.49285714285,
+    "t2": 76279.5857142857,
+    "t3": 75441.04285714283,
+    "partial": 0.5,
+    "qty": 0.003,
+    "qty_btc": 0.003,
+    "notional_usd": 232.61,
+    "margin_inr": 7360.51,
+    "margin_released": 7360.51,
+    "rem_wallet": 0.0,
+    "leverage": 3,
+    "fx": 94.928524,
+    "risk_inr": 119.4,
+    "fees_usd": 0.23,
+    "realized_usd": -1.2578142857142958,
+    "stage": 0,
+    "remaining": 0,
+    "mfe_R": 0.1,
+    "mae_R": 1.19,
+    "exits": [
+     {
+      "ts": "2026-11-04T01:04:41+00:00",
+      "kind": "STOP-LOSS",
+      "price": 77956.67142857143,
+      "frac": 1.0,
+      "pnl_inr": -119.4
+     }
+    ],
+    "events": [
+     {
+      "ts": "2026-11-03T19:36:42+00:00",
+      "type": "OPENED",
+      "price": 77537.4,
+      "note": "qty 0.003 BTC, margin \u20b97,361"
+     },
+     {
+      "ts": "2026-11-04T01:04:41+00:00",
+      "type": "STOP-LOSS",
+      "price": 77956.7,
+      "note": "100% of position, P/L -\u20b9119"
+     },
+     {
+      "ts": "2026-11-04T01:04:41+00:00",
+      "type": "CLOSED",
+      "price": 77956.7,
+      "note": "STOP-LOSS"
+     }
+    ],
+    "created": "2026-11-03T19:36:42+00:00",
+    "last_ts": 1793753100000.0,
+    "expiry_h": 72,
+    "cfg": {
+     "enabled": true,
+     "label": "Early Signal (experimental)",
+     "risk_pct": 0.25,
+     "block_hours_utc": [
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7
+     ],
+     "min_score": 65,
+     "partial_pct": 50,
+     "expiry_hours": 72,
+     "cooldown_hours": 1,
+     "leverage": 3,
+     "fee_per_side": 0.0005
+    },
+    "ctx": {
+     "score": 85,
+     "regime": "RANGE",
+     "side_n": -1,
+     "side": "SHORT",
+     "hour": 19,
+     "wd": 1,
+     "funding": 0.0001,
+     "atr_pct": 0.503
+    },
+    "entry_ctx": {
+     "time_utc": "2026-11-03T19:36:42+00:00",
+     "session": "US (13-21 UTC)",
+     "weekday": "Tue",
+     "regime": "RANGE",
+     "stage": "Stage 4-5: trade active",
+     "stage_status": "TRADE ACTIVE (see Home)",
+     "direction": "NONE",
+     "scores": {
+      "structure": 50.0,
+      "volume": 49.2,
+      "momentum": 47.0,
+      "order_flow": 42.2,
+      "liquidity": 47.4,
+      "htf": 31.7,
+      "accumulation": 40.0,
+      "distribution": 85.0,
+      "volatility_pct": 48.5,
+      "large_move_potential": 38.0,
+      "continuation": 42.6,
+      "exhaustion_risk": 25.3,
+      "setup": 0.0
+     },
+     "false_signal_risk": "n/a",
+     "range": {
+      "high": 78831.1,
+      "low": 76300.0,
+      "mid": 77565.55,
+      "position_pct": 48.883884477104814
+     },
+     "expected_move": [
+      771.4961350000001,
+      1487.165414
+     ],
+     "mtf": [
+      [
+       "4H",
+       "DOWN",
+       0.31
+      ],
+      [
+       "1H",
+       "FLAT",
+       0.07
+      ],
+      [
+       "30m",
+       "FLAT",
+       0.17
+      ],
+      [
+       "15m",
+       "FLAT",
+       0.15
+      ],
+      [
+       "5m",
+       "FLAT",
+       0.14
+      ]
+     ],
+     "move_radar": 37,
+     "aggression": "NORMAL / BALANCED",
+     "hour_class": "MEDIUM",
+     "hour_activity": 93,
+     "crowding": "balanced",
+     "oi_quadrant": "short_covering",
+     "taker_delta": 0.028,
+     "liquidations": null,
+     "funding": 0.0001,
+     "radar": {
+      "LONG": 1,
+      "SHORT": 4
+     },
+     "reversal": "none",
+     "methods": {
+      "verdict": "WAIT",
+      "net": -22.7,
+      "agree": 2,
+      "against": 0,
+      "total": 7,
+      "keys": [
+       "candles",
+       "sr"
+      ]
+     },
+     "methods_text": "2/7 methods trade ke saath, 0 khilaaf (consensus: WAIT)"
+    },
+    "confirm_lvl": 77490.6,
+    "grade": "A",
+    "why": "Bhaav range ke upar (resistance) ke paas tha aur ye cheezein ek saath mili: bhaav range ke upar (resistance ke paas) hai; upar nikalne ki koshish fail hui aur bhaav wapas neeche aaya; kharidne wala volume ghat raha hai; volatility sikud rahi hai (badi move se pehle ki shaanti); momentum neeche mudne laga hai. Setup score 85/100 (kam se kam 65 chahiye). Kamzor pehlu: lower-high abhi nahi bana. Ye 'early' signal hai (palatne se pehle pakadne ki koshish), isliye risk kam rakha aur aadha profit T1 par book hota hai. Iska pichla backtest record negative tha, to ise experiment samjho.",
+    "capped": false,
+    "last_px": 76938.2,
+    "closed": "2026-11-04T01:04:41+00:00",
+    "outcome": "STOP-LOSS",
+    "exit": 77956.67142857143,
+    "R": -1.185,
+    "pnl_inr": -141.54,
+    "net_usd": -1.49,
+    "gross_usd": -1.26,
+    "hold_h": 5.5,
+    "lesson": "Jaldi haar (6 ghante, best +0.1R): entry ka timing theek nahi tha ya achanak volatility ne stop tod diya.",
+    "feedback": {
+     "auto": {
+      "result": "LOSS",
+      "verdict": "\ud83d\udfe1 Normal haar: sirf tay risk (-1.2R) gaya. Is tarah ki strategy mein aksar 3 mein 2 trade harte hain.",
+      "plan_followed": true,
+      "best_R": 0.1,
+      "worst_R": 1.19
+     },
+     "user": null
+    }
+   }
+  },
+  "TP-SHORT-20261103-003": {
+   "id": "TP-SHORT-20261103-003",
+   "source": "PAPER",
+   "sym": "BTC",
+   "strategy": "trend_pullback",
+   "label": "Trend Pullback",
+   "side": "SHORT",
+   "opened": "2026-11-03T18:01:25+00:00",
+   "opened_ist": "03 Nov 2026, 11:31 PM IST",
+   "entry": 77618.9,
+   "stop": 78797.59999999999,
+   "targets": [
+    72904.10000000002
+   ],
+   "qty_btc": 0.0043,
+   "margin_inr": 10561.15,
+   "leverage": 3,
+   "risk_inr": 481.14,
+   "why": "Bade (4H) chart pe BTC ka trend neeche hai (taakat 0.37, kam se kam 0.30 chahiye thi). Us trend ke beech bhaav thoda upar chadha (3.2 ATR ki halchal) aur ab trend ki taraf palat raha hai (pichli 1H candle trend ke saath band hui). Isliye trend ke saath SELL liya. Stop-loss 3.0\u00d7ATR door rakha taaki chhoti uthal-puthal se na toote, target risk ka 4.0 guna. Backtest mein har 3 mein ~2 trade harte hain, isliye loss normal hai.",
+   "context": {
+    "er4": 0.366,
+    "atr_pct": 0.506,
+    "depth": 3.2,
+    "hour": 17,
+    "wd": 1,
+    "side_n": -1,
+    "side": "SHORT",
+    "funding": 0.0001,
+    "regime": "RANGE"
+   },
+   "entry_context": {
+    "time_utc": "2026-11-03T18:01:25+00:00",
+    "session": "US (13-21 UTC)",
+    "weekday": "Tue",
+    "regime": "RANGE",
+    "stage": "Stage 4-5: trade active",
+    "stage_status": "TRADE ACTIVE (see Home)",
+    "direction": "NONE",
+    "scores": {
+     "structure": 50.0,
+     "volume": 47.2,
+     "momentum": 72.4,
+     "order_flow": 45.1,
+     "liquidity": 50.5,
+     "htf": 31.7,
+     "accumulation": 40.0,
+     "distribution": 75.0,
+     "volatility_pct": 51.5,
+     "large_move_potential": 38.0,
+     "continuation": 50.4,
+     "exhaustion_risk": 29.4,
+     "setup": 0.0
+    },
+    "false_signal_risk": "n/a",
+    "range": {
+     "high": 78831.1,
+     "low": 76260.0,
+     "mid": 77545.55,
+     "position_pct": 52.73229357084516
+    },
+    "expected_move": [
+     772.2772100000001,
+     1488.671044
+    ],
+    "mtf": [
+     [
+      "4H",
+      "DOWN",
+      0.31
+     ],
+     [
+      "1H",
+      "FLAT",
+      0.03
+     ],
+     [
+      "30m",
+      "FLAT",
+      0.19
+     ],
+     [
+      "15m",
+      "UP",
+      0.21
+     ],
+     [
+      "5m",
+      "FLAT",
+      0.15
+     ]
+    ],
+    "move_radar": 45,
+    "aggression": "NORMAL / BALANCED",
+    "hour_class": "HIGH",
+    "hour_activity": 108,
+    "crowding": "balanced",
+    "oi_quadrant": "short_covering",
+    "taker_delta": 0.151,
+    "liquidations": null,
+    "funding": 0.0001,
+    "radar": {
+     "LONG": 1,
+     "SHORT": 4
+    },
+    "reversal": "none",
+    "methods": {
+     "verdict": "WAIT",
+     "net": -22.7,
+     "agree": 2,
+     "against": 0,
+     "total": 7,
+     "keys": [
+      "candles",
+      "sr"
+     ]
+    },
+    "methods_text": "2/7 methods trade ke saath, 0 khilaaf (consensus: WAIT)"
+   },
+   "grade": "B",
+   "status": "OPEN",
+   "outcome": "",
+   "closed": null,
+   "closed_ist": "",
+   "exit": null,
+   "R": null,
+   "pnl_inr": null,
+   "fees_usd": 0.166880635,
+   "hold_h": null,
+   "best_R": 0.671841859675912,
+   "worst_R": 0.3652328836854177,
+   "exits": [],
+   "lesson": "",
+   "auto_feedback": "",
+   "user_rating": "",
+   "user_note": "",
+   "user_feedback_ist": "",
+   "user_exit": null,
+   "timeline": [
+    {
+     "time_ist": "03 Nov 2026, 11:31 PM IST",
+     "type": "OPENED",
+     "price": 77618.9,
+     "note": "qty 0.0043 BTC, margin \u20b910,561"
+    },
+    {
+     "time_ist": "04 Nov 2026, 06:34 AM IST",
+     "type": "CONFIRMED",
+     "price": 76938.2,
+     "note": "4/6 checks"
+    }
+   ],
+   "raw": {
+    "id": "TP-SHORT-20261103-003",
+    "strategy": "trend_pullback",
+    "sym": "BTC",
+    "key": "trend_pullback",
+    "label": "Trend Pullback",
+    "side": -1,
+    "entry": 77618.9,
+    "sl0": 78797.59999999999,
+    "sl": 78797.59999999999,
+    "risk": 1178.699999999995,
+    "mode": "fixed",
+    "tp": 72904.10000000002,
+    "t1": null,
+    "t2": null,
+    "t3": null,
+    "partial": 0.5,
+    "qty": 0.0043,
+    "qty_btc": 0.0043,
+    "notional_usd": 333.76,
+    "margin_inr": 10561.15,
+    "margin_released": 0.0,
+    "rem_wallet": 1.0,
+    "leverage": 3,
+    "fx": 94.928524,
+    "risk_inr": 481.14,
+    "fees_usd": 0.166880635,
+    "realized_usd": 0.0,
+    "stage": 0,
+    "remaining": 1.0,
+    "mfe_R": 0.671841859675912,
+    "mae_R": 0.3652328836854177,
+    "exits": [],
+    "events": [
+     {
+      "ts": "2026-11-03T18:01:25+00:00",
+      "type": "OPENED",
+      "price": 77618.9,
+      "note": "qty 0.0043 BTC, margin \u20b910,561"
+     },
+     {
+      "ts": "2026-11-04T01:04:41+00:00",
+      "type": "CONFIRMED",
+      "price": 76938.2,
+      "note": "4/6 checks"
+     }
+    ],
+    "created": "2026-11-03T18:01:25+00:00",
+    "last_ts": 1793753100000.0,
+    "expiry_h": 120,
+    "cfg": {
+     "enabled": true,
+     "label": "Trend Pullback",
+     "risk_pct": 1.0,
+     "stop_atr": 3.0,
+     "target_r": 4.0,
+     "expiry_hours": 120,
+     "cooldown_hours": 24,
+     "leverage": 3,
+     "fee_per_side": 0.0005
+    },
+    "ctx": {
+     "er4": 0.366,
+     "atr_pct": 0.506,
+     "depth": 3.2,
+     "hour": 17,
+     "wd": 1,
+     "side_n": -1,
+     "side": "SHORT",
+     "funding": 0.0001,
+     "regime": "RANGE"
+    },
+    "entry_ctx": {
+     "time_utc": "2026-11-03T18:01:25+00:00",
+     "session": "US (13-21 UTC)",
+     "weekday": "Tue",
+     "regime": "RANGE",
+     "stage": "Stage 4-5: trade active",
+     "stage_status": "TRADE ACTIVE (see Home)",
+     "direction": "NONE",
+     "scores": {
+      "structure": 50.0,
+      "volume": 47.2,
+      "momentum": 72.4,
+      "order_flow": 45.1,
+      "liquidity": 50.5,
+      "htf": 31.7,
+      "accumulation": 40.0,
+      "distribution": 75.0,
+      "volatility_pct": 51.5,
+      "large_move_potential": 38.0,
+      "continuation": 50.4,
+      "exhaustion_risk": 29.4,
+      "setup": 0.0
+     },
+     "false_signal_risk": "n/a",
+     "range": {
+      "high": 78831.1,
+      "low": 76260.0,
+      "mid": 77545.55,
+      "position_pct": 52.73229357084516
+     },
+     "expected_move": [
+      772.2772100000001,
+      1488.671044
+     ],
+     "mtf": [
+      [
+       "4H",
+       "DOWN",
+       0.31
+      ],
+      [
+       "1H",
+       "FLAT",
+       0.03
+      ],
+      [
+       "30m",
+       "FLAT",
+       0.19
+      ],
+      [
+       "15m",
+       "UP",
+       0.21
+      ],
+      [
+       "5m",
+       "FLAT",
+       0.15
+      ]
+     ],
+     "move_radar": 45,
+     "aggression": "NORMAL / BALANCED",
+     "hour_class": "HIGH",
+     "hour_activity": 108,
+     "crowding": "balanced",
+     "oi_quadrant": "short_covering",
+     "taker_delta": 0.151,
+     "liquidations": null,
+     "funding": 0.0001,
+     "radar": {
+      "LONG": 1,
+      "SHORT": 4
+     },
+     "reversal": "none",
+     "methods": {
+      "verdict": "WAIT",
+      "net": -22.7,
+      "agree": 2,
+      "against": 0,
+      "total": 7,
+      "keys": [
+       "candles",
+       "sr"
+      ]
+     },
+     "methods_text": "2/7 methods trade ke saath, 0 khilaaf (consensus: WAIT)"
+    },
+    "confirm_lvl": null,
+    "grade": "B",
+    "why": "Bade (4H) chart pe BTC ka trend neeche hai (taakat 0.37, kam se kam 0.30 chahiye thi). Us trend ke beech bhaav thoda upar chadha (3.2 ATR ki halchal) aur ab trend ki taraf palat raha hai (pichli 1H candle trend ke saath band hui). Isliye trend ke saath SELL liya. Stop-loss 3.0\u00d7ATR door rakha taaki chhoti uthal-puthal se na toote, target risk ka 4.0 guna. Backtest mein har 3 mein ~2 trade harte hain, isliye loss normal hai.",
+    "capped": false,
+    "last_px": 76938.2,
+    "mgmt": {
+     "status": "\ud83d\udfe2 HOLD: MOMENTUM STRONG",
+     "stage": "PROFIT DEVELOPING",
+     "uR": 0.58,
+     "mfe_R": 0.67,
+     "exhaustion": 20,
+     "reversal_flags": {
+      "structure_break": false,
+      "momentum_negative": false,
+      "gave_back": false
+     },
+     "reasons": [
+      "Momentum trend ke saath chal raha hai (pichle 3 ghante +1.7 ATR)",
+      "Volume theek hai (normal ka 1.1 guna)",
+      "Pichli candle mein upar (trend ki taraf) se rejection wick hai: bhaav wahan tik nahi paya"
+     ],
+     "stop_advice": "Stop jaisa hai waisa rakho",
+     "suggested_sl": 78797.6,
+     "hold_vs_book": "Hold: target 3.4R door, stop tak 1.6R (R/R 2.2). Abhi book karo to +0.6R pakka.",
+     "next_zone": 74082.8,
+     "momentum_atr": 1.69,
+     "volume_ratio": 1.09
+    },
+    "mstatus": "\ud83d\udfe2 HOLD: MOMENTUM STRONG",
+    "mts": "2026-11-04T01:04:41+00:00",
+    "confirm_info": {
+     "state": "CONFIRMED",
+     "score": 4,
+     "total": 6,
+     "checks": [
+      [
+       "Entry ke baad bhaav aage chala",
+       true,
+       "+0.58R"
+      ],
+      [
+       "Profit +0.5R se zyada",
+       true,
+       "+0.58R"
+      ],
+      [
+       "Momentum trade ke saath",
+       true,
+       "+1.7 ATR (3h)"
+      ],
+      [
+       "15m aur 1H direction trade ke saath",
+       false,
+       "15m FLAT, 1H FLAT"
+      ],
+      [
+       "Order flow (taker) trade ke saath",
+       false,
+       "taker delta +0.15"
+      ],
+      [
+       "Reversal ke sanket nahi",
+       true,
+       "koi flag nahi"
+      ]
+     ],
+     "ts": "2026-11-04T01:04:41+00:00",
+     "first": "2026-11-04T01:04:41+00:00"
+    },
+    "confirmed_at_R": 0.58
+   }
   }
  },
- "updated": "2026-11-03T17:31:33+00:00"
+ "updated": "2026-11-04T01:04:58+00:00"
 }
