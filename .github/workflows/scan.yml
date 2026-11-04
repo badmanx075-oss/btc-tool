@@ -7,6 +7,7 @@ on:
 
 permissions:
   contents: write
+  actions: write
 
 concurrency:
   group: scan
@@ -17,6 +18,11 @@ jobs:
     timeout-minutes: 345
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 8
+
+      - name: Remember start time
+        run: echo "START_TS=$(date +%s)" >> $GITHUB_ENV
 
       - uses: actions/setup-python@v5
         with:
@@ -38,6 +44,10 @@ jobs:
         run: |
           git config user.name bot
           git config user.email bot@users.noreply.github.com
+          for f in state.json trade_history.json config.json; do          # never commit a half-written JSON (run killed mid-write): restore the last good copy instead
+            if [ -f "$f" ] && ! python -c "import json,sys; json.load(open(sys.argv[1]))" "$f" 2>/dev/null; then echo "BROKEN $f, restoring last committed copy"; rm -f "$f.tmp"; git checkout -- "$f"; fi
+          done
+          rm -f *.tmp
           for f in state.json market_log.csv flow_log.csv config.json trade_history.json; do
             if [ -f "$f" ]; then git add "$f"; fi
           done
@@ -48,3 +58,10 @@ jobs:
             echo "push attempt $i failed, retrying"; git rebase --abort 2>/dev/null || true; sleep $((i * 4))
           done
           echo "could not push state (will be saved by the next run)"; exit 0
+
+      - name: Start the next run right away (GitHub cron is unreliable)
+        if: always()
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          if [ $(( $(date +%s) - ${START_TS:-0} )) -gt 600 ]; then gh workflow run scan.yml --ref "${GITHUB_REF_NAME}" && echo "next run queued"; else echo "run was short, not chaining (cron will start the next one)"; fi
