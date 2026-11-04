@@ -310,5 +310,5 @@ def run(S, send, now, scan=None):
                 gate = C.get("risk", {}).get("min_methods_agree", 0)
                 if gate and ag < gate:
                     jlog(P, now, "FILTERED", f"{name} skipped: only {ag} methods agree (need {gate})"); send(f"🧩 Signal skipped: sirf {ag}/{mres_['total']} methods trade ke saath ({gate} chahiye). {name} {'BUY' if k_ == 1 else 'SELL'} chhoda gaya.", cat="setup"); continue
-            jlog(P, now, "SIGNAL", f"{name} {'LONG' if sg['side'] == 1 else 'SHORT'} signal at ${sg['entry']:,.0f}")
+            jlog(P, now, "SIGNAL", f"{name} {'LONG' if sg['side'] == 1 else 'SHORT'} signal at ${sg['entry']:,.{0 if sg['entry'] >= 1000 else 2}f}")
             if not open_position(P, C, name, sg, now, h15_, fx(P), send, sym=sym): P["last_entry"][key] = now.timestamp() * 1000 - max(sc.get("cooldown_hours", 1) - 1, 0) * 3.6e6

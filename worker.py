@@ -56,7 +56,8 @@ def settings_kb():
     on = config.load()["alerts"]; btns = [{"text": ("✅ " if on.get(k, True) else "❌ ") + lab, "callback_data": "tgl|" + k} for k, lab in notify.CATS]
     return {"inline_keyboard": [btns[i:i + 2] for i in range(0, len(btns), 2)]}
 
-S = json.load(open("state.json")) if os.path.exists("state.json") else {"trades": {}, "offset": 0, "n": {}, "sent": {}}
+import safeio
+S = safeio.load("state.json", {"trades": {}, "offset": 0, "n": {}, "sent": {}}) or {"trades": {}, "offset": 0, "n": {}, "sent": {}}
 now = dt.datetime.now(dt.timezone.utc)
 P = lambda x: f"${x:,.0f}"
 
@@ -227,7 +228,7 @@ def scan_cycle():
         print("data error", e)
         if os.environ.get("GITHUB_EVENT_NAME") == "workflow_dispatch":
             send("Data error: " + str(e)[:250])
-        json.dump(S, open("state.json", "w"), indent=1)
+        safeio.dump(S, "state.json", indent=1)
         return
     S["last_price"] = px = float(m5.c.iloc[-1])
     record(px, fr, oi); flow.record(now)
@@ -306,10 +307,10 @@ def scan_cycle():
                 send(f"🌆 GOOD EVENING\nDaily Review\nPrice: {P(px)}\nRegime: {r['regime']}\nSignals: {len(today)}\nT1: {cnt('T1 HIT')} T2: {cnt('T2 HIT')} T3: {cnt('T3 HIT')} SL: {cnt('SL HIT')}\n{wallet.summary(S.get('paper') or {})}\n{paper.radar_line(S.get('paper', {}))}", cat="evening")
     if loc.hour == CF["evening_hour"] and loc.weekday() == 6 and S["sent"].get("weekly") != key:
         S["sent"]["weekly"] = key; send(paper.weekly_text(S.get("paper") or {}, now), cat="weekly")
-    json.dump(S, open("state.json", "w"), indent=1)
+    safeio.dump(S, "state.json", indent=1)
 
 def publish():  # push state to GitHub right away so the dashboard shows new trades within seconds (not at the end of the run)
-    json.dump(S, open("state.json", "w"), indent=1)
+    safeio.dump(S, "state.json", indent=1)
     try: history.seed_from_backups(); history.sync(S)            # permanent trade record (never deleted, separate from state.json)
     except Exception as e: print("history error", e)
     if not os.environ.get("GITHUB_ACTIONS"): return
@@ -353,6 +354,6 @@ def main():
         listen(max(30, 300 - (time.time() - t_cycle)))                    # answers Telegram until the next 5-min slot
         ST["last_run"] = dt.datetime.now(dt.timezone.utc).isoformat(timespec="seconds")
         if time.time() - t_start + 320 > loop_s: break
-    ST["last_run"] = dt.datetime.now(dt.timezone.utc).isoformat(timespec="seconds"); json.dump(S, open("state.json", "w"), indent=1)
+    ST["last_run"] = dt.datetime.now(dt.timezone.utc).isoformat(timespec="seconds"); safeio.dump(S, "state.json", indent=1)
 
 main()
