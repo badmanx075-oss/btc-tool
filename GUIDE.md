@@ -190,3 +190,6 @@ Ye ek nearest-neighbour machine-learning model hai (koi API key ya paid service 
 - "📈 Live chart" me ab Pivot Points Standard (Traditional/Fibonacci/Camarilla/Woodie; day/week/month) + Ichimoku, Parabolic SAR, DEMA/TEMA/HMA, LinReg, Williams %R, AO, Aroon, TRIX, CMF, UO, StochRSI, Momentum, BB Width, PPO, TSI jude hain (total 36).
 - Indicators sirf isi Live chart me browser ke andar save rehte hain. Embedded TradingView widget me save hona platform limit hai.
 - Sirf `livechart.py` badla; upload karke dashboard reboot karo.
+
+## Update: hang-proof scan
+- scan.yml: `timeout -s KILL 20400 python -u worker.py` (5h40m hard kill) + PYTHONUNBUFFERED, taaki run kabhi atke nahi aur log live dikhe.
