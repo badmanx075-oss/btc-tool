@@ -36,8 +36,9 @@ jobs:
         run: pip install requests pandas numpy
 
       - name: Run worker
-        run: python worker.py
+        run: timeout -s KILL 20400 python -u worker.py   # -u: log live; hard-kill after 5h40m so a hang can never block the chain
         env:
+          PYTHONUNBUFFERED: "1"
           LOOP_MINUTES: "330"
           CHAINED: ${{ github.event.inputs.chained }}
           TG_TOKEN: ${{ secrets.TG_TOKEN }}
