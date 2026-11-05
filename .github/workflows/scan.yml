@@ -4,6 +4,10 @@ on:
   schedule:
     - cron: "*/15 * * * *"
   workflow_dispatch:
+    inputs:
+      chained:
+        description: "set by the previous run (no 'Bot connected' message)"
+        default: "false"
 
 permissions:
   contents: write
@@ -35,6 +39,7 @@ jobs:
         run: python worker.py
         env:
           LOOP_MINUTES: "330"
+          CHAINED: ${{ github.event.inputs.chained }}
           TG_TOKEN: ${{ secrets.TG_TOKEN }}
           TG_CHAT_ID: ${{ secrets.TG_CHAT_ID }}
           DASHBOARD_URL: ${{ secrets.DASHBOARD_URL }}
@@ -64,4 +69,4 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          if [ $(( $(date +%s) - ${START_TS:-0} )) -gt 600 ]; then gh workflow run scan.yml --ref "${GITHUB_REF_NAME}" && echo "next run queued"; else echo "run was short, not chaining (cron will start the next one)"; fi
+          if [ $(( $(date +%s) - ${START_TS:-0} )) -gt 600 ]; then gh workflow run scan.yml --ref "${GITHUB_REF_NAME}" -f chained=true && echo "next run queued"; else echo "run was short, not chaining (cron will start the next one)"; fi
