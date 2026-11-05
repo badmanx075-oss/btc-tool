@@ -42,6 +42,14 @@ def open_interest():
         try: return float(_tick()["openInterestValue"])
         except Exception: return 0.0
 
+def funding_sym(sym):
+    try: return float(_get("public/funding-rate", instId=f"{sym}-USDT-SWAP")[0]["fundingRate"])
+    except Exception: return 0.0
+
+def oi_sym(sym):
+    try: return float(_get("public/open-interest", instType="SWAP", instId=f"{sym}-USDT-SWAP")[0]["oiUsd"])
+    except Exception: return 0.0
+
 SL_MULT = 1.0            # widen/narrow stop after backtest_v3 results
 TP_R = (1.5, 3, 5, 8)     # target multiples of risk (T1,T2,T3,Ext)
 

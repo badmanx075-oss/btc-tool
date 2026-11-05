@@ -2,7 +2,7 @@
 import os, json, time, subprocess, requests, datetime as dt
 from zoneinfo import ZoneInfo
 import engine as E
-import paper, learn, config, wallet, analysis, history, stats, flow, desk, review as rvw, notify, timing, sr, orderflow, ask, askstats, dailylog, analog
+import paper, learn, config, wallet, analysis, history, stats, flow, desk, review as rvw, notify, timing, sr, orderflow, ask, askstats, dailylog, analog, coindesk
 import pandas as pd
 import faulthandler; faulthandler.dump_traceback_later(330, exit=True)  # if stuck >5.5 min: print where, then exit
 
@@ -217,16 +217,17 @@ def record(px, fr, oi):  # builds our own OI/funding/order-book history for futu
         if new: f.write("ts,price,funding,oi_usd,book_imbalance\n")
         f.write(f"{now.isoformat(timespec='seconds')},{px},{fr},{oi},{imb}\n")
 
+MANUAL = os.environ.get("GITHUB_EVENT_NAME") == "workflow_dispatch" and os.environ.get("CHAINED", "false") != "true"; _SENT_HELLO = [False]
 def scan_cycle():
     handle_updates()
-    if os.environ.get("GITHUB_EVENT_NAME") == "workflow_dispatch":
-        send("Bot connected. Manual test run OK.")
+    if MANUAL and not _SENT_HELLO[0]:                                  # only for a run YOU started by hand, and only once per run (chained/looped runs stay silent)
+        _SENT_HELLO[0] = True; send("Bot connected. Manual test run OK.")
     try:
         m5, m15, h1, h4 = (E.candles(b) for b in ("5m", "15m", "1H", "4H"))
         fr, oi = E.funding(), E.open_interest()
     except Exception as e:
         print("data error", e)
-        if os.environ.get("GITHUB_EVENT_NAME") == "workflow_dispatch":
+        if MANUAL:
             send("Data error: " + str(e)[:250])
         safeio.dump(S, "state.json", indent=1)
         return
@@ -289,6 +290,8 @@ def scan_cycle():
     except Exception as e: print("desk error", e)
     try: paper.run(S, send, now, scan=r)
     except Exception as e: print("paper error", e)
+    try: coindesk.run(S, now, config.load().get("assets", {}).get("extra") or [])         # full per-coin analysis for the dashboard (ETH, SOL ...)
+    except Exception as e: print("coindesk error", e)
     try:
         askstats.ensure(now)                                            # history stats for Ask (rebuilt weekly, ~1-2 min only when due)
         if analog.ensure(now) and not S.get("analog"): S["analog"] = analog.live(h1)      # analog engine library (weekly, ~1 min when due)

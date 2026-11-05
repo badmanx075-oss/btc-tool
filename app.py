@@ -63,10 +63,28 @@ def amin(iso): return (now - dt.datetime.fromisoformat(iso)).total_seconds() / 6
 def side_txt(k): return "BUY (LONG)" if k == 1 else "SELL (SHORT)"
 def pl_usd(t, px): return (px - t["entry"]) * t["side"] * t["qty"] * t["remaining"]
 
-head, btn = st.columns([6, 1]); head.title("📈 BTC Perpetual Tool")
+
+# ---------------- coin selector: every tab follows the coin you pick (BTC / ETH / SOL ...). Remembered in the page URL, so a browser refresh keeps it.
+_COINS = ["BTC"] + [c for c in ((CFG.get("assets") or {}).get("extra") or [])]
+try: _q0 = st.query_params.get("coin", "BTC")
+except Exception: _q0 = "BTC"
+COIN = st.radio("🪙 Coin (neeche ke saare tab isi coin ke ho jaate hain)", _COINS, index=_COINS.index(_q0) if _q0 in _COINS else 0, horizontal=True, key="coin_sel")
+try: st.query_params["coin"] = COIN
+except Exception: pass
+POS_ALL = POS
+if COIN != "BTC":
+    _cd = (S.get("coindesk") or {}).get(COIN) or {}; _pc = (P.get("coins") or {}).get(COIN) or {}
+    if not _cd: st.warning(f"{COIN} ka analysis abhi ban raha hai (naya worker chalne ke baad ~5 minute mein aata hai). Tab tak neeche BTC ka data dikh sakta hai.")
+    else:
+        S = dict(S, market=_cd.get("market"), analysis=_cd.get("analysis"), desk=_cd.get("desk"), sr=_cd.get("sr"), orderflow=None, timing=None, daily=None, stage_log=[], move_watch=None, move_log=None, last_price=(_cd.get("market") or {}).get("price"))
+        M, A, lp = S["market"], S["analysis"], S["last_price"]
+        P = dict(P, methods=_pc.get("methods"), radar=(dict(_pc["radar"], ts=_pc.get("ts"), price=_pc.get("price")) if _pc.get("radar") else None), radar_move=None)
+        POS = [t for t in POS if t.get("sym", "BTC") == COIN]; CL = [t for t in CL if t.get("sym", "BTC") == COIN]
+
+head, btn = st.columns([6, 1]); head.title(f"📈 {COIN} Perpetual Tool")
 if btn.button("🔄 Refresh"): st.cache_data.clear(); st.rerun()
 if M:
-    age = amin(M["ts"]); head.caption(f"Last scan {age:.0f} min ago | BTC ${M['price']:,.0f} | Funding {M['funding'] * 100:.4f}% | OI ${M['oi'] / 1e9:.2f}B")
+    age = amin(M["ts"]); head.caption(f"Last scan {age:.0f} min ago | {COIN} ${M['price']:,.{0 if M['price'] >= 1000 else 2}f} | Funding {M['funding'] * 100:.4f}% | OI ${M['oi'] / 1e9:.2f}B")
     if age > 30: st.warning("Scanner looks delayed (more than 30 min). Check GitHub Actions.")
 if T.get("token_ok") and not T.get("last_error"): head.caption(f"📨 Telegram: ✅ connected (@{T.get('bot', '')}, checked {(amin(T.get('last_run')) or 0):.0f} min ago)")
 elif T: head.caption(f"📨 Telegram: ❌ problem. {T.get('last_error') or 'bot token not accepted'}")
@@ -271,7 +289,7 @@ with tTH:
             b_ = stats._block([r for r in _cp if stats.coin_of(r) == c_]); op_ = sum(1 for r in rows_ if r["source"] == "PAPER" and r["status"] == "OPEN" and stats.coin_of(r) == c_)
             _sc.append({"Coin": c_, "Closed": b_.get("n", 0), "Win %": b_.get("win_pct"), "Wins": b_.get("wins", 0), "Losses": b_.get("losses", 0), "Avg R": b_.get("mean_R"), "Net ₹": b_.get("net_inr"), "Profit factor": b_.get("profit_factor"), "Open now": op_})
         st.dataframe(pd.DataFrame(_sc), hide_index=True, use_container_width=True); st.caption("Under 30 trades per coin = noise: do not judge a coin by a few trades.")
-        coin_sel = st.radio("Show details for", ["All"] + _coins, horizontal=True)
+        coin_sel = st.radio("Show details for", ["All"] + _coins, index=(["All"] + _coins).index(COIN) if COIN in _coins else 0, horizontal=True, key=f"th_{COIN}")
         if coin_sel != "All": rows_ = [r for r in rows_ if stats.coin_of(r) == coin_sel]; rec = {r["id"]: r for r in rows_}
         cl = [r for r in rows_ if r["source"] == "PAPER" and r["status"] == "CLOSED"]; wins = sum(1 for r in cl if (r.get("pnl_inr") or 0) > 0); net = sum(r.get("pnl_inr") or 0 for r in cl)
         m = st.columns(5); m[0].metric("All trades", len(rows_)); m[1].metric("Open now", sum(r["status"] == "OPEN" for r in rows_)); m[2].metric("Paper closed", len(cl), f"{wins} win / {len(cl) - wins} loss"); m[3].metric("Paper net P/L", inr(net)); m[4].metric("Alert signals", sum(r["source"] == "SIGNAL" for r in rows_))
@@ -312,9 +330,9 @@ with tCH:
     TVX = {"OKX": "OKX:{c}USDT.P", "BINANCE": "BINANCE:{c}USDT.P", "BYBIT": "BYBIT:{c}USDT.P"}
     t1_, t2_, t3_ = st.columns([3, 2, 2]); cmode = t1_.radio("Chart", ["📈 Live chart (indicators save rehte hain)", "📊 TradingView", "🧭 Tool chart (levels + trades)"], horizontal=True); lc = cmode.startswith("📈"); tv = cmode.startswith("📊"); tool = cmode.startswith("🧭")
     if lc:
-        embed(LC.ticker_html(POS), 120); embed(LC.chart_html(POS), 720)
+        embed(LC.ticker_html(POS), 120); embed(LC.chart_html(POS_ALL, height=480, coin=COIN), 1250)
     if tv:
-        coin_ = t2_.radio("Coin", ["BTC", "ETH", "SOL"], horizontal=True); exch_ = t3_.radio("Data", list(TVX), horizontal=True)
+        coin_ = t2_.radio("Coin", ["BTC", "ETH", "SOL"], index=["BTC", "ETH", "SOL"].index(COIN) if COIN in ("BTC", "ETH", "SOL") else 0, horizontal=True); exch_ = t3_.radio("Data", list(TVX), horizontal=True)
         components.html("""<div class="tradingview-widget-container" style="height:100%;width:100%"><div id="tvchart" style="height:680px"></div></div><script src="https://s3.tradingview.com/tv.js"></script>
 <script>new TradingView.widget({autosize:true,symbol:"__SYM__",interval:"60",timezone:"Asia/Kolkata",theme:"dark",style:"1",locale:"en",toolbar_bg:"#131722",enable_publishing:false,allow_symbol_change:true,hide_side_toolbar:false,withdateranges:true,details:false,studies:["Volume@tv-basicstudies","RSI@tv-basicstudies"],container_id:"tvchart"});</script>""".replace("__SYM__", TVX[exch_].format(c=coin_)), height=700)
         st.caption("Ye asli TradingView chart hai: upar 'Indicators' se koi bhi indicator (EMA, MACD, Bollinger, VWAP...), left side se drawing tools. Chart na khule to 'Data' mein BINANCE ya BYBIT chuno. Is chart par tool ke trade levels nahi dikhte: unke liye '🧭 Tool chart' chuno.")
@@ -381,6 +399,7 @@ with tRV:
         with st.expander("Review pack ka text preview"): st.code(review.pack_md(PK))
 
 with tTM:
+    if COIN != "BTC": st.info("ℹ️ Time tab: ghante-wise move ka history abhi sirf BTC ka hai.")
     TS = load("time_stats.json"); TC = S.get("timing")
     st.caption("BTC kis samay (IST) zyada hilta hai, kitne points, upar aur neeche alag. Pichle 1 saal ki 1H candles se bana. Samay ka pattern bharosemand hai, direction ka nahi.")
     if TC:
@@ -446,6 +465,7 @@ with tS:
     st.info("Backtested rule: trend_pullback stop 3×ATR, target 4R, expiry 120h. Changing these makes new trades differ from what was tested.")
 
 with tO:
+    if COIN != "BTC": st.info("ℹ️ Old signals: ye purane early-signal alerts BTC ke hain.")
     st.warning("Early-signal engine (experimental). Its backtest was negative, so this is for learning. The paper wallet trades it separately as 'Early Signal'.")
     Tr = S.get("trades", {})
     if Tr:
@@ -513,6 +533,7 @@ with tB:
     else: st.caption("Session Breakout (V8) ka backtest abhi nahi chala: GitHub Actions > research > Run workflow.")
 
 with tAsk:
+    if COIN != "BTC": st.info("ℹ️ Ask: sawal-jawab abhi sirf BTC par hai. ETH/SOL ke liye 'Decision Desk', 'Analysis' aur '🪙 Indication' dekho.")
     import ask as ASK, askstats as ASS, dailylog as DLG0
     st.subheader("💬 Kuch bhi poochho (bina API key, tool ke apne data se)")
     st.caption("Market, trade, wallet, points ya trading ke sawaal likho. Jawab tool ke live data aur lambi history se aata hai. Jahan edge nahi hota wahan seedha '50-50' likhta hai.")

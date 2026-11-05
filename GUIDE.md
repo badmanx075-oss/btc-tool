@@ -179,3 +179,14 @@ Ye ek nearest-neighbour machine-learning model hai (koi API key ya paid service 
 - Wajah: run beech mein kat gaya (cancel/timeout) aur `state.json` aadhi likhi hui commit ho gayi; uske baad har scan us file par crash hota raha.
 - Fix: (1) `safeio.py`: state.json ab temp file se atomic replace hoti hai (beech mein kat bhi jaye to adhoori file nahi banti). (2) Load karte waqt file kharab mile to git history se pichhli valid copy automatic wapas aati hai. (3) `scan.yml` commit se pehle JSON check karta hai, kharab ho to pichhli sahi copy restore. (4) Har run ke end par agla run turant queue hota hai (GitHub cron beech mein 2-3 ghante gayab ho jata tha). Dhyan: bot rokna ho to Actions mein scan workflow ko "Disable" karo, sirf run cancel karne se agla run chain se shuru ho jayega.
 - Repo mein `app (1).py`, `GUIDE (1).md`, `GUIDE (2).md` jaisi extra copies padi hain (upload ke waqt bani). Ye kuch nahi karti, delete kar sakte ho.
+- **"Bot connected" har 5 min:** chain wala agla run `workflow_dispatch` se shuru hota tha, aur worker har cycle par "Bot connected. Manual test run OK." bhejta tha. Ab ye message sirf tab aata hai jab tum khud "Run workflow" dabao, aur run mein sirf ek baar (chained run chup rehta hai).
+
+## 5 Nov: coin selector, full analysis for ETH/SOL, chart v2
+- **Coin selector (dashboard ke upar):** BTC / ETH / SOL chuno, to Home, Chart, Decision Desk, Analysis, Trade History sab us coin ke ho jaate hain. Chuna hua coin URL mein yaad rehta hai (browser refresh par bhi). Ask, Time, Old signals abhi BTC ke hain (tab mein likha aata hai). Wallet, Review, Health, Settings sab coins ke liye ek hi hain.
+- **ETH/SOL ka poora analysis:** `coindesk.py`: BTC wale hi functions ETH/SOL ke apne candles par chalte hain (regime/signal, multi-timeframe trend, support/resistance, decision-desk data, stage/checklist) aur state.json ke `coindesk` mein jaate hain (~8 KB/coin). Order-flow tape, ghante-wise stats aur move-statistics BTC-only rahe.
+- **Chart v2 (Live chart):** indicator search box (EMA, SMA, WMA, Bollinger, VWAP, Supertrend, Donchian, Keltner, Volume, RSI, MACD, Stochastic, ATR, ADX, CCI, OBV, MFI, ROC): add karo, length badlo, hatao; Horizontal line aur Trend line draw karo. Sab (coin, timeframe, indicators, drawings) browser mein save: refresh par jas ka tas. TradingView widget ke indicators save nahi ho sakte (uski limit), isliye ye alag chart hai.
+
+## Update: Live chart me Pivot Points + 36 indicators
+- "📈 Live chart" me ab Pivot Points Standard (Traditional/Fibonacci/Camarilla/Woodie; day/week/month) + Ichimoku, Parabolic SAR, DEMA/TEMA/HMA, LinReg, Williams %R, AO, Aroon, TRIX, CMF, UO, StochRSI, Momentum, BB Width, PPO, TSI jude hain (total 36).
+- Indicators sirf isi Live chart me browser ke andar save rehte hain. Embedded TradingView widget me save hona platform limit hai.
+- Sirf `livechart.py` badla; upload karke dashboard reboot karo.
