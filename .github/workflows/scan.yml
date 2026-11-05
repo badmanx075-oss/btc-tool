@@ -33,9 +33,11 @@ jobs:
           python-version: "3.11"
 
       - name: Install
-        run: pip install requests pandas numpy
+        timeout-minutes: 5
+        run: pip install --no-input --disable-pip-version-check requests pandas numpy
 
       - name: Run worker
+        timeout-minutes: 340
         run: timeout -s KILL 20400 python -u worker.py   # -u: log live; hard-kill after 5h40m so a hang can never block the chain
         env:
           PYTHONUNBUFFERED: "1"
