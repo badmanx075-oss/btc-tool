@@ -23198,20 +23198,28 @@
    },
    "entry_context": null,
    "grade": "B",
-   "status": "OPEN",
-   "outcome": "",
-   "closed": null,
-   "closed_ist": "",
-   "exit": null,
-   "R": null,
-   "pnl_inr": null,
-   "fees_usd": 0.0694289,
-   "hold_h": null,
-   "best_R": 0.38903107861059566,
-   "worst_R": 0.8190127970749451,
-   "exits": [],
-   "lesson": "",
-   "auto_feedback": "",
+   "status": "CLOSED",
+   "outcome": "SMART EXIT",
+   "closed": "2026-11-08T07:04:40+00:00",
+   "closed_ist": "08 Nov 2026, 12:34 PM IST",
+   "exit": 89.07,
+   "R": -0.163,
+   "pnl_inr": -23.36,
+   "fees_usd": 0.14,
+   "hold_h": 10.1,
+   "best_R": 0.39,
+   "worst_R": 0.82,
+   "exits": [
+    {
+     "ts": "2026-11-08T07:04:40+00:00",
+     "kind": "SMART EXIT",
+     "price": 89.07,
+     "frac": 1.0,
+     "pnl_inr": -10.28
+    }
+   ],
+   "lesson": "Smart exit (10 ghante mein trade ne kuch nahi kiya (stall, -0.1R)): -0.2R par band kiya, taaki trade lamba na chale. Fixed rule se tulna review pack mein hoti hai.",
+   "auto_feedback": "\u26aa Lagbhag barabari: fees ke baad profit/loss ~0.",
    "user_rating": "",
    "user_note": "",
    "user_feedback_ist": "",
@@ -23222,6 +23230,18 @@
      "type": "OPENED",
      "price": 89.0,
      "note": "qty 1.5602 SOL, margin \u20b94,357"
+    },
+    {
+     "time_ist": "08 Nov 2026, 12:34 PM IST",
+     "type": "SMART EXIT",
+     "price": 89.1,
+     "note": "100% of position, P/L -\u20b910"
+    },
+    {
+     "time_ist": "08 Nov 2026, 12:34 PM IST",
+     "type": "CLOSED",
+     "price": 89.1,
+     "note": "SMART EXIT"
     }
    ],
    "raw": {
@@ -23245,28 +23265,48 @@
     "qty_btc": 1.5602,
     "notional_usd": 138.86,
     "margin_inr": 4357.32,
-    "margin_released": 0.0,
-    "rem_wallet": 1.0,
+    "margin_released": 4357.32,
+    "rem_wallet": 0.0,
     "leverage": 3,
     "fx": 94.139177,
     "risk_inr": 143.47,
-    "fees_usd": 0.0694289,
-    "realized_usd": 0.0,
+    "fees_usd": 0.14,
+    "realized_usd": -0.10921399999998936,
     "stage": 0,
-    "remaining": 1.0,
-    "mfe_R": 0.38903107861059566,
-    "mae_R": 0.8190127970749451,
-    "exits": [],
+    "remaining": 0,
+    "mfe_R": 0.39,
+    "mae_R": 0.82,
+    "exits": [
+     {
+      "ts": "2026-11-08T07:04:40+00:00",
+      "kind": "SMART EXIT",
+      "price": 89.07,
+      "frac": 1.0,
+      "pnl_inr": -10.28
+     }
+    ],
     "events": [
      {
       "ts": "2026-11-07T21:01:39+00:00",
       "type": "OPENED",
       "price": 89.0,
       "note": "qty 1.5602 SOL, margin \u20b94,357"
+     },
+     {
+      "ts": "2026-11-08T07:04:40+00:00",
+      "type": "SMART EXIT",
+      "price": 89.1,
+      "note": "100% of position, P/L -\u20b910"
+     },
+     {
+      "ts": "2026-11-08T07:04:40+00:00",
+      "type": "CLOSED",
+      "price": 89.1,
+      "note": "SMART EXIT"
      }
     ],
     "created": "2026-11-07T21:01:39+00:00",
-    "last_ts": 1794119400000.0,
+    "last_ts": 1794120300000.0,
     "expiry_h": 24,
     "cfg": {
      "enabled": true,
@@ -23299,11 +23339,11 @@
     "grade": "B",
     "why": "Pichle 6 ghante bhaav ek tang box mein (2.5 ATR) ghoom raha tha. Ab 1H candle ne box ke neeche mazboot band di, volume normal ka 1.9 guna tha, aur bade (4H) trend ne iska virodh nahi kiya. Theek-thaak samay mein breakout hone se follow-through ki sambhavna behtar hoti hai. Isliye SELL liya. Stop box ke doosri taraf, target 2.0R. Ye experimental hai: backtest se pehle isse sabit nahi maana jaata.",
     "capped": false,
-    "last_px": 89.03,
+    "last_px": 89.07,
     "mgmt": {
      "status": "\ud83d\udfe2 HOLD: THESIS INTACT",
      "stage": "ENTRY",
-     "uR": -0.03,
+     "uR": -0.07,
      "mfe_R": 0.24,
      "exhaustion": 0,
      "reversal_flags": {
@@ -23312,20 +23352,40 @@
       "gave_back": false
      },
      "reasons": [
-      "Momentum dheema pad raha hai (pichle 3 ghante -0.3 ATR)",
-      "Volume theek hai (normal ka 0.9 guna)"
+      "Momentum trend ke saath chal raha hai (pichle 3 ghante +0.6 ATR)",
+      "Volume theek hai (normal ka 1.0 guna)"
      ],
      "stop_advice": "Stop jaisa hai waisa rakho",
      "suggested_sl": 90.0,
-     "hold_vs_book": "Hold: target 2.0R door, stop tak 1.0R (R/R 2.1). Abhi book karo to +-0.0R pakka.",
+     "hold_vs_book": "Hold: target 2.1R door, stop tak 0.9R (R/R 2.2). Abhi book karo to +-0.1R pakka.",
      "next_zone": 87.5,
-     "momentum_atr": -0.28,
-     "volume_ratio": 0.93
+     "momentum_atr": 0.6,
+     "volume_ratio": 0.97
     },
-    "mstatus": "\ud83d\udfe2 HOLD: MORE UPSIDE POSSIBLE",
-    "mts": "2026-11-08T06:44:13+00:00"
+    "mstatus": "\ud83d\udfe2 HOLD: THESIS INTACT",
+    "mts": "2026-11-08T07:04:40+00:00",
+    "smart_reason": "10 ghante mein trade ne kuch nahi kiya (stall, -0.1R)",
+    "closed": "2026-11-08T07:04:40+00:00",
+    "outcome": "SMART EXIT",
+    "exit": 89.07,
+    "R": -0.163,
+    "pnl_inr": -23.36,
+    "net_usd": -0.25,
+    "gross_usd": -0.11,
+    "hold_h": 10.1,
+    "lesson": "Smart exit (10 ghante mein trade ne kuch nahi kiya (stall, -0.1R)): -0.2R par band kiya, taaki trade lamba na chale. Fixed rule se tulna review pack mein hoti hai.",
+    "feedback": {
+     "auto": {
+      "result": "FLAT",
+      "verdict": "\u26aa Lagbhag barabari: fees ke baad profit/loss ~0.",
+      "plan_followed": true,
+      "best_R": 0.39,
+      "worst_R": 0.82
+     },
+     "user": null
+    }
    }
   }
  },
- "updated": "2026-11-08T06:59:50+00:00"
+ "updated": "2026-11-08T07:04:53+00:00"
 }
