@@ -65,16 +65,31 @@ def pl_usd(t, px): return (px - t["entry"]) * t["side"] * t["qty"] * t["remainin
 
 
 # ---------------- coin selector: every tab follows the coin you pick (BTC / ETH / SOL ...). Remembered in the page URL, so a browser refresh keeps it.
-_COINS = ["BTC"] + [c for c in ((CFG.get("assets") or {}).get("extra") or [])]
+_UNI = S.get("universe") or {}
+_COINS = ["BTC"] + [c for c in ((CFG.get("assets") or {}).get("extra") or []) if c != "BTC"]
+for _c in [r["sym"] for r in (_UNI.get("rows") or [])] + sorted({(t.get("sym") or "BTC") for t in list((P.get("pos") or {}).values()) + list(P.get("closed") or []) if t}):
+    if _c not in _COINS: _COINS.append(_c)
+
+@st.cache_data(ttl=120, show_spinner="Is coin ka live analysis ban raha hai (5-10 second)...")
+def _live_coin(sym):
+    """Full BTC-style analysis for ANY perpetual, computed on demand from public candles (the scanner stores the full snapshot only for ETH/SOL to keep state.json small)."""
+    try:
+        import coindesk
+        return coindesk.build(sym, dt.datetime.now(dt.timezone.utc), False, True)
+    except Exception as e: return {"error": f"{type(e).__name__}: {str(e)[:120]}"}
 try: _q0 = st.query_params.get("coin", "BTC")
 except Exception: _q0 = "BTC"
-COIN = st.radio("🪙 Coin (neeche ke saare tab isi coin ke ho jaate hain)", _COINS, index=_COINS.index(_q0) if _q0 in _COINS else 0, horizontal=True, key="coin_sel")
+COIN = st.selectbox(f"🪙 Coin ({len(_COINS)} perpetuals: type karke search karo; neeche ke saare tab isi coin ke ho jaate hain)", _COINS, index=_COINS.index(_q0) if _q0 in _COINS else 0, key="coin_sel")
 try: st.query_params["coin"] = COIN
 except Exception: pass
 POS_ALL = POS
 if COIN != "BTC":
     _cd = (S.get("coindesk") or {}).get(COIN) or {}; _pc = (P.get("coins") or {}).get(COIN) or {}
-    if not _cd: st.warning(f"{COIN} ka analysis abhi ban raha hai (naya worker chalne ke baad ~5 minute mein aata hai). Tab tak neeche BTC ka data dikh sakta hai.")
+    if not _cd:
+        _lv = _live_coin(COIN)
+        if _lv and not _lv.get("error"): _cd, _pc = _lv, (_lv.get("ind") or {}); st.caption(f"ℹ️ {COIN} ka analysis abhi live public candles se bana hai (2 minute cache). ETH/SOL jaisa saved snapshot sirf config ke 'assets.extra' coins ka rehta hai.")
+        elif _lv: st.warning(f"{COIN} ka live analysis nahi ban paya ({_lv.get('error')}). 🔄 Refresh dabake dobara try karo.")
+    if not _cd: st.warning(f"{COIN} ka analysis abhi nahi mila. Tab tak neeche BTC ka data dikh sakta hai.")
     else:
         S = dict(S, market=_cd.get("market"), analysis=_cd.get("analysis"), desk=_cd.get("desk"), sr=_cd.get("sr"), orderflow=None, timing=None, daily=None, stage_log=[], move_watch=None, move_log=None, last_price=(_cd.get("market") or {}).get("price"))
         M, A, lp = S["market"], S["analysis"], S["last_price"]
@@ -84,7 +99,7 @@ if COIN != "BTC":
 head, btn = st.columns([6, 1]); head.title(f"📈 {COIN} Perpetual Tool")
 if btn.button("🔄 Refresh"): st.cache_data.clear(); st.rerun()
 if M:
-    age = amin(M["ts"]); head.caption(f"Last scan {age:.0f} min ago | {COIN} ${M['price']:,.{0 if M['price'] >= 1000 else 2}f} | Funding {M['funding'] * 100:.4f}% | OI ${M['oi'] / 1e9:.2f}B")
+    age = amin(M["ts"]); head.caption(f"Last scan {age:.0f} min ago | {COIN} ${M['price']:,.{0 if M['price'] >= 1000 else 2}f} | Funding {M['funding'] * 100:.4f}% | OI {('$%.2fB' % (M['oi'] / 1e9)) if M['oi'] >= 1e9 else ('$%.1fM' % (M['oi'] / 1e6))}")
     if age > 30: st.warning("Scanner looks delayed (more than 30 min). Check GitHub Actions.")
 if T.get("token_ok") and not T.get("last_error"): head.caption(f"📨 Telegram: ✅ connected (@{T.get('bot', '')}, checked {(amin(T.get('last_run')) or 0):.0f} min ago)")
 elif T: head.caption(f"📨 Telegram: ❌ problem. {T.get('last_error') or 'bot token not accepted'}")
@@ -95,7 +110,7 @@ tH_, tAsk, tCH, tDD, tA, tW, tTH, tRV, tTM, tL, tHl, tS, tO, tB, tG = st.tabs(["
 
 def position_card(t):
     px = (lp or t["entry"]) if t.get("sym", "BTC") == "BTC" else (t.get("last_px") or t["entry"]); ur = (px - t["entry"]) * t["side"] / t["risk"]; usd = pl_usd(t, px) + t.get("realized_usd", 0); m = t.get("mgmt")
-    dd = 0 if t["entry"] >= 1000 else 2
+    dd = config.pdec(t["entry"])
     hrs = (now - dt.datetime.fromisoformat(t["created"])).total_seconds() / 3600; tgt = t.get("tp") or t.get("t2")
     st.markdown(f"### {t['label']}: {side_txt(t['side'])} {t['qty']} {t.get('sym', 'BTC')}"); st.caption(f"{t['id']} | stage {t['stage']} | open {hrs:.0f} h of {t['expiry_h']} h | leverage {t.get('leverage')}x")
     if m: st.markdown(f"**{m['status']}**  (stage: {m['stage']}, exhaustion {m['exhaustion']}/100)")
@@ -110,7 +125,7 @@ def position_card(t):
     if (t.get("entry_ctx") or {}).get("methods_text"): st.caption("🧩 Doosri raay (entry ke waqt): " + t["entry_ctx"]["methods_text"])
     if m:
         for r_ in m["reasons"]: st.markdown("• " + r_)
-        st.markdown(m["hold_vs_book"]); st.markdown("🔧 " + m["stop_advice"] + "  (salah hai, paper rule nahi badalta)"); st.caption(f"Agla decision zone ${m['next_zone']:,.0f}")
+        st.markdown(m["hold_vs_book"]); st.markdown("🔧 " + m["stop_advice"] + "  (salah hai, paper rule nahi badalta)"); st.caption(f"Agla decision zone ${config.pf(m['next_zone'])}")
 
 with tH_:
     live_widget(next((t for t in POS if t.get("sym", "BTC") == "BTC"), None))
@@ -122,10 +137,36 @@ with tH_:
             if not m_ or not m_.get("votes"): _tb.append({"Coin": sy_, "Price $": px_, "Tareeke": "data nahi"}); continue
             _tb.append({"Coin": sy_, "Price $": round(px_, 1 if (px_ or 0) >= 1000 else 3), "Tareeke (verdict)": m_["verdict"], "LONG": m_["long"], "SHORT": m_["short"], "Net": m_["net"], "Setup radar BUY": f"{sum(c[1] for c in r_['LONG'])}/4" if r_ else "-", "Setup radar SELL": f"{sum(c[1] for c in r_['SHORT'])}/4" if r_ else "-",
                         "Open trade": ", ".join(t["id"] for t in POS if t.get("sym", "BTC") == sy_) or "-"})
-        st.dataframe(pd.DataFrame(_tb), hide_index=True, use_container_width=True); st.caption("Ye 'indication' hai, guarantee nahi. Telegram par bhi aata hai: setup 3/4 hone par aur jab tareeke ek taraf ho jaayein. Trade tool tabhi kholta hai jab uski shartein poori hon (abhi ETH/SOL par trend_pullback aur session_breakout).")
+        st.dataframe(pd.DataFrame(_tb), hide_index=True, use_container_width=True); st.caption("Ye 'indication' hai, guarantee nahi. Telegram par bhi aata hai: setup 3/4 hone par aur jab tareeke ek taraf ho jaayein. Trade tool tabhi kholta hai jab uski shartein poori hon (sab coins par trend_pullback, session_breakout aur bb_rsi_vol).")
         _pick = st.selectbox("Kis coin ke tareeke dekhne hain", [r[0] for r in _rows], key="ind_coin"); _m = next((r[2] for r in _rows if r[0] == _pick), None)
         if _m and _m.get("votes"):
             for v_ in _m["votes"]: st.markdown(f"{'🟢' if v_['dir'] == 1 else '🔴' if v_['dir'] == -1 else '⚪'} **{v_['name']}**: {v_['why']}")
+    _UR = (_UNI.get("rows") or [])
+    with st.expander(f"🌐 Saare perpetuals ({len(_UR) + 1} coins): indication + trade status", expanded=True):
+        if not _UR: st.info("Abhi saare-perpetuals ka data nahi aaya. Naya worker.py/paper.py upload karke scan chalao; pehle scan ke baad ye table bharega.")
+        else:
+            _ag = amin(_UNI.get("ts")); st.caption(f"{_UNI.get('n_data', 0)}/{_UNI.get('n_listed', 0)} coins ka data | last update {(_ag or 0):.0f} min pehle | sab coins par wahi 3 strategies: trend_pullback, session_breakout, bb_rsi_vol")
+            _flt = st.radio("Dikhao", ["Sab", "🟢 BUY ki taraf", "🔴 SELL ki taraf", "Setup radar 3/4+", "Open trade wale"], horizontal=True, key="uni_f")
+            _opn = {}
+            for t_ in POS_ALL: _opn.setdefault(t_.get("sym", "BTC"), []).append(t_["id"])
+            _pcs = P.get("coins") or {}; _all = [dict(sym="BTC", px=lp, chg=None, vol=None, verdict=(P.get("methods") or {}).get("verdict"), net=(P.get("methods") or {}).get("net"), long=(P.get("methods") or {}).get("long"), short=(P.get("methods") or {}).get("short"),
+                                                        rb=sum(c_[1] for c_ in (P.get("radar") or {}).get("LONG", [])), rs=sum(c_[1] for c_ in (P.get("radar") or {}).get("SHORT", [])))]
+            for r_ in _UR:
+                r2 = dict(r_); pc_ = _pcs.get(r_["sym"])
+                if pc_ and (pc_.get("methods") or {}).get("votes") and not r2.get("verdict"):
+                    m_ = pc_["methods"]; r2.update(verdict=m_["verdict"], net=m_["net"], long=m_["long"], short=m_["short"], rb=sum(c_[1] for c_ in (pc_.get("radar") or {}).get("LONG", [])), rs=sum(c_[1] for c_ in (pc_.get("radar") or {}).get("SHORT", [])))
+                _all.append(r2)
+            _show = []
+            for r_ in _all:
+                if _flt == "🟢 BUY ki taraf" and r_.get("verdict") != "LONG": continue
+                if _flt == "🔴 SELL ki taraf" and r_.get("verdict") != "SHORT": continue
+                if _flt == "Setup radar 3/4+" and max(r_.get("rb") or 0, r_.get("rs") or 0) < 3: continue
+                if _flt == "Open trade wale" and r_["sym"] not in _opn: continue
+                _show.append({"Coin": r_["sym"], "Price $": config.pf(r_["px"]) if r_.get("px") else "-", "24h %": r_.get("chg"), "Volume $M": round((r_["vol"] or 0) / 1e6) if r_.get("vol") else None,
+                              "Tareeke": r_.get("verdict") or "-", "Net": r_.get("net"), "LONG": r_.get("long"), "SHORT": r_.get("short"), "Radar BUY": f"{r_['rb']}/4" if r_.get("rb") is not None else "-", "Radar SELL": f"{r_['rs']}/4" if r_.get("rs") is not None else "-",
+                              "Open trade": ", ".join(_opn.get(r_["sym"], [])) or "-"})
+            st.dataframe(pd.DataFrame(_show), hide_index=True, use_container_width=True, height=min(80 + 35 * max(len(_show), 1), 520))
+            st.caption("Kisi coin ka poora analysis (chart, decision desk, levels...) dekhne ke liye upar 'Coin' selector me uska naam chuno. Ye 'indication' hai, guarantee nahi: abhi tak koi strategy profitable saabit nahi hui.")
     c = st.columns(4); c[0].metric("Wallet equity", inr(eq), f"{(eq / start - 1) * 100:+.1f}% since start"); c[1].metric("Free cash", inr(W.get("cash", 0))); c[2].metric("In open trades", inr(W.get("margin", 0)))
     c[3].metric("Open positions", len(POS))
     if POS: st.info("Paper position(s) OPEN. Nothing to do: the tool closes them at stop, target or expiry.")
@@ -137,7 +178,7 @@ with tH_:
     RM = P.get("radar_move"); MW = S.get("move_watch")
     if RM:
         st.subheader("🚀 Move radar: kya achhi move aane wali hai?")
-        a_, b_ = st.columns([1, 2]); a_.metric("Radar score", f"{RM['score']}/100", RM["state"].title()); b_.progress(min(RM["score"] / 100, 1.0), text=f"{RM['state']} | jhukaav: {({1: 'UPAR', -1: 'NEECHE', 0: 'saaf nahi'})[RM['lean']]} | typical move ~{RM['exp_pts']:,.0f} pts | trigger: ${RM['box_lo']:,.0f} ke neeche / ${RM['box_hi']:,.0f} ke upar band")
+        a_, b_ = st.columns([1, 2]); a_.metric("Radar score", f"{RM['score']}/100", RM["state"].title()); b_.progress(min(RM["score"] / 100, 1.0), text=f"{RM['state']} | jhukaav: {({1: 'UPAR', -1: 'NEECHE', 0: 'saaf nahi'})[RM['lean']]} | typical move ~{RM['exp_pts']:,.0f} pts | trigger: ${config.pf(RM['box_lo'])} ke neeche / ${config.pf(RM['box_hi'])} ke upar band")
         (st.success if RM["state"] == "GOOD MOVE LIKELY" else st.info)("Parts: " + ", ".join(f"{k.replace('_', ' ')} {v}" for k, v in RM["parts"].items()) + (" | " + "; ".join(RM["notes"]) if RM["notes"] else ""))
         if MW:
             _mt = ("move shuru " + ("UPAR" if MW["triggered"] == 1 else "NEECHE") + " (start $" + format(MW.get("start", 0), ",.0f") + ")") if MW.get("triggered") else "trigger ka intezaar"
@@ -172,7 +213,7 @@ with tDD:
     D = S.get("desk") or {}; V7 = load("backtest_v7_results.json")
     if not A: st.info("Decision Desk appears after the next scan (needs the latest worker.py).")
     else:
-        top = st.columns(4); top[0].metric("Price", f"${A['price']:,.0f}"); top[1].metric("Regime", A["regime"]); top[2].metric("Stage", A["stage"].split(":")[0]); top[3].metric("Timeframes", ((D.get("mtf") or {}).get("alignment") or "n/a").split(" (")[0])
+        top = st.columns(4); top[0].metric("Price", f"${config.pf(A['price'])}"); top[1].metric("Regime", A["regime"]); top[2].metric("Stage", A["stage"].split(":")[0]); top[3].metric("Timeframes", ((D.get("mtf") or {}).get("alignment") or "n/a").split(" (")[0])
         st.markdown(f"### {A['status']}"); st.caption(A["stage"] + "  |  Informational and probabilistic. Never a guaranteed prediction.")
         Qs = decision.build(A, M, D, POS[0] if POS else None, V7)
         with st.expander("❓ Before entry: is there a trade? (questions 1 to 16)", expanded=True):
@@ -182,11 +223,11 @@ with tDD:
         Lv = D.get("levels")
         if Lv:
             st.subheader("🧱 Key levels around price")
-            rows_ = [dict(Level=f"${r['price']:,.0f}", Side="▲ resistance", Why=", ".join(r["names"]), Strength=r["strength"], Points=f"{r['dist_pts']:+,.0f}", Percent=f"{r['dist_pct']:+.2f}%", ATR_1h=f"{r['dist_atr1h']:+.1f}") for r in reversed(Lv["resistance"])]
-            rows_.append(dict(Level=f"${Lv['price']:,.0f}", Side="● PRICE NOW", Why="", Strength="", Points="", Percent="", ATR_1h=""))
-            rows_ += [dict(Level=f"${r['price']:,.0f}", Side="▼ support", Why=", ".join(r["names"]), Strength=r["strength"], Points=f"{r['dist_pts']:+,.0f}", Percent=f"{r['dist_pct']:+.2f}%", ATR_1h=f"{r['dist_atr1h']:+.1f}") for r in Lv["support"]]
+            rows_ = [dict(Level=f"${config.pf(r['price'])}", Side="▲ resistance", Why=", ".join(r["names"]), Strength=r["strength"], Points=f"{r['dist_pts']:+,.0f}", Percent=f"{r['dist_pct']:+.2f}%", ATR_1h=f"{r['dist_atr1h']:+.1f}") for r in reversed(Lv["resistance"])]
+            rows_.append(dict(Level=f"${config.pf(Lv['price'])}", Side="● PRICE NOW", Why="", Strength="", Points="", Percent="", ATR_1h=""))
+            rows_ += [dict(Level=f"${config.pf(r['price'])}", Side="▼ support", Why=", ".join(r["names"]), Strength=r["strength"], Points=f"{r['dist_pts']:+,.0f}", Percent=f"{r['dist_pct']:+.2f}%", ATR_1h=f"{r['dist_atr1h']:+.1f}") for r in Lv["support"]]
             st.dataframe(pd.DataFrame(rows_), hide_index=True, use_container_width=True)
-            if Lv.get("vwap"): st.caption(f"Today's VWAP ${Lv['vwap']['vwap']:,.0f}: price is {Lv['vwap']['dev_atr']:+.1f} ATR from it ({Lv['vwap']['note']}). Several reasons at one price (strong) means price has reacted there before. Not a guarantee.")
+            if Lv.get("vwap"): st.caption(f"Today's VWAP ${config.pf(Lv['vwap']['vwap'])}: price is {Lv['vwap']['dev_atr']:+.1f} ATR from it ({Lv['vwap']['note']}). Several reasons at one price (strong) means price has reacted there before. Not a guarantee.")
         Mv = D.get("moves")
         if Mv:
             st.subheader("📏 Point-move classes (adapt to current volatility)")
@@ -218,14 +259,14 @@ with tDD:
                 p1 = st.slider("Book at Target 1 (%)", 0, 100, 30); p2 = st.slider("Book at Target 2 (%)", 0, 100 - p1, min(30, 100 - p1)); p3 = st.slider("Book at Target 3 (%)", 0, 100 - p1 - p2, min(20, 100 - p1 - p2)); run_ = 100 - p1 - p2 - p3
                 g1, g2, g3 = st.columns(3); en_ = g1.number_input("Entry $", value=float(A["price"]), key="pl_en"); q_ = g2.number_input("Quantity BTC", value=0.01, step=0.001, format="%.4f", key="pl_q"); fx_ = g3.number_input("₹ per $1", value=float(P.get("fx", 88.0)), key="pl_fx")
                 sd = 1 if A["direction"] != "SHORT" else -1; ex_ = Lz["extended"]; plan_ = [("Target 1", Lz["t1"], p1), ("Target 2", Lz["t2"], p2), ("Target 3", Lz["t3"], p3), (f"Runner (trail, shown at extended {ex_:,.0f})", ex_, run_)]
-                rws = [{"Stage": n_, "Price": f"${p_:,.0f}", "Closes": f"{pc}%", "Points": f"{(p_ - en_) * sd:+,.0f}", "Profit ₹": inr((p_ - en_) * sd * q_ * pc / 100 * fx_)} for n_, p_, pc in plan_]
+                rws = [{"Stage": n_, "Price": f"${config.pf(p_)}", "Closes": f"{pc}%", "Points": f"{(p_ - en_) * sd:+,.0f}", "Profit ₹": inr((p_ - en_) * sd * q_ * pc / 100 * fx_)} for n_, p_, pc in plan_]
                 st.table(pd.DataFrame(rws)); tot = sum((p_ - en_) * sd * q_ * pc / 100 * fx_ for _, p_, pc in plan_); loss = (en_ - Lz["preferred_sl"]) * sd * q_ * fx_
                 st.write(f"If everything goes to plan: **{inr(tot)}**. If the stop {Lz['preferred_sl']:,.0f} is hit first: **{inr(-abs(loss))}**. The runner is only reached if the trade keeps going; trailing stops protect it.")
 
 with tA:
     if not A: st.info("Analysis appears after the next scan (needs the latest worker.py).")
     else:
-        c = st.columns(4); c[0].metric("Price", f"${A['price']:,.0f}"); c[1].metric("Regime", A["regime"]); c[2].metric("Direction lean", A["direction"]); c[3].metric("False-signal risk", A["false_signal_risk"])
+        c = st.columns(4); c[0].metric("Price", f"${config.pf(A['price'])}"); c[1].metric("Regime", A["regime"]); c[2].metric("Direction lean", A["direction"]); c[3].metric("False-signal risk", A["false_signal_risk"])
         st.markdown(f"### {A['status']}"); st.caption(A["stage"]); s_ = A["scores"]
         names = [("Setup score", "setup"), ("Structure", "structure"), ("Momentum", "momentum"), ("Volume", "volume"), ("Order flow", "order_flow"), ("Liquidity", "liquidity"), ("Higher timeframe", "htf"),
                  ("Accumulation", "accumulation"), ("Distribution", "distribution"), ("Large-move potential", "large_move_potential"), ("Continuation", "continuation"), ("Exhaustion risk", "exhaustion_risk"), ("Volatility percentile", "volatility_pct")]
@@ -236,20 +277,20 @@ with tA:
         L = A.get("levels")
         if L:
             st.subheader("Levels (informational)")
-            st.table(pd.DataFrame([["Early entry zone", f"${L['early_zone'][0]:,.0f} - ${L['early_zone'][1]:,.0f}"], ["Confirmation entry", f"beyond ${L['confirmation']:,.0f}"], ["Retest entry zone", f"${L['retest_zone'][0]:,.0f} - ${L['retest_zone'][1]:,.0f}"],
-                                   ["Late entry / avoid", f"beyond ${L['late_above']:,.0f}"], ["Hard invalidation", f"${L['hard_invalidation']:,.0f}"], ["Preferred stop", f"${L['preferred_sl']:,.0f}"], ["Emergency risk zone", f"${L['emergency_sl']:,.0f}"],
-                                   ["Target 1 / 2 / 3", f"${L['t1']:,.0f} / ${L['t2']:,.0f} / ${L['t3']:,.0f}"], ["Extended", f"${L['extended']:,.0f}"], ["Risk/reward to T1", str(L["rr_t1"])]], columns=["Level", "Value"]))
+            st.table(pd.DataFrame([["Early entry zone", f"${config.pf(L['early_zone'][0])} - ${config.pf(L['early_zone'][1])}"], ["Confirmation entry", f"beyond ${config.pf(L['confirmation'])}"], ["Retest entry zone", f"${config.pf(L['retest_zone'][0])} - ${config.pf(L['retest_zone'][1])}"],
+                                   ["Late entry / avoid", f"beyond ${config.pf(L['late_above'])}"], ["Hard invalidation", f"${config.pf(L['hard_invalidation'])}"], ["Preferred stop", f"${config.pf(L['preferred_sl'])}"], ["Emergency risk zone", f"${config.pf(L['emergency_sl'])}"],
+                                   ["Target 1 / 2 / 3", f"${config.pf(L['t1'])} / ${config.pf(L['t2'])} / ${config.pf(L['t3'])}"], ["Extended", f"${config.pf(L['extended'])}"], ["Risk/reward to T1", str(L["rr_t1"])]], columns=["Level", "Value"]))
             st.caption(f"{L['entry_state']}. Targets from: {L['targets_from']}.")
         E_ = A.get("expected_move")
         if E_:
-            st.subheader("Expected move from history (similar volatility)"); mv = lambda r: f"${r[0]:,.0f} to ${r[1]:,.0f}"
+            st.subheader("Expected move from history (similar volatility)"); mv = lambda r: f"${config.pf(r[0])} to ${config.pf(r[1])}"
             st.table(pd.DataFrame([["Expected", mv(E_["expected"])], ["Strong", mv(E_["strong"])], ["Extended", mv(E_["extended"])]], columns=["Move size (points, direction lean)", "Range"]))
             st.table(pd.DataFrame([{"Move": f"{k} pts", "Up within 24h": f"{v[0] * 100:.1f}%", "Down within 24h": f"{v[1] * 100:.1f}%"} for k, v in E_["odds"].items()])); st.caption(f"Based on {E_['sample']} similar hours. Estimates, not promises.")
         else: st.info("Run the 'research' workflow once to add history-based expected moves and point-move odds.")
         if A.get("checklist"): st.subheader("False-signal checklist")
         if A.get("checklist"):
             for t_, f in A["checklist"]: st.markdown(f"{'⚠️' if f else '✅'} {t_}")
-        r_ = A["range"]; st.subheader("Range and breakout"); st.write(f"Range high ${r_['high']:,.0f} | mid ${r_['mid']:,.0f} | low ${r_['low']:,.0f} | price at {r_['position_pct']:.0f}% of range | **{A['breakout']}**")
+        r_ = A["range"]; st.subheader("Range and breakout"); st.write(f"Range high ${config.pf(r_['high'])} | mid ${config.pf(r_['mid'])} | low ${config.pf(r_['low'])} | price at {r_['position_pct']:.0f}% of range | **{A['breakout']}**")
 
 with tW:
     c = st.columns(5); c[0].metric("Equity", inr(eq), f"{(eq / start - 1) * 100:+.1f}%"); c[1].metric("Start", inr(start)); c[2].metric("Free cash", inr(W.get("cash", 0))); c[3].metric("Trades closed", len(CL)); c[4].metric("Max drawdown", f"{P.get('max_dd_pct', 0)}%")
@@ -257,7 +298,7 @@ with tW:
     with st.expander("🧮 Position size calculator (for your own manual trades)"):
         x1, x2, x3 = st.columns(3); wv = x1.number_input("Wallet ₹", value=float(eq or 20000), step=1000.0); rp = x2.number_input("Risk % per trade", value=1.0, step=0.25); fxv = x3.number_input("₹ per $1", value=88.0)
         y1, y2 = st.columns(2); en = y1.number_input("Entry price $", value=float(lp or 80000)); sv = y2.number_input("Stop price $", value=float((lp or 80000) * 0.985))
-        if abs(en - sv) > 0: q = (wv * rp / 100) / (abs(en - sv) * fxv); st.write(f"Quantity **{q:.4f} BTC** | position ${q * en:,.0f} (₹{q * en * fxv:,.0f}, {q * en * fxv / wv:.1f}x wallet) | money at risk ₹{wv * rp / 100:,.0f}")
+        if abs(en - sv) > 0: q = (wv * rp / 100) / (abs(en - sv) * fxv); st.write(f"Quantity **{q:.4f} {COIN}** | position ${config.pf(q * en)} (₹{q * en * fxv:,.0f}, {q * en * fxv / wv:.1f}x wallet) | money at risk ₹{wv * rp / 100:,.0f}")
     led = W.get("ledger", [])
     if led: st.markdown("**Equity curve**"); st.line_chart(pd.DataFrame(led).set_index("ts")["equity"])
     st.subheader("Trade journal (saved on GitHub: refresh ya browser band hone se kuch nahi jaata)")
@@ -268,8 +309,8 @@ with tW:
             fb = (t_.get("feedback") or {}); au = fb.get("auto") or {}
             if au: st.markdown("**Tool ka feedback:** " + au.get("verdict", ""))
             if fb.get("user"): st.markdown(f"**Aapka feedback:** {fb['user'].get('rating', '-')} {fb['user'].get('note', '')}")
-            if t_.get("user_exit"): st.markdown(f"**Aapka exit:** ${t_['user_exit']['price']:,.0f} ({t_['user_exit']['pct']:+.2f}%) vs system {t_.get('R', '-')}R")
-            st.caption(f"Qty {t_.get('qty')} BTC | entry ${t_['entry']:,.0f} | stop ${t_.get('sl0', t_.get('sl', 0)):,.0f} | exits: " + (", ".join(f"{e['kind']} {e['frac'] * 100:.0f}% @ ${e['price']:,.0f}" for e in t_.get("exits", [])) or "-"))
+            if t_.get("user_exit"): st.markdown(f"**Aapka exit:** ${config.pf(t_['user_exit']['price'])} ({t_['user_exit']['pct']:+.2f}%) vs system {t_.get('R', '-')}R")
+            st.caption(f"Qty {t_.get('qty')} {t_.get('sym', 'BTC')} | entry ${config.pf(t_['entry'])} | stop ${config.pf(t_.get('sl0', t_.get('sl', 0)))} | exits: " + (", ".join(f"{e['kind']} {e['frac'] * 100:.0f}% @ ${config.pf(e['price'])}" for e in t_.get("exits", [])) or "-"))
     if CL: st.subheader("Trade book"); st.dataframe(pd.DataFrame(CL).reindex(columns=["closed", "id", "label", "qty", "entry", "exit", "outcome", "gross_usd", "fees_usd", "pnl_inr", "R", "hold_h"]))
     if P.get("journal"): st.subheader("Activity log (newest first)"); st.dataframe(pd.DataFrame(P["journal"]).iloc[::-1].head(60))
     if led: st.subheader("Wallet ledger (newest first)"); st.dataframe(pd.DataFrame(led).iloc[::-1].head(80))
@@ -289,7 +330,7 @@ with tTH:
             b_ = stats._block([r for r in _cp if stats.coin_of(r) == c_]); op_ = sum(1 for r in rows_ if r["source"] == "PAPER" and r["status"] == "OPEN" and stats.coin_of(r) == c_)
             _sc.append({"Coin": c_, "Closed": b_.get("n", 0), "Win %": b_.get("win_pct"), "Wins": b_.get("wins", 0), "Losses": b_.get("losses", 0), "Avg R": b_.get("mean_R"), "Net ₹": b_.get("net_inr"), "Profit factor": b_.get("profit_factor"), "Open now": op_})
         st.dataframe(pd.DataFrame(_sc), hide_index=True, use_container_width=True); st.caption("Under 30 trades per coin = noise: do not judge a coin by a few trades.")
-        coin_sel = st.radio("Show details for", ["All"] + _coins, index=(["All"] + _coins).index(COIN) if COIN in _coins else 0, horizontal=True, key=f"th_{COIN}")
+        coin_sel = st.selectbox("Show details for", ["All"] + _coins, index=(["All"] + _coins).index(COIN) if COIN in _coins else 0, key=f"th_{COIN}")
         if coin_sel != "All": rows_ = [r for r in rows_ if stats.coin_of(r) == coin_sel]; rec = {r["id"]: r for r in rows_}
         cl = [r for r in rows_ if r["source"] == "PAPER" and r["status"] == "CLOSED"]; wins = sum(1 for r in cl if (r.get("pnl_inr") or 0) > 0); net = sum(r.get("pnl_inr") or 0 for r in cl)
         m = st.columns(5); m[0].metric("All trades", len(rows_)); m[1].metric("Open now", sum(r["status"] == "OPEN" for r in rows_)); m[2].metric("Paper closed", len(cl), f"{wins} win / {len(cl) - wins} loss"); m[3].metric("Paper net P/L", inr(net)); m[4].metric("Alert signals", sum(r["source"] == "SIGNAL" for r in rows_))
@@ -320,7 +361,7 @@ with tTH:
             if r.get("lesson"): st.write("**What happened:** " + r["lesson"])
             if r.get("auto_feedback"): st.write("**Tool's own review:** " + r["auto_feedback"])
             st.write("**Your feedback:** " + (fbtxt(r) or "none yet (use the 👍 / 👎 buttons or /note on Telegram)") + (f"  ({r['user_feedback_ist']})" if r.get("user_feedback_ist") else ""))
-            if r.get("user_exit"): st.write(f"**Your own exit:** ${r['user_exit']['price']:,.0f} ({r['user_exit']['pct']:+.2f}%) {r['user_exit'].get('note') or ''}")
+            if r.get("user_exit"): st.write(f"**Your own exit:** ${config.pf(r['user_exit']['price'])} ({r['user_exit']['pct']:+.2f}%) {r['user_exit'].get('note') or ''}")
             if r.get("timeline"): st.write("**Timeline**"); st.dataframe(pd.DataFrame(r["timeline"]).rename(columns={"time_ist": "Time (IST)", "type": "Event", "price": "Price", "note": "Note"}), hide_index=True, use_container_width=True)
             with st.expander("Everything stored for this trade (raw)"): st.json(r.get("raw", r))
     st.caption(f"Record file last updated: {history.ist((HF or {}).get('updated')) or 'not created yet (it is created on the next scan)'}")
@@ -362,9 +403,9 @@ with tCH:
             nw_ = OFA["now"]; (st.success if "BUY" in nw_["state"] and "AGGRESSIVE" in nw_["state"] else st.error if "SELL" in nw_["state"] and "AGGRESSIVE" in nw_["state"] else st.info)(f"Abhi (60 min): **{nw_['state']}** | buy {nw_['buy']:,.0f} BTC vs sell {nw_['sell']:,.0f} BTC | delta {nw_['ratio'] * 100:+.0f}% | bade orders {nw_['big_share'] * 100:.0f}%")
             q1, q2, q3 = st.columns(3); q1.metric("4 ghante", OFA["h4"]["state"].title(), f"delta {OFA['h4']['ratio'] * 100:+.0f}%"); q2.metric("24 ghante", OFA["h24"]["state"].title(), f"delta {OFA['h24']['ratio'] * 100:+.0f}%"); q3.metric("Data jama", f"{OFA['history_h']} ghante", f"coverage {OFA.get('coverage_pct', '?')}%")
             za, zb = st.columns(2)
-            za.markdown("**🟢 Buying ka dabaav wale price zones (4h, delta +40% se zyada = aggressive)**"); za.dataframe(pd.DataFrame([{"zone": f"${z['lo']:,.0f}-{z['hi']:,.0f}", "volume BTC": z["vol"], "delta %": round(z["ratio"] * 100), "bade orders %": round(z["big_share"] * 100)} for z in OFA["buy_zones"]]) if OFA["buy_zones"] else pd.DataFrame({"info": ["koi saaf zone nahi"]}), hide_index=True)
-            zb.markdown("**🔴 Selling ka dabaav wale price zones (4h, delta -40% se kam = aggressive)**"); zb.dataframe(pd.DataFrame([{"zone": f"${z['lo']:,.0f}-{z['hi']:,.0f}", "volume BTC": z["vol"], "delta %": round(z["ratio"] * 100), "bade orders %": round(z["big_share"] * 100)} for z in OFA["sell_zones"]]) if OFA["sell_zones"] else pd.DataFrame({"info": ["koi saaf zone nahi"]}), hide_index=True)
-            if OFA.get("poc"): st.caption(f"📍 Sabse zyada trading: ${OFA['poc']['lo']:,.0f}-{OFA['poc']['hi']:,.0f} ({OFA['poc']['vol']:,.0f} BTC). Aggressive = taker (market order) bahut zyada, bade orders (2+ BTC) ya volume normal se 1.5x. Delta = (buy-sell)/total.")
+            za.markdown("**🟢 Buying ka dabaav wale price zones (4h, delta +40% se zyada = aggressive)**"); za.dataframe(pd.DataFrame([{"zone": f"${config.pf(z['lo'])}-{z['hi']:,.0f}", "volume BTC": z["vol"], "delta %": round(z["ratio"] * 100), "bade orders %": round(z["big_share"] * 100)} for z in OFA["buy_zones"]]) if OFA["buy_zones"] else pd.DataFrame({"info": ["koi saaf zone nahi"]}), hide_index=True)
+            zb.markdown("**🔴 Selling ka dabaav wale price zones (4h, delta -40% se kam = aggressive)**"); zb.dataframe(pd.DataFrame([{"zone": f"${config.pf(z['lo'])}-{z['hi']:,.0f}", "volume BTC": z["vol"], "delta %": round(z["ratio"] * 100), "bade orders %": round(z["big_share"] * 100)} for z in OFA["sell_zones"]]) if OFA["sell_zones"] else pd.DataFrame({"info": ["koi saaf zone nahi"]}), hide_index=True)
+            if OFA.get("poc"): st.caption(f"📍 Sabse zyada trading: ${config.pf(OFA['poc']['lo'])}-{OFA['poc']['hi']:,.0f} ({OFA['poc']['vol']:,.0f} BTC). Aggressive = taker (market order) bahut zyada, bade orders (2+ BTC) ya volume normal se 1.5x. Delta = (buy-sell)/total.")
         else: st.info("Order-flow data abhi jama ho raha hai (naya worker chalne ke ~1 ghante baad poori tasveer aati hai).")
         SRD = S.get("sr")
         if SRD and SRD.get("tf"):
@@ -372,9 +413,9 @@ with tCH:
             rows_ = []
             for tf_ in SRM.TFS:
                 v_ = SRD["tf"].get(tf_)
-                if v_: rows_.append({"Timeframe": tf_, "Support (paas wala pehle)": " | ".join(f"${x['price']:,.0f} ({x['touches']}x, {x['dist_pct']:+.1f}%)" for x in v_["supports"]) or "-", "Resistance": " | ".join(f"${x['price']:,.0f} ({x['touches']}x, {x['dist_pct']:+.1f}%)" for x in v_["resistances"]) or "-"})
+                if v_: rows_.append({"Timeframe": tf_, "Support (paas wala pehle)": " | ".join(f"${config.pf(x['price'])} ({x['touches']}x, {x['dist_pct']:+.1f}%)" for x in v_["supports"]) or "-", "Resistance": " | ".join(f"${config.pf(x['price'])} ({x['touches']}x, {x['dist_pct']:+.1f}%)" for x in v_["resistances"]) or "-"})
             st.dataframe(pd.DataFrame(rows_), hide_index=True, use_container_width=True)
-            if SRD.get("zones"): st.markdown("**🎯 Confluence zones (kai timeframe ek jagah, sabse mazboot):**\n\n" + "\n\n".join(f"{'🟢' if z['kind'] == 'support' else '🔴'} {z['kind']} **${z['lo']:,.0f}-{z['hi']:,.0f}** ({' + '.join(z['tfs'])}, score {z['score']})" for z in SRD["zones"][:5]))
+            if SRD.get("zones"): st.markdown("**🎯 Confluence zones (kai timeframe ek jagah, sabse mazboot):**\n\n" + "\n\n".join(f"{'🟢' if z['kind'] == 'support' else '🔴'} {z['kind']} **${config.pf(z['lo'])}-{z['hi']:,.0f}** ({' + '.join(z['tfs'])}, score {z['score']})" for z in SRD["zones"][:5]))
             st.caption("touches = kitni baar bhaav is level se palta. Zyada touches + zyada timeframe = mazboot level. Bade timeframe (4H, 1D) ke level chhote timeframe se zyada maane jaate hain.")
 
 with tRV:
@@ -440,7 +481,7 @@ with tHl:
     st.caption("One-glance check that every part of the tool is alive.")
     rl = load("market_log.csv", "csv"); sa = amin(M["ts"]) if M else None; ls = amin(T.get("last_send_ok")); lc = amin(T.get("last_cmd_ts")); pr = amin((P.get("radar") or {}).get("ts")); aa = amin(None)
     rows_h = [["Scanner (GitHub Action)", sa is not None and sa < 30, f"last scan {sa:.0f} min ago" if sa is not None else "no scan yet", "Open the Actions tab, cancel any stuck run, then Run workflow"],
-              ["Exchange data", bool(M) and (M.get("price") or 0) > 0, f"BTC ${M['price']:,.0f}" if M else "no data", "The exchange may be blocking GitHub servers"],
+              ["Exchange data", bool(M) and (M.get("price") or 0) > 0, f"BTC ${config.pf(M['price'])}" if M else "no data", "The exchange may be blocking GitHub servers"],
               ["Telegram bot token", bool(T.get("token_ok")), f"bot @{T.get('bot')}" if T.get("token_ok") else "not verified yet", "Recheck the TG_TOKEN secret"],
               ["Telegram sending", bool(T.get("last_send_ok")) and not T.get("last_error"), f"last message {ls:.0f} min ago" if ls is not None else "none yet", T.get("last_error") or "Run the workflow manually: 'Bot connected' should arrive"],
               ["Telegram commands (/ping)", lc is not None, f"last '{T.get('last_cmd')}' {lc:.0f} min ago" if lc is not None else "no command received yet", "Send /ping to your bot"],

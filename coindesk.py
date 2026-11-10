@@ -6,7 +6,7 @@ import datetime as dt
 import engine as E, analysis, desk, sr
 
 
-def build(sym, now, has_pos=False):
+def build(sym, now, has_pos=False, ind=False):
     m5, m15, h1, h4 = (E.candles_sym(sym, b, 300) for b in ("5m", "15m", "1H", "4H"))
     try: d1 = E.candles_sym(sym, "1D", 250)
     except Exception: d1 = None
@@ -15,6 +15,11 @@ def build(sym, now, has_pos=False):
                   tf=E.tf_view({"5m": m5, "15m": m15, "1H": h1, "4H": h4}), funding=fr, oi=oi, pro=r["pro"], con=r["con"], ts=now.isoformat(timespec="seconds"))
     scan = {k: r.get(k) for k in ("signal", "side", "score", "entry", "zone", "sl", "t1", "t2", "t3", "ext", "confirm", "move_class", "risk", "regime") if k in r}
     out = dict(sym=sym, ts=now.isoformat(timespec="seconds"), market=market, scan=scan, analysis=None, desk=None, sr=None)
+    if ind:                                                      # dashboard on-demand: 7-method vote + setup radar for this coin (stored coins get it from paper.run)
+        try:
+            import methods as MT, backtest_v4 as W4, paper
+            hp = W4.prep(h1); ic = len(hp) - 2; out["ind"] = dict(price=px, ts=now.isoformat(timespec="seconds"), methods=MT.consensus(MT.votes(MT.prepare(hp.reset_index(drop=True)), ic)), radar=paper.radar(hp, ic))
+        except Exception as e: print("coindesk ind error", sym, e)
     try: out["analysis"] = analysis.snapshot(h1, fr, oi, None, None, r["regime"], r["scores"], has_pos)
     except Exception as e: print("coindesk analysis error", sym, e)
     try:

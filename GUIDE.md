@@ -193,3 +193,27 @@ Ye ek nearest-neighbour machine-learning model hai (koi API key ya paid service 
 
 ## Update: hang-proof scan
 - scan.yml: `timeout -s KILL 20400 python -u worker.py` (5h40m hard kill) + PYTHONUNBUFFERED, taaki run kabhi atke nahi aur log live dikhe.
+
+## Update: 50-trade review (9 Nov)
+Numbers (khud recompute kiye): 50 trades, win 30%, mean -0.41R, net -Rs2,233, PF 0.41 (t=-2.75, yaani ye sirf luck nahi hai).
+Strategy-wise: early_signal n=27 -0.39R (backtest bhi negative tha), confluence n=9 -0.75R (pehle se OFF), session_breakout n=9 -0.16R, trend_pullback n=5 -0.4R (dono abhi noise).
+Badlav: early_signal ab OFF (config.py + config.json). Wapas on: /set early_signal.enabled on
+Baaki sab same. Subgroup patterns (Asia, MILD SELLING, regime) ignore kiye: har group chhota hai, 40+ trades se pehle ye luck hota hai.
+Smart-exit rakha: 14 trades me +0.34R vs fixed +0.02R (chhota sample, par direction sahi).
+Early signal OFF karne se purane 27 trades ka -10.4R hata ke ginte to baaki 41->14 trades -0.25R (ye sirf peeche dekhna hai, proof nahi).
+
+## Update: saare perpetuals + naya strategy BB+RSI+Volume (10 Nov)
+**1. Saare perpetual futures (top coins by volume)**
+- Har scan me OKX se saare USDT perpetuals ki list (ek call) aur top 100 (24h volume >= $5M) ka 1H data aata hai (~100 calls, ~10-15 sec, parallel + rate-limited).
+- Har coin par wahi 7-tareeke vote + setup radar, aur teeno strategies (trend_pullback, session_breakout, bb_rsi_vol) paper trade karti hain. BTC par sab enabled strategies chalti hain (early_signal OFF hai).
+- Wallet shared hai, max 5 open positions (BTC pehle check hota hai). Naya coin tabhi khulta hai jab strategy ki shart puri ho.
+- Poora list chahiye: config.json me `{"universe": {"max_coins": 300, "min_vol_usd": 0}}` (scan thoda lamba hoga; time budget `fetch_budget_s`).
+- Dashboard: Home par "Saare perpetuals" table (filter: BUY/SELL/radar 3/4+/open trade). Upar Coin selector (search) se kisi bhi coin ka poora analysis: ETH/SOL ka saved snapshot, baaki coins ka live (public candles se, 2 min cache).
+- Telegram: `/perps` = kaun se coins BUY/SELL ke sabse kareeb. `/coins` = har coin ka win rate alag.
+- Chhote daam ke coins (DOGE, PEPE) ka price sahi decimals me dikhta hai. Kuch deep BTC-style tables (points/ATR columns) sub-$1 coins par rounded dikh sakte hain.
+**2. Naya strategy bb_rsi_vol (experimental, alag se test hoga)**
+- LONG: 1H candle ne lower Bollinger(20,2) chhua + RSI<=30 + volume >= 1.5x normal + candle upar band hui. SHORT: ulta (upper band, RSI>=70).
+- 4H me strong trend ulta ho to trade nahi (trend_guard). Stop spike ke extreme ke us paar, target 1.5R, expiry 24h, risk 0.3%.
+- Settings /set se badal sakte ho: bb_rsi_vol.rsi_os, vol_mult, bb_mult, target_r, trend_guard (on/off), enabled.
+- Backtest: research workflow ab V13 bhi chalata hai (9 coins, 5 saal, train/test) -> backtest_v13_results.json. Jab tak ye result na aaye, ise sabit mat maano.
+**Dhyan:** coins badhne se trades badhenge, par edge nahi. Tool ka overall result abhi negative hai; naye strategy ko bhi 30+ trades ya V13 result ke baad hi judge karo.

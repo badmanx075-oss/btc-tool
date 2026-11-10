@@ -2,7 +2,7 @@
 trailing-stop advice, hold-vs-book comparison. ADVISORY only: the paper rule (fixed stop/target/5-day expiry) is what was backtested and stays unchanged."""
 import datetime as dt
 import numpy as np
-import engine as E
+import engine as E, config
 
 def assess(t, h, px):
     k, e, risk, sl = t["side"], t["entry"], t["risk"], t["sl"]; tp = t.get("tp") or t.get("t2") or e + k * 4 * risk; tpR = abs(tp - e) / risk
@@ -30,9 +30,9 @@ def assess(t, h, px):
     if near_tp: R.append("Target bahut paas hai")
     cs = c[since]; hc = float(cs.max()) if len(cs) else float(c[-1]); be, atr_t, st_t = k * e, hc - 3 * a, float(lo[-12:].min()) - 0.2 * a
     better = lambda x: (x - sl * k) > 0                      # in direction-space: is x a tighter stop than the current one?
-    if exh >= 50 and better(atr_t): adv, newsl = f"Stop tight karo: ATR trail ${atr_t * k:,.0f}", atr_t * k
-    elif uR >= 1.5 and better(st_t): adv, newsl = f"Stop structure ke neeche ${st_t * k:,.0f} tak le ja sakte ho", st_t * k
-    elif uR >= 1 and better(be): adv, newsl = f"Stop breakeven (${e:,.0f}) par le jaana soch sakte ho", float(e)
+    if exh >= 50 and better(atr_t): adv, newsl = f"Stop tight karo: ATR trail ${config.pf(atr_t * k)}", atr_t * k
+    elif uR >= 1.5 and better(st_t): adv, newsl = f"Stop structure ke neeche ${config.pf(st_t * k)} tak le ja sakte ho", st_t * k
+    elif uR >= 1 and better(be): adv, newsl = f"Stop breakeven (${config.pf(e)}) par le jaana soch sakte ho", float(e)
     else: adv, newsl = "Stop jaisa hai waisa rakho", float(sl)
     left, riskleft = (tp - px) * k / risk, max((px - newsl) * k / risk, 0.05)
     hvb = f"Hold: target {left:.1f}R door, stop tak {riskleft:.1f}R (R/R {left / riskleft:.1f}). Abhi book karo to +{uR:.1f}R pakka."
@@ -40,6 +40,6 @@ def assess(t, h, px):
                 hold_vs_book=hvb, next_zone=round(float(e + k * 0.75 * tpR * risk), 1), momentum_atr=round(float(mom), 2), volume_ratio=round(vr, 2))
 
 def message(t, m, px):
-    return (f"📊 POSITION UPDATE\n{t['id']}\nStage: {m['stage']}\nStatus: {m['status']}\nNow ${px:,.0f} | Open P/L {m['uR']:+.2f}R | Exhaustion {m['exhaustion']}/100\n"
-            + "\n".join("• " + r for r in m["reasons"]) + f"\n{m['hold_vs_book']}\n{m['stop_advice']}\nAgla decision zone: ${m['next_zone']:,.0f}\n"
+    return (f"📊 POSITION UPDATE\n{t['id']}\nStage: {m['stage']}\nStatus: {m['status']}\nNow ${config.pf(px)} | Open P/L {m['uR']:+.2f}R | Exhaustion {m['exhaustion']}/100\n"
+            + "\n".join("• " + r for r in m["reasons"]) + f"\n{m['hold_vs_book']}\n{m['stop_advice']}\nAgla decision zone: ${config.pf(m['next_zone'])}\n"
             "(Salah hai. Paper rule sirf stop/target/5 din par band karta hai. Probabilistic, guarantee nahi.)")

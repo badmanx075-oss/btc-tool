@@ -23,7 +23,7 @@ def trend_pullback(env, sc):
     if not Sg["trend_pullback"]: return None
     k = Sg["trend_pullback"][0][1]; e = float(h1.c.iloc[i]); risk = sc["stop_atr"] * float(h1.atr.iloc[i]); M = env["S"].get("market") or {}
     ctx = dict(feat(h1, i, k), side_n=k, side="LONG" if k == 1 else "SHORT", funding=float(M.get("funding", 0)), regime=M.get("regime")); up = k == 1
-    why = (f"Bade (4H) chart pe BTC ka trend {'upar' if up else 'neeche'} hai (taakat {ctx['er4']:.2f}, kam se kam 0.30 chahiye thi). Us trend ke beech bhaav thoda {'neeche gira' if up else 'upar chadha'} "
+    why = (f"Bade (4H) chart pe {env.get('sym', 'BTC')} ka trend {'upar' if up else 'neeche'} hai (taakat {ctx['er4']:.2f}, kam se kam 0.30 chahiye thi). Us trend ke beech bhaav thoda {'neeche gira' if up else 'upar chadha'} "
            f"({ctx['depth']:.1f} ATR ki halchal) aur ab trend ki taraf palat raha hai (pichli 1H candle trend ke saath band hui). Isliye trend ke saath {'BUY' if up else 'SELL'} liya. "
            f"Stop-loss {sc['stop_atr']}×ATR door rakha taaki chhoti uthal-puthal se na toote, target risk ka {sc['target_r']} guna. Backtest mein har 3 mein ~2 trade harte hain, isliye loss normal hai.")
     return dict(side=k, entry=e, sl=e - k * risk, tp=e + k * sc["target_r"] * risk, risk=risk, mode="fixed", ctx=ctx, why=why)
@@ -92,4 +92,33 @@ def analog_edge(env, sc):
            f"Stop 1.5 ATR, target {sc.get('target_r', 1.5)}R. Ye experimental hai: backtest V11 se pehle isse sabit nahi maana jaata.")
     return dict(side=k, entry=e, sl=e - k * risk, tp=e + k * sc.get("target_r", 1.5) * risk, confirm=e + k * 0.5 * a, risk=risk, mode="fixed", ctx=ctx, why=why)
 
-SIGNALS = {"trend_pullback": trend_pullback, "early_signal": early_signal, "session_breakout": session_breakout, "confluence": confluence, "analog_edge": analog_edge}
+def bb_rsi_vol(env, sc):
+    """Bollinger + RSI + volume reversion (experimental, added 10 Nov). All THREE must agree on a CLOSED 1H candle:
+    LONG : price pierced the lower Bollinger band AND RSI is oversold AND volume is well above normal (selling climax) AND the candle closed up (bounce).
+    SHORT: mirror image at the upper band / overbought. Skips fading a STRONG 4H trend (a band touch in a strong trend is usually continuation, not reversal).
+    Stop just beyond the spike extreme, fixed target. Works on every coin."""
+    h1, i, now = env["h1"], env["i"], env["now"]; n = int(sc.get("bb_len", 20)); m = float(sc.get("bb_mult", 2.0)); rl = int(sc.get("rsi_len", 14))
+    if i < max(n, rl) + 30 or env.get("tcls") == "LOW" and sc.get("skip_low", False): return None
+    if now.timestamp() - (float(h1.ts.iloc[i]) / 1000 + 3600) > 1800: return None              # candle closed >30 min ago: too late
+    c, o, hi, lo, v = h1.c.values, h1.o.values, h1.h.values, h1.l.values, h1.v.values; a = float(h1.atr.iloc[i])
+    if not (a == a) or a <= 0: return None
+    w = c[i - n + 1:i + 1]; mid = float(w.mean()); sd = float(w.std()); up, dn = mid + m * sd, mid - m * sd
+    d = h1.c.diff().iloc[:i + 1]; g = d.clip(lower=0).ewm(alpha=1 / rl, adjust=False).mean().iloc[-1]; l_ = (-d.clip(upper=0)).ewm(alpha=1 / rl, adjust=False).mean().iloc[-1]
+    rsi = 100.0 if l_ == 0 else 100 - 100 / (1 + g / l_); vr = float(v[i] / max(v[i - 24:i].mean(), 1e-12)); rng = max(hi[i] - lo[i], 1e-12)
+    os_, ob_, vm = sc.get("rsi_os", 30), sc.get("rsi_ob", 70), sc.get("vol_mult", 1.5)
+    for k in (1, -1):
+        band = (lo[i] <= dn) if k == 1 else (hi[i] >= up); rs_ok = (rsi <= os_) if k == 1 else (rsi >= ob_); bounce = (c[i] > o[i]) if k == 1 else (c[i] < o[i])
+        if not (band and rs_ok and vr >= vm and bounce): continue
+        er4, d4 = float(h1.er4.iloc[i]), float(h1.dir4.iloc[i])
+        if sc.get("trend_guard", True) and er4 == er4 and er4 >= sc.get("guard_er", 0.5) and d4 * k < 0: continue      # strong 4H trend against the reversal: do not fade it
+        e = float(c[i]); ext = float(min(lo[i], lo[i - 1]) if k == 1 else max(hi[i], hi[i - 1])); stop = ext - k * 0.3 * a
+        risk = min(max(abs(e - stop), sc.get("stop_min_atr", 0.8) * a), sc.get("stop_max_atr", 2.0) * a); M = env["S"].get("market") or {}
+        ctx = dict(side_n=k, side="LONG" if k == 1 else "SHORT", hour=now.hour, wd=now.weekday(), atr_pct=round(a / e * 100, 3), rsi=round(float(rsi), 1), vol_ratio=round(vr, 2),
+                   bb_pct=round(float((c[i] - dn) / max(up - dn, 1e-12) * 100), 1), er4=round(er4, 3) if er4 == er4 else None, tcls=env.get("tcls"), regime=M.get("regime"), funding=float(M.get("funding", 0)))
+        why = (f"Bhaav ne {'neeche' if k == 1 else 'upar'} wale Bollinger band ko chhua/tod diya, RSI {rsi:.0f} ({'oversold, 30 ke neeche' if k == 1 else 'overbought, 70 ke upar'}) hai, aur volume normal ka {vr:.1f} guna tha "
+               f"(bhagdad jaisi bikri/kharidari). Candle ulta band hui ({'upar' if k == 1 else 'neeche'}), yaani palatne ke shuruaati sanket. Teeno shartein ek saath mili, isliye {'BUY' if k == 1 else 'SELL'} liya. "
+               f"Stop spike ke extreme ke us paar, target {sc.get('target_r', 1.5)}R. Ye experimental hai: backtest se pehle isse sabit nahi maana jaata, aur mean-reversion strong trend me aksar harta hai.")
+        return dict(side=k, entry=e, sl=e - k * risk, tp=e + k * sc.get("target_r", 1.5) * risk, confirm=e + k * 0.5 * a, risk=risk, mode="fixed", ctx=ctx, why=why)
+    return None
+
+SIGNALS = {"trend_pullback": trend_pullback, "early_signal": early_signal, "session_breakout": session_breakout, "confluence": confluence, "analog_edge": analog_edge, "bb_rsi_vol": bb_rsi_vol}

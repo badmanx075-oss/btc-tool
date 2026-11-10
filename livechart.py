@@ -4,7 +4,7 @@
                            so a page refresh does NOT reset them. Candles come straight from OKX (fallback Binance, Bybit) and update every 3 seconds. Open paper trades are drawn as lines.
   ticker_html(positions) : live price strip for ETH and SOL (websocket, REST fallback) with the open paper P/L of each coin.
 Times are shown in IST. The BTC live-price widget in app.py is separate and untouched."""
-import json
+import json, re
 
 LW = "https://unpkg.com/lightweight-charts@4.1.3/dist/lightweight-charts.standalone.production.js"
 
@@ -28,10 +28,11 @@ CHART = r"""<meta charset="utf-8"><div id="wrap" style="font-family:-apple-syste
 <script src="__LW__"></script>
 <script>
 (function(){
-const POS=__POS__, FORCE="__COIN__", COINS=["BTC","ETH","SOL"], TFS=["5m","15m","1H","4H","1D"];
+const POS=__POS__, FORCE="__COIN__", COINS0=["BTC","ETH","SOL"], TFS=["5m","15m","1H","4H","1D"];
 const KEY="btcTool.chart.v2", OFF=19800, COLS=["#f5a623","#2962ff","#e040fb","#00bcd4","#8bc34a","#ff7043","#ffd54f","#90caf9","#f06292","#a1887f"];
 let cfg={coin:"BTC",tf:"1H",inds:[{id:1,type:"ema",p:{len:20}},{id:2,type:"ema",p:{len:50}},{id:3,type:"volume",p:{}},{id:4,type:"rsi",p:{len:14}}],draw:{},nid:10};
 try{const s=JSON.parse(localStorage.getItem(KEY)||"{}"); Object.keys(s).forEach(k=>{if(k in cfg) cfg[k]=s[k];});}catch(e){}
+const COINS=(FORCE&&COINS0.indexOf(FORCE)<0)?COINS0.concat([FORCE]):COINS0;
 if(FORCE) cfg.coin=FORCE;
 function save(){try{localStorage.setItem(KEY,JSON.stringify(cfg));}catch(e){}}
 const $=id=>document.getElementById(id), msg=t=>$("msg").textContent=t;
@@ -240,5 +241,5 @@ def _pos(positions):
     return out
 
 
-def chart_html(positions, height=430, coin=""): return CHART.replace("__LW__", LW).replace("__POS__", json.dumps(_pos(positions))).replace("__H1__", str(height)).replace("__COIN__", coin if coin in ("BTC", "ETH", "SOL") else "")
+def chart_html(positions, height=430, coin=""): return CHART.replace("__LW__", LW).replace("__POS__", json.dumps(_pos(positions))).replace("__H1__", str(height)).replace("__COIN__", coin if re.fullmatch(r"[A-Z0-9]{2,15}", coin or "") else "")
 def ticker_html(positions): return TICKER.replace("__POS__", json.dumps(_pos(positions)))

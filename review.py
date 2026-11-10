@@ -22,6 +22,7 @@ def session(hour_utc):
 def grade(strategy, ctx):
     """A = strongest, B = good, C = weak. Only a label for later analysis."""
     if strategy == "session_breakout": return "A" if (ctx or {}).get("vol_ratio", 0) >= 2 and (ctx or {}).get("tcls") == "HIGH" else "B"
+    if strategy == "bb_rsi_vol": return "A" if (ctx or {}).get("vol_ratio", 0) >= 2.5 and ((ctx or {}).get("rsi", 50) <= 22 or (ctx or {}).get("rsi", 50) >= 78) else "B"
     if strategy == "trend_pullback": return "A" if (ctx or {}).get("er4", 0) >= 0.45 else "B"
     s = (ctx or {}).get("score", 0)
     return "A" if s >= 80 else "B" if s >= 65 else "C"

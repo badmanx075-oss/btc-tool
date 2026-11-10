@@ -1,6 +1,7 @@
 """Paper trading engine: virtual wallet with ledger, strategy registry, staged exits, remarks + feedback. NO real orders are ever placed.
 Rules live in config.json (settings), strategies.py (entries) and lifecycle.py (exits)."""
-import datetime as dt, requests
+import datetime as dt, requests, time
+import universe
 import moveradar as MR, methods as MT, timing as TM, confirm as CF, engine as E, backtest_v4 as W4, learn, config, wallet, lifecycle, advisor, review, strategies as ST
 from config import inr
 
@@ -13,8 +14,8 @@ def fx(P):
 
 iso = lambda now: now.isoformat(timespec="seconds")
 def jlog(P, now, kind, text): P["journal"].append(dict(ts=iso(now), kind=kind, text=text)); del P["journal"][:-500]
-def ev(t, now, typ, price, note=""): t["events"].append(dict(ts=iso(now), type=typ, price=round(float(price), 1), note=note))
-def order(P, now, tid, act, qty, price, note): P["orders"].append(dict(ts=iso(now), order_id=tid, action=act, qty_btc=round(float(qty), 6), price=round(float(price), 1), note=note)); del P["orders"][:-300]
+def ev(t, now, typ, price, note=""): t["events"].append(dict(ts=iso(now), type=typ, price=config.rp(price), note=note))
+def order(P, now, tid, act, qty, price, note): P["orders"].append(dict(ts=iso(now), order_id=tid, action=act, qty_btc=round(float(qty), 6), price=config.rp(price), note=note)); del P["orders"][:-300]
 
 def radar(h1, i):  # live checklist for trend_pullback: how close are we to a trade?
     out = {}
@@ -40,11 +41,21 @@ def coin_text(S):
     L.append("Ye jaankari hai, guarantee nahi. Trade tool tabhi kholta hai jab uski shartein poori hon.")
     return "\n".join(L)
 
+def perps_text(S, top=8):
+    """/perps: strongest BUY and SELL indications across ALL perpetuals (7-method vote), from the last scan."""
+    U = (S.get("universe") or {}); rows = [r for r in U.get("rows", []) if r.get("verdict")]
+    if not rows: return "🌐 Perpetuals ka indication abhi nahi bana (naya scan chalne ke baad aayega)."
+    buy = sorted([r for r in rows if r["verdict"] == "LONG"], key=lambda r: -r["net"])[:top]; sell = sorted([r for r in rows if r["verdict"] == "SHORT"], key=lambda r: r["net"])[:top]
+    f = lambda r: f"{r['sym']} ${config.pf(r['px'])} ({r['chg']:+.1f}% 24h) net {r['net']:+.0f} | LONG {r['long']}/SHORT {r['short']} of {r['total']} | radar B{r['rb']}/4 S{r['rs']}/4"
+    L = [f"🌐 SAARE PERPETUALS ({U.get('n_data', 0)} coins ka data, {U.get('n_listed', 0)} listed)", "🟢 BUY ki taraf: " + ("" if buy else "koi nahi")] + [f(r) for r in buy] + ["🔴 SELL ki taraf: " + ("" if sell else "koi nahi")] + [f(r) for r in sell]
+    L.append("Ye jaankari hai, guarantee nahi. Trade tabhi khulta hai jab strategy ki shartein poori hon.")
+    return "\n".join(L)
+
 def radar_line(P):
     r = P.get("radar")
     return "Setup radar: " + " | ".join(f"{'BUY' if s == 'LONG' else 'SELL'} {sum(c[1] for c in r[s])}/4" for s in ("LONG", "SHORT")) if r else "Setup radar: not computed yet"
 
-def D(t): return 0 if float(t.get("entry") or 0) >= 1000 else 2          # price decimals: BTC/ETH whole dollars, SOL 2 decimals
+def D(t): return config.pdec(t.get("entry"))          # price decimals by size: BTC/ETH whole dollars, SOL 2, DOGE 4, PEPE 6
 def SY(t): return t.get("sym", "BTC")
 def positions(P): return [t for t in (P.get("pos") or {}).values() if t]
 
@@ -56,7 +67,7 @@ def unreal_inr(P, px):
 
 def status_text(S):
     P, lp, M = S.get("paper") or {}, S.get("last_price"), S.get("market") or {}; Wl = P.get("wallet") or {}; eq = Wl.get("cash", 0) + Wl.get("margin", 0)
-    L = [f"BTC: ${lp:,.0f}" if lp else "BTC: n/a", f"Regime: {M.get('regime', '-')}", f"Wallet equity {inr(eq)} ({(eq / Wl.get('start', eq or 1) - 1) * 100:+.1f}% since start) | free {inr(Wl.get('cash', 0))} | in trades {inr(Wl.get('margin', 0))}",
+    L = [f"BTC: ${config.pf(lp)}" if lp else "BTC: n/a", f"Regime: {M.get('regime', '-')}", f"Wallet equity {inr(eq)} ({(eq / Wl.get('start', eq or 1) - 1) * 100:+.1f}% since start) | free {inr(Wl.get('cash', 0))} | in trades {inr(Wl.get('margin', 0))}",
          f"Trades closed: {len(P.get('closed', []))}"]
     for t in positions(P):
         if lp: L.append(f"Open {t['id']} ({t['label']}): {(tpx(t, lp) - t['entry']) * t['side'] / t['risk']:+.2f}R | stop ${t['sl']:,.{D(t)}f} | target ${t['tp']:,.{D(t)}f}")
@@ -95,7 +106,7 @@ def my_exit(S, tid, price, note, now):   # YOUR own manual exit, to compare with
     try: px = float(str(price).replace(",", "").replace("$", ""))
     except ValueError: return "Price number likho: /myexit ID 83500 optional-note"
     pct = round((px - t["entry"]) * t["side"] / t["entry"] * 100, 2); t["user_exit"] = dict(price=px, pct=pct, note=note, ts=iso(now))
-    return f"Aapka exit ${px:,.0f} = {pct:+.2f}% (entry ${t['entry']:,.0f}). " + (f"System: {t['R']:+.2f}R ({t['outcome']})." if "R" in t else "System trade abhi khula hai.")
+    return f"Aapka exit ${config.pf(px)} = {pct:+.2f}% (entry ${config.pf(t['entry'])}). " + (f"System: {t['R']:+.2f}R ({t['outcome']})." if "R" in t else "System trade abhi khula hai.")
 
 def reset_wallet(S, now):
     P = S.get("paper") or {}; S.setdefault("archive", []).append(dict(ts=iso(now), closed=P.get("closed", []), ledger=(P.get("wallet") or {}).get("ledger", [])[-50:])); S["paper"] = {}
@@ -174,7 +185,7 @@ def open_position(P, C, name, sg, now, h15, fxr, send, sym="BTC"):
     qty = (Wl["cash"] + Wl["margin"]) * sc["risk_pct"] / 100 / (sg["risk"] * fxr); cap = Wl["cash"] * 0.99 / (e * fxr * (1 / lev + fee)); capped = qty > cap; qty = min(qty, cap)
     step = C["wallet"].get("qty_step", 0.0001); qty = round(int(qty / step) * step, 6)
     if qty < step: jlog(P, now, "SKIPPED", f"{name} {'LONG' if k == 1 else 'SHORT'} signal skipped: not enough free balance"); return False
-    P["n"][key] = P["n"].get(key, 0) + 1; side = "LONG" if k == 1 else "SHORT"; tid = f"{ {'trend_pullback': 'TP', 'session_breakout': 'SB', 'confluence': 'CF', 'analog_edge': 'AE'}.get(name, 'ES') }{'' if sym == 'BTC' else '-' + sym}-{side}-{now.strftime('%Y%m%d')}-{P['n'][key]:03d}"
+    P["n"][key] = P["n"].get(key, 0) + 1; side = "LONG" if k == 1 else "SHORT"; tid = f"{ {'trend_pullback': 'TP', 'session_breakout': 'SB', 'confluence': 'CF', 'analog_edge': 'AE', 'bb_rsi_vol': 'BB'}.get(name, 'ES') }{'' if sym == 'BTC' else '-' + sym}-{side}-{now.strftime('%Y%m%d')}-{P['n'][key]:03d}"
     notional = qty * e; margin = notional * fxr / lev; fee_usd = fee * notional
     t = dict(id=tid, strategy=name, sym=sym, key=key, label=sc.get("label", name) + ("" if sym == "BTC" else f" · {sym}"), side=k, entry=e, sl0=sg["sl"], sl=sg["sl"], risk=sg["risk"], mode=sg["mode"], tp=sg.get("tp"), t1=sg.get("t1"), t2=sg.get("t2"), t3=sg.get("t3"),
              partial=sc.get("partial_pct", 50) / 100, qty=qty, qty_btc=qty, notional_usd=round(notional, 2), margin_inr=round(margin, 2), margin_released=0.0, rem_wallet=1.0, leverage=lev, fx=fxr,
@@ -186,7 +197,7 @@ def open_position(P, C, name, sg, now, h15, fxr, send, sym="BTC"):
             f"Stop-loss ${t['sl']:,.{d_}f} | T1 ${t['t1']:,.{d_}f} ({sc['partial_pct']}% booked, stop to entry) | T2 ${t['t2']:,.{d_}f} (rest)")
     if C["alerts"].get("paper_open"):
         send(f"📝 PAPER ORDER PLACED (virtual)  🕒 {config.ist(now, C)} IST\n{t['label']} | Grade {t['grade']}\nOrder ID: {tid}\nAction: {'BUY' if k == 1 else 'SELL'} ({side}) {sym}USDT Perpetual\nQty: {qty} {sym} @ ${e:,.{d_}f}\n"
-             f"Position value ${notional:,.0f} ({inr(notional * fxr)}) | margin locked {inr(margin)} ({lev}x) | entry fee {inr(fee_usd * fxr)}\n{plan}\n"
+             f"Position value ${config.pf(notional)} ({inr(notional * fxr)}) | margin locked {inr(margin)} ({lev}x) | entry fee {inr(fee_usd * fxr)}\n{plan}\n"
              f"Risk {inr(t['risk_inr'])} ({sc['risk_pct']}% of equity)" + (" | size capped by free balance" if capped else "") + f"\n💬 Kyun liya: {t['why']}\n🧩 Doosri raay: {(t.get('entry_ctx') or {}).get('methods_text', 'n/a')}\n"
              f"💰 Wallet: free {inr(Wl['cash'])} | in trades {inr(Wl['margin'])} | equity {inr(Wl['cash'] + Wl['margin'])}")
     return True
@@ -222,20 +233,42 @@ def run(S, send, now, scan=None):
     if old_open and not P["pos"].get("trend_pullback"): migrate_open(P, C, old_open, now)
     h15, hr = E.candles("15m", 300), E.candles("1H", 300); px = float(h15.c.iloc[-1]); fee = C["wallet"]["fee_rate_per_side"]
     h1 = W4.prep(hr); i = len(h1) - 2; P["radar"] = dict(ts=iso(now), price=px, **radar(h1, i))
-    XA = {}                                                      # extra coins (ETH, SOL...): own candles, same wallet
-    for sy in (C.get("assets", {}).get("extra") or []):
+    XA = {}                                                      # other coins: own candles, same wallet. extra (ETH, SOL) = eager 15m+1H; the rest of the universe = 1H now, 15m only when needed
+    UC = C.get("universe") or {}; U = S.setdefault("universe", {}); extra = list(C.get("assets", {}).get("extra") or [])
+    rows = universe.listing(UC.get("max_coins", 100), UC.get("min_vol_usd", 5e6)) if UC.get("enabled") else []
+    tick = {r["sym"]: r["px"] for r in rows}
+    for sy in extra:
         try:
-            a15, a1 = E.candles_sym(sy, "15m", 300), E.candles_sym(sy, "1H", 300); XA[sy] = dict(h15=a15, hr=a1, px=float(a15.c.iloc[-1]), h1=W4.prep(a1))
+            a15, a1 = E.candles_sym(sy, "15m", 300), E.candles_sym(sy, "1H", 300); XA[sy] = universe.Coin(sym=sy, h15=a15, hr=a1, px=float(a15.c.iloc[-1]), h1=W4.prep(a1))
         except Exception as ex: print("extra coin data error", sy, ex)
-    H15 = {"BTC": h15, **{k: v["h15"] for k, v in XA.items()}}
+    keep = {SY(t) for t in positions(P)} | {sh.get("sym", "BTC") for sh in P["shadow"] if "R" not in sh}          # a coin with an open trade/shadow is always fetched, even if it left the top list
+    want = [r["sym"] for r in rows if r["sym"] not in XA] + [s_ for s_ in keep if s_ != "BTC" and s_ not in XA and s_ not in tick]
+    for sy, a1 in universe.fetch_h1(want, UC.get("fetch_budget_s", 150)).items():
+        try: XA[sy] = universe.Coin(sym=sy, hr=a1, px=float(tick.get(sy) or a1.c.iloc[-1]), h1=W4.prep(a1))
+        except Exception as ex: print("coin data error", sy, ex)
+    urows = []
+    for r in rows:                                               # compact per-coin indication for the dashboard's "all perpetuals" table (full 7-method detail is computed on demand there)
+        rec = dict(r); v = XA.get(r["sym"])
+        if v is not None and r["sym"] not in extra:
+            try: rec.update(universe.indication(v["h1"], len(v["h1"]) - 2))
+            except Exception as ex: print("indication error", r["sym"], type(ex).__name__)
+        urows.append(rec)
+    if rows: U.update(ts=iso(now), n_listed=len(rows), n_data=sum(1 for r in rows if r["sym"] in XA), rows=urows)
+    def h15_of(sy):
+        try: return h15 if sy == "BTC" else (XA[sy]["h15"] if sy in XA else None)
+        except Exception as ex: print("15m fetch error", sy, type(ex).__name__); return None
     P.setdefault("coins", {})
-    for sy, v in XA.items():                                     # indication for ETH / SOL, same checklist + 7-method vote as BTC (shown on the dashboard, alerts via notify)
+    for sy in extra:                                             # full indication for ETH / SOL, same checklist + 7-method vote as BTC (shown on the dashboard, alerts via notify)
+        v = XA.get(sy)
+        if v is None: continue
         try:
             h1c = v["h1"]; ic = len(h1c) - 2; mrc = MT.consensus(MT.votes(MT.prepare(h1c.reset_index(drop=True)), ic)); P["coins"][sy] = dict(ts=iso(now), price=v["px"], methods=mrc, radar=radar(h1c, ic))
         except Exception as ex: print("coin indication error", sy, ex)
     def feed(t):                                                 # candles/price of the coin this trade is in (None if its data failed this scan)
         sy = SY(t)
-        return (h15, hr, px) if sy == "BTC" else ((XA[sy]["h15"], XA[sy]["hr"], XA[sy]["px"]) if sy in XA else None)
+        if sy == "BTC": return (h15, hr, px)
+        h_ = h15_of(sy)
+        return (h_, XA[sy]["hr"], XA[sy]["px"]) if h_ is not None else None
     d = P.get("demo")
     if d:                                                       # demo trade: tests the pipeline, never touches the wallet
         k = d["side"]; age = (now - dt.datetime.fromisoformat(d["created"])).total_seconds() / 3600; hit = None
@@ -244,15 +277,17 @@ def run(S, send, now, scan=None):
         elif age >= 1: hit = ("TIME UP (1h)", px)
         if hit:
             usd = (hit[1] - d["entry"]) * k * d["qty"]; P["demo"] = None; jlog(P, now, "DEMO", f"{d['id']} closed {hit[0]}")
-            send(f"🧪 DEMO ORDER CLOSED (test only, wallet NOT changed)  🕒 {config.ist(now, C)} IST\n{d['id']}\n{hit[0]} at ${hit[1]:,.0f}\nWould-be P/L: {'+' if usd >= 0 else '-'}{inr(abs(usd * d['fx']))}\nPipeline works: scan -> order -> monitor -> close -> Telegram.")
+            send(f"🧪 DEMO ORDER CLOSED (test only, wallet NOT changed)  🕒 {config.ist(now, C)} IST\n{d['id']}\n{hit[0]} at ${config.pf(hit[1])}\nWould-be P/L: {'+' if usd >= 0 else '-'}{inr(abs(usd * d['fx']))}\nPipeline works: scan -> order -> monitor -> close -> Telegram.")
     elif P.pop("force_demo", False):
         fxr = fx(P); e = px; risk = 0.003 * px; qty = round(P["wallet"]["cash"] * 0.002 / (risk * fxr), 4) or 0.0001
         P["demo"] = dict(id=f"DEMO-{now.strftime('%H%M')}", side=1, entry=e, sl=e - risk, tp=e + risk, risk=risk, qty=qty, fx=fxr, created=iso(now), why="Ye sirf test (demo) trade hai: scan, order, monitor, close aur Telegram chal rahe hain ya nahi, ye jaanchne ke liye.")
-        send(f"🧪 DEMO ORDER PLACED (test only, wallet NOT affected)  🕒 {config.ist(now, C)} IST\nOrder ID: {P['demo']['id']}\nBUY (LONG) {qty} BTC @ ${e:,.0f}\nStop ${e - risk:,.0f} | Target ${e + risk:,.0f}\nCloses at stop/target or within 1 hour.")
+        send(f"🧪 DEMO ORDER PLACED (test only, wallet NOT affected)  🕒 {config.ist(now, C)} IST\nOrder ID: {P['demo']['id']}\nBUY (LONG) {qty} BTC @ ${config.pf(e)}\nStop ${config.pf(e - risk)} | Target ${config.pf(e + risk)}\nCloses at stop/target or within 1 hour.")
     for sh in P.get("smartshadow", []):
         if "R" not in sh: shadow_step(sh, h15, now, fee)
     for sh in P["shadow"]:
-        if "R" not in sh and "mode" in sh and sh.get("sym", "BTC") in H15: shadow_step(sh, H15[sh.get("sym", "BTC")], now, fee)
+        if "R" not in sh and "mode" in sh:
+            h_ = h15_of(sh.get("sym", "BTC"))
+            if h_ is not None: shadow_step(sh, h_, now, fee)
     del P["shadow"][:-100]
     for m in learn.check_filters(P): send(m)
     for name, t in list(P["pos"].items()):
@@ -276,7 +311,7 @@ def run(S, send, now, scan=None):
         TS_ = TM.load(); rm = MR.live(S, mI, i, now, TM.cls_of(TS_, now.hour), TM.cls_of(TS_, (now.hour + 1) % 24)); P["radar_move"] = rm; MR.watch(S, rm, px, mI, i, now, send)
     except Exception as ex: print("move radar error", ex)
     tcls = TM.cls_of(TM.load(), now.hour); loss_hit = daily_loss_hit(P, C, now, send)
-    SETS = [("BTC", h1, i, h15, scan, mI, mres)] + [(sy, v["h1"], len(v["h1"]) - 2, v["h15"], None, None, None) for sy, v in XA.items()]
+    SETS = [("BTC", h1, i, (lambda: h15), scan, mI, mres)] + [(sy, v["h1"], len(v["h1"]) - 2, (lambda v=v: v["h15"]), None, None, None) for sy, v in XA.items()]
     for sym, h1_, i_, h15_, scan_, mI_, mres_ in SETS:
         for name, sc in C["strategies"].items():
             if loss_hit or (tcls == "LOW" and C["timing"].get("skip_low_activity")): break
@@ -285,7 +320,7 @@ def run(S, send, now, scan=None):
             if S.get("paused") or not sc.get("enabled") or P["pos"].get(key) or name not in ST.SIGNALS: continue
             if now.timestamp() * 1000 - P["last_entry"].get(key, 0) < sc.get("cooldown_hours", 1) * 3.6e6: continue
             if len(positions(P)) >= C["wallet"]["max_open_positions"]: continue
-            sg = ST.SIGNALS[name](dict(h1=h1_, i=i_, S=S if sym == "BTC" else dict(market={}), scan=scan_, now=now, tcls=tcls, mI=mI_), sc)
+            sg = ST.SIGNALS[name](dict(h1=h1_, i=i_, S=S if sym == "BTC" else dict(market={}), scan=scan_, now=now, tcls=tcls, mI=mI_, sym=sym), sc)
             if not sg: continue
             P["last_entry"][key] = now.timestamp() * 1000; blk = learn.blocked_by(P, sg["ctx"], name) if sym == "BTC" else None
             msp = C.get("risk", {}).get("min_stop_pct", 0); spct = abs(sg["entry"] - sg["sl"]) / sg["entry"] * 100
@@ -297,7 +332,7 @@ def run(S, send, now, scan=None):
                 blk = dict(id="hour", text=f"{now.hour:02d}:00 UTC (Asia ghante): is strategy ne in ghanto mein ~15% trade jite (50 mein se ~10 nahi)")
             if blk:
                 sh = lifecycle.new_state(sg["side"], sg["entry"], sg["sl"], sg["mode"], sg.get("tp"), sg.get("t1"), sg.get("t2"), sc.get("partial_pct", 50) / 100)
-                sh.update(sym=sym, id=f"SHADOW-{name[:2].upper()}{'' if sym == 'BTC' else '-' + sym}-{now.strftime('%Y%m%d%H%M')}", strategy=name, filter=blk["text"], ctx=sg["ctx"], exits=[], last_ts=float(h15_.ts.iloc[-1]), created=iso(now), expiry_h=sc["expiry_hours"])
+                sh.update(sym=sym, id=f"SHADOW-{name[:2].upper()}{'' if sym == 'BTC' else '-' + sym}-{now.strftime('%Y%m%d%H%M')}", strategy=name, filter=blk["text"], ctx=sg["ctx"], exits=[], last_ts=float(h15_().ts.iloc[-1]), created=iso(now), expiry_h=sc["expiry_hours"])
                 P["shadow"].append(sh); jlog(P, now, "FILTERED", f"{name} signal skipped by filter #{blk['id']}")
                 send(f"🧠 Signal skipped by {'tight-stop rule' if blk['id'] == 'stop' else 'hour rule' if blk['id'] == 'hour' else 'learned filter #' + str(blk['id'])}: {blk['text']}\nIt is tracked as a shadow trade to check whether the filter really helps.", cat="setup"); continue
             if sym == "BTC":
@@ -311,4 +346,4 @@ def run(S, send, now, scan=None):
                 if gate and ag < gate:
                     jlog(P, now, "FILTERED", f"{name} skipped: only {ag} methods agree (need {gate})"); send(f"🧩 Signal skipped: sirf {ag}/{mres_['total']} methods trade ke saath ({gate} chahiye). {name} {'BUY' if k_ == 1 else 'SELL'} chhoda gaya.", cat="setup"); continue
             jlog(P, now, "SIGNAL", f"{name} {'LONG' if sg['side'] == 1 else 'SHORT'} signal at ${sg['entry']:,.{0 if sg['entry'] >= 1000 else 2}f}")
-            if not open_position(P, C, name, sg, now, h15_, fx(P), send, sym=sym): P["last_entry"][key] = now.timestamp() * 1000 - max(sc.get("cooldown_hours", 1) - 1, 0) * 3.6e6
+            if not open_position(P, C, name, sg, now, h15_(), fx(P), send, sym=sym): P["last_entry"][key] = now.timestamp() * 1000 - max(sc.get("cooldown_hours", 1) - 1, 0) * 3.6e6
