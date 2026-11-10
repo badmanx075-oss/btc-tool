@@ -107,3 +107,57 @@ def timeline_text(rec):
     return (f"🧾 {rec['id']} ({rec.get('side')}) {rec.get('status')}\nOpened: {rec.get('opened_ist')} | Closed: {rec.get('closed_ist') or '-'}\n"
             f"Why: {rec.get('why') or '-'}\nResult: {rec.get('outcome') or 'open'}" + (f" {rec['R']:+.2f}R ₹{rec['pnl_inr']:,.0f}" if rec.get("R") is not None and rec.get("pnl_inr") is not None else "")
             + f"\nYour feedback: {rec.get('user_rating') or '-'} {rec.get('user_note') or ''}\n\nTimeline (IST):\n{tl}")
+
+
+# ---------------------------------------------------------------- reports: total / per strategy / per coin / coin x strategy
+def strat_label(name):
+    try:
+        import config
+        return config.load()["strategies"].get(name, {}).get("label") or name or "?"
+    except Exception: return name or "?"
+
+
+def _xblock(rows):
+    b = _block(rows)
+    if not b.get("n"): return b
+    pnl = [float(r.get("pnl_inr") or 0) for r in rows]; hold = [float(r["hold_h"]) for r in rows if r.get("hold_h") is not None]
+    b.update(gross_profit=round(sum(p for p in pnl if p > 0), 2), gross_loss=round(sum(p for p in pnl if p < 0), 2), best_inr=round(max(pnl), 2), worst_inr=round(min(pnl), 2), avg_hold_h=round(sum(hold) / len(hold), 1) if hold else None)
+    return b
+
+
+def report(records):
+    """{overall, by_strategy, by_coin, matrix[coin][strategy]} from the permanent history. Open counts included. Every block has n/win%/net/avgR/PF."""
+    recs = [r for r in records if r.get("source") == "PAPER"]; rows = closed_paper(recs); opn = [r for r in recs if r.get("status") == "OPEN"]
+    sk = lambda r: r.get("strategy") or "?"
+    def grp(keyfn):
+        g, o = defaultdict(list), defaultdict(int)
+        for r in rows: g[keyfn(r)].append(r)
+        for r in opn: o[keyfn(r)] += 1; g.setdefault(keyfn(r), [])
+        return {k: dict(_xblock(v), open=o.get(k, 0)) for k, v in g.items()}
+    cells = defaultdict(list)
+    for r in rows: cells[(coin_of(r), sk(r))].append(r)
+    matrix = {}
+    for (c, st_), v in cells.items(): matrix.setdefault(c, {})[st_] = _xblock(v)
+    return dict(overall=dict(_xblock(rows), open=len(opn)), by_strategy=grp(sk), by_coin=grp(coin_of), matrix=matrix)
+
+
+def _line(name, b):
+    if not b.get("n"): return f"{name}: abhi koi band trade nahi" + (f" ({b['open']} open)" if b.get("open") else "")
+    pf = b.get("profit_factor"); return (f"{name}: {b['n']} trade | win {b['win_pct']}% ({b['wins']}W/{b['losses']}L) | net {'+' if b['net_inr'] >= 0 else '-'}₹{abs(b['net_inr']):,.0f} | avg {b['mean_R']:+.2f}R | PF {pf if pf is not None else '-'}"
+                                         + (f" | {b['open']} open" if b.get("open") else "") + (" ⚠️kam trade" if b["n"] < MIN_TRADES else ""))
+
+
+def strategy_text(records):
+    R = report(records); L = ["🧠 STRATEGY-WISE RESULT (paper, band trades)"]
+    L += [_line(strat_label(k), v) for k, v in sorted(R["by_strategy"].items(), key=lambda kv: -(kv[1].get("n") or 0))] or ["abhi koi trade nahi"]
+    return "\n".join(L)
+
+
+def report_text(records, top=15):
+    R = report(records); o = R["overall"]
+    if not o.get("n") and not o.get("open"): return "📑 REPORT: abhi koi paper trade nahi."
+    L = ["📑 FULL REPORT (paper wallet, virtual)", _line("TOTAL", o), "", "🧠 STRATEGY-WISE"]
+    L += [_line(strat_label(k), v) for k, v in sorted(R["by_strategy"].items(), key=lambda kv: -(kv[1].get("n") or 0))]
+    cs = sorted(R["by_coin"].items(), key=lambda kv: -(kv[1].get("n") or 0)); L += ["", f"🪙 COIN-WISE ({len(cs)} coins, zyada trade wale pehle)"] + [_line(k, v) for k, v in cs[:top]]
+    if len(cs) > top: L.append(f"... aur {len(cs) - top} coins (dashboard 📑 Reports tab me poori list)")
+    L.append("30 se kam trade = sirf andaaza. Ye jaankari hai, guarantee nahi."); return "\n".join(L)[:3900]

@@ -2,7 +2,7 @@
 trailing-stop advice, hold-vs-book comparison. ADVISORY only: the paper rule (fixed stop/target/5-day expiry) is what was backtested and stays unchanged."""
 import datetime as dt
 import numpy as np
-import engine as E, config
+import engine as E, config, fmt
 
 def assess(t, h, px):
     k, e, risk, sl = t["side"], t["entry"], t["risk"], t["sl"]; tp = t.get("tp") or t.get("t2") or e + k * 4 * risk; tpR = abs(tp - e) / risk
@@ -40,6 +40,6 @@ def assess(t, h, px):
                 hold_vs_book=hvb, next_zone=round(float(e + k * 0.75 * tpR * risk), 1), momentum_atr=round(float(mom), 2), volume_ratio=round(vr, 2))
 
 def message(t, m, px):
-    return (f"📊 POSITION UPDATE\n{t['id']}\nStage: {m['stage']}\nStatus: {m['status']}\nNow ${config.pf(px)} | Open P/L {m['uR']:+.2f}R | Exhaustion {m['exhaustion']}/100\n"
+    return (f"📊 POSITION UPDATE\n{fmt.sline(t)}\n{fmt.live_line(t, px)}\nStage: {m['stage']}\nStatus: {m['status']}\nOpen P/L {m['uR']:+.2f}R | Exhaustion {m['exhaustion']}/100\n"
             + "\n".join("• " + r for r in m["reasons"]) + f"\n{m['hold_vs_book']}\n{m['stop_advice']}\nAgla decision zone: ${config.pf(m['next_zone'])}\n"
             "(Salah hai. Paper rule sirf stop/target/5 din par band karta hai. Probabilistic, guarantee nahi.)")

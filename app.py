@@ -106,7 +106,7 @@ elif T: head.caption(f"📨 Telegram: ❌ problem. {T.get('last_error') or 'bot 
 else: head.caption("📨 Telegram: no status yet (upload the latest worker.py and run the scan once)")
 if S.get("paused"): st.warning("⏸ PAUSED: no new trades or alerts will start. Open trades are still managed. Send /resume on Telegram to restart.")
 st.caption("⚠️ Informational and statistical only. Virtual money, no real orders. Backtests show NO proven edge yet.")
-tH_, tAsk, tCH, tDD, tA, tW, tTH, tRV, tTM, tL, tHl, tS, tO, tB, tG = st.tabs(["🏠 Home", "💬 Ask", "📈 Chart", "🧭 Decision Desk", "📋 Analysis", "💰 Wallet", "📒 Trade History", "📦 Review", "🕒 Time", "🧠 Learning", "🩺 Health", "⚙️ Settings", "📡 Old signals", "📊 Backtests", "📘 Guide"])
+tH_, tAsk, tCH, tDD, tA, tW, tTH, tRP, tRV, tTM, tL, tHl, tS, tO, tB, tG = st.tabs(["🏠 Home", "💬 Ask", "📈 Chart", "🧭 Decision Desk", "📋 Analysis", "💰 Wallet", "📒 Trade History", "📑 Reports", "📦 Review", "🕒 Time", "🧠 Learning", "🩺 Health", "⚙️ Settings", "📡 Old signals", "📊 Backtests", "📘 Guide"])
 
 def position_card(t):
     px = (lp or t["entry"]) if t.get("sym", "BTC") == "BTC" else (t.get("last_px") or t["entry"]); ur = (px - t["entry"]) * t["side"] / t["risk"]; usd = pl_usd(t, px) + t.get("realized_usd", 0); m = t.get("mgmt")
@@ -349,7 +349,7 @@ with tTH:
         sel = [r for r in rows_ if r["source"] in fs and r["status"] in fst and r.get("side") in fsd and (not q or q in json.dumps({k: r.get(k) for k in ("id", "why", "outcome", "label", "user_note", "lesson")}, default=str).lower())]
         fbtxt = lambda r: {"good": "👍 good", "bad": "👎 bad"}.get(r.get("user_rating"), "") + (" " + r["user_note"] if r.get("user_note") else "")
         tbl = pd.DataFrame([{"Trade ID": r["id"], "Coin": stats.coin_of(r), "Type": "Paper" if r["source"] == "PAPER" else "Alert", "Strategy": r.get("label") or r.get("strategy"), "Side": r.get("side"), "Opened (IST)": r.get("opened_ist"), "Closed (IST)": r.get("closed_ist") or "-",
-                             "Entry": round(r["entry"]) if r.get("entry") else None, "Exit": round(r["exit"]) if r.get("exit") else None, "Status": r["status"], "Outcome": r.get("outcome") or "-", "R": r.get("R"),
+                             "Entry": config.rp(r["entry"]) if r.get("entry") else None, "Exit": config.rp(r["exit"]) if r.get("exit") else None, "Status": r["status"], "Outcome": r.get("outcome") or "-", "R": r.get("R"),
                              "P/L ₹": r.get("pnl_inr"), "Your feedback": fbtxt(r), "Why taken": r.get("why", "")} for r in sel])
         st.dataframe(tbl, hide_index=True, use_container_width=True); st.download_button("⬇️ Download full history (CSV)", tbl.to_csv(index=False).encode(), "trade_history.csv", "text/csv")
         if sel:
@@ -417,6 +417,39 @@ with tCH:
             st.dataframe(pd.DataFrame(rows_), hide_index=True, use_container_width=True)
             if SRD.get("zones"): st.markdown("**🎯 Confluence zones (kai timeframe ek jagah, sabse mazboot):**\n\n" + "\n\n".join(f"{'🟢' if z['kind'] == 'support' else '🔴'} {z['kind']} **${config.pf(z['lo'])}-{z['hi']:,.0f}** ({' + '.join(z['tfs'])}, score {z['score']})" for z in SRD["zones"][:5]))
             st.caption("touches = kitni baar bhaav is level se palta. Zyada touches + zyada timeframe = mazboot level. Bade timeframe (4H, 1D) ke level chhote timeframe se zyada maane jaate hain.")
+
+with tRP:
+    st.caption("Paper-wallet trades (virtual). Total, har strategy aur har coin ka alag hisaab. 30 se kam trade = sirf andaaza, usse rule mat badlo.")
+    _HF = load("trade_history.json"); _rc = dict((_HF or {}).get("records", {}))
+    for _r in history._all_trades(S): _rc[_r["id"]] = history._merge(_rc.get(_r["id"]), _r)
+    _R = stats.report(list(_rc.values())); _o = _R["overall"]
+    if not _o.get("n") and not _o.get("open"): st.info("Abhi koi paper trade nahi. Pehla trade band hone ke baad yahan report banegi.")
+    else:
+        _m = st.columns(6); _m[0].metric("Total closed", _o.get("n", 0)); _m[1].metric("Total win rate", f"{_o.get('win_pct', 0)}%", f"{_o.get('wins', 0)}W / {_o.get('losses', 0)}L"); _m[2].metric("Net P/L", inr(_o.get("net_inr", 0))); _m[3].metric("Avg R / trade", f"{_o.get('mean_R', 0):+.2f}")
+        _m[4].metric("Profit factor", _o.get("profit_factor") or "-"); _m[5].metric("Open now", _o.get("open", 0))
+        def _tbl(d, first):
+            rows = []
+            for k, b in d.items():
+                rows.append({first: stats.strat_label(k) if first == "Strategy" else k, "Closed": b.get("n", 0), "Open": b.get("open", 0), "Win %": b.get("win_pct"), "Wins": b.get("wins", 0), "Losses": b.get("losses", 0), "Net ₹": b.get("net_inr"), "Avg R": b.get("mean_R"),
+                             "Profit factor": b.get("profit_factor"), "Gross profit ₹": b.get("gross_profit"), "Gross loss ₹": b.get("gross_loss"), "Best trade ₹": b.get("best_inr"), "Worst trade ₹": b.get("worst_inr"), "Avg hold h": b.get("avg_hold_h"),
+                             "Note": "kam trade (andaaza)" if 0 < b.get("n", 0) < 30 else ("" if b.get("n") else "abhi band trade nahi")})
+            return pd.DataFrame(rows).sort_values("Closed", ascending=False) if rows else pd.DataFrame()
+        st.markdown("#### 🧠 Strategy-wise report"); _ts = _tbl(_R["by_strategy"], "Strategy"); st.dataframe(_ts, hide_index=True, use_container_width=True)
+        st.markdown("#### 🪙 Coin-wise report (har coin ki alag entry)"); _tc = _tbl(_R["by_coin"], "Coin"); _qc = st.text_input("Coin search", key="rp_q").strip().upper()
+        st.dataframe(_tc[_tc["Coin"].str.contains(_qc)] if _qc and len(_tc) else _tc, hide_index=True, use_container_width=True)
+        st.download_button("⬇️ Coin report (CSV)", _tc.to_csv(index=False).encode(), "coin_report.csv", "text/csv"); st.download_button("⬇️ Strategy report (CSV)", _ts.to_csv(index=False).encode(), "strategy_report.csv", "text/csv")
+        if _R["matrix"]:
+            st.markdown("#### 🔀 Coin × Strategy (kis coin par kaunsi strategy kaisi chali)")
+            _mx = [{"Coin": c_, "Strategy": stats.strat_label(s_), "Trades": b.get("n", 0), "Win %": b.get("win_pct"), "Net ₹": b.get("net_inr"), "Avg R": b.get("mean_R")} for c_, d_ in _R["matrix"].items() for s_, b in d_.items()]
+            st.dataframe(pd.DataFrame(_mx).sort_values(["Coin", "Trades"], ascending=[True, False]), hide_index=True, use_container_width=True)
+        _cl = sorted(_R["by_coin"].keys())
+        if _cl:
+            _pc = st.selectbox("Ek coin ki poori report", _cl, index=_cl.index(COIN) if COIN in _cl else 0, key="rp_coin"); _b = _R["by_coin"][_pc]
+            _x = st.columns(5); _x[0].metric(f"{_pc} closed", _b.get("n", 0)); _x[1].metric("Win rate", f"{_b.get('win_pct', 0)}%"); _x[2].metric("Net P/L", inr(_b.get("net_inr", 0))); _x[3].metric("Avg R", f"{_b.get('mean_R', 0):+.2f}"); _x[4].metric("Open", _b.get("open", 0))
+            _tr = [r for r in _rc.values() if r.get("source") == "PAPER" and stats.coin_of(r) == _pc]
+            st.dataframe(pd.DataFrame([{"Trade ID": r["id"], "Strategy": stats.strat_label(r.get("strategy")), "Side": r.get("side"), "Status": r["status"], "Opened (IST)": r.get("opened_ist"), "Entry": config.rp(r["entry"]) if r.get("entry") else None,
+                                         "Exit": config.rp(r["exit"]) if r.get("exit") else None, "Outcome": r.get("outcome") or "-", "R": r.get("R"), "P/L ₹": r.get("pnl_inr")} for r in sorted(_tr, key=lambda r: r.get("opened") or "", reverse=True)]), hide_index=True, use_container_width=True)
+        st.caption("Ye sirf virtual paper trades ka hisaab hai. Abhi tak koi strategy profitable saabit nahi hui.")
 
 with tRV:
     st.caption("Tool ko chalne do. Jab 30+ trades band ho jayein, neeche se review pack download karo aur mujhe (Claude ko) bhejo. Main uske hisaab se rules tune karunga.")

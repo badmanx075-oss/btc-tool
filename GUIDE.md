@@ -217,3 +217,10 @@ Early signal OFF karne se purane 27 trades ka -10.4R hata ke ginte to baaki 41->
 - Settings /set se badal sakte ho: bb_rsi_vol.rsi_os, vol_mult, bb_mult, target_r, trend_guard (on/off), enabled.
 - Backtest: research workflow ab V13 bhi chalata hai (9 coins, 5 saal, train/test) -> backtest_v13_results.json. Jab tak ye result na aaye, ise sabit mat maano.
 **Dhyan:** coins badhne se trades badhenge, par edge nahi. Tool ka overall result abhi negative hai; naye strategy ko bhi 30+ trades ya V13 result ke baad hi judge karo.
+
+## Update: strategy note, reports, Telegram live updates (10 Nov)
+- Har trade me strategy ka naam save hota hai (history, dashboard, Telegram sab jagah). Trade ID prefix bhi batata hai: TP = Trend Pullback, SB = Session Breakout, BB = BB+RSI+Volume, ES = Early Signal, CF = Confluence; coin ka naam ID me hota hai (jaise BB-DOGE-LONG-...).
+- Dashboard me naya tab "📑 Reports": total win rate, strategy-wise, coin-wise (har coin ki alag entry), coin x strategy, aur ek coin ki poori report + CSV download.
+- Telegram: har trade message (order open, T1, position update, smart exit, close) me "🧠 Strategy | 🪙 coin | ID" aur BUY/SELL price -> live price -> P/L (profit 🟢, loss 🔴), stop, target dikhta hai.
+- Naya "📈 OPEN TRADES UPDATE": har 3 ghante me sab open trades strategy ke hisaab se (buy price, live price, P/L). Band karna: /set digest_hours 0 ya /notify digest off. Ghanta badalna: /set digest_hours 2.
+- Naye Telegram commands: /report (total + strategy + coin), /strategies, /perps.

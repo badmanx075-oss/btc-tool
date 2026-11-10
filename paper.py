@@ -1,7 +1,7 @@
 """Paper trading engine: virtual wallet with ledger, strategy registry, staged exits, remarks + feedback. NO real orders are ever placed.
 Rules live in config.json (settings), strategies.py (entries) and lifecycle.py (exits)."""
 import datetime as dt, requests, time
-import universe
+import universe, fmt
 import moveradar as MR, methods as MT, timing as TM, confirm as CF, engine as E, backtest_v4 as W4, learn, config, wallet, lifecycle, advisor, review, strategies as ST
 from config import inr
 
@@ -50,6 +50,23 @@ def perps_text(S, top=8):
     L = [f"🌐 SAARE PERPETUALS ({U.get('n_data', 0)} coins ka data, {U.get('n_listed', 0)} listed)", "🟢 BUY ki taraf: " + ("" if buy else "koi nahi")] + [f(r) for r in buy] + ["🔴 SELL ki taraf: " + ("" if sell else "koi nahi")] + [f(r) for r in sell]
     L.append("Ye jaankari hai, guarantee nahi. Trade tabhi khulta hai jab strategy ki shartein poori hon.")
     return "\n".join(L)
+
+def digest(P, C, now, send):
+    """Every `schedule.digest_hours` hours: all OPEN trades grouped by strategy with buy price, live price, P/L (profit shown green). Silent when nothing is open."""
+    hrs = C.get("schedule", {}).get("digest_hours", 3); ops = [t for t in positions(P) if not t.get("closed")]
+    last = P.get("last_digest")
+    if not hrs or not ops: return
+    if last and (now - dt.datetime.fromisoformat(last)).total_seconds() < hrs * 3600: return
+    P["last_digest"] = iso(now); g = {}
+    for t in ops: g.setdefault(fmt.strat_name(t), []).append(t)
+    L = [f"📈 OPEN TRADES UPDATE  🕒 {config.ist(now, C)} IST"]; tot = 0.0
+    for name, ts in sorted(g.items()):
+        L.append(f"\n🧠 {name} ({len(ts)} trade)")
+        for t in ts:
+            px = P.get("last_px_btc") if SY(t) == "BTC" else (t.get("last_px") or t["entry"]); px = px or t["entry"]; inr_, R = fmt.live_pl(t, px); tot += inr_
+            L.append(f"• {SY(t)} {'BUY' if t['side'] == 1 else 'SELL'} | buy ${config.pf(t['entry'])} → live ${config.pf(px)} | {'🟢' if inr_ >= 0 else '🔴'} {'+' if inr_ >= 0 else '-'}{inr(abs(inr_))} ({R:+.2f}R) | {t['id']}")
+    Wl = P["wallet"]; L.append(f"\n{'🟢' if tot >= 0 else '🔴'} Open P/L total {'+' if tot >= 0 else '-'}{inr(abs(tot))} | equity {inr(Wl['cash'] + Wl['margin'])}")
+    send("\n".join(L), cat="digest")
 
 def radar_line(P):
     r = P.get("radar")
@@ -129,7 +146,7 @@ def apply_exit(P, C, t, kind, price, frac, now, send):
     ev(t, now, kind, price, f"{frac * 100:.0f}% of position, P/L {inr(pnl * t['fx'])}"); order(P, now, t["id"], "SELL" if t["side"] == 1 else "BUY", units, price, "exit: " + kind)
     jlog(P, now, "EXIT", f"{t['id']} {kind} at ${price:,.{D(t)}f} ({frac * 100:.0f}%)")
     if kind == "T1 PARTIAL" and C["alerts"].get("stage_alerts"):
-        d_ = D(t); send(f"🎯 T1 HIT ({t['id']})  🕒 {config.ist(now, C)} IST\n{frac * 100:.0f}% booked at ${price:,.{d_}f} ({'+' if pnl >= 0 else '-'}{inr(abs(pnl * t['fx']))}).\nStop moved to entry ${t['entry']:,.{d_}f}. Remaining {t['remaining'] * 100:.0f}% runs to T2 ${t['t2']:,.{d_}f}.")
+        d_ = D(t); send(f"🎯 T1 HIT ({t['id']})  🕒 {config.ist(now, C)} IST\n{frac * 100:.0f}% booked at ${price:,.{d_}f} ({'+' if pnl >= 0 else '-'}{inr(abs(pnl * t['fx']))}).\nStop moved to entry ${t['entry']:,.{d_}f}. Remaining {t['remaining'] * 100:.0f}% runs to T2 ${t['t2']:,.{d_}f}.\n{fmt.sline(t)}\n{fmt.live_line(t, price)}")
 
 def smart_exit(S, P, C, t, hr, px, now, send):
     """Closes a paper trade early when the move looks COMPLETE (exhaustion / expected move reached) or the trade is STALLED, so trades do not run for days.
@@ -149,7 +166,7 @@ def smart_exit(S, P, C, t, hr, px, now, send):
               exits=[(e["kind"], e["price"], e["frac"]) for e in t["exits"]], smart_R_at_exit=round(uR, 2), reason=reason)
     P.setdefault("smartshadow", []).append(sh); del P["smartshadow"][:-60]
     frac = t["remaining"]; t["remaining"] = 0; t["smart_reason"] = reason; jlog(P, now, "SMART EXIT", f"{t['id']}: {reason}"); apply_exit(P, C, t, "SMART EXIT", px, frac, now, send)
-    send(f"🏁 SMART EXIT ({t['id']}): {reason}\nTrade lamba na chale isliye band kiya. Asli rule (stop/target) wali copy shadow mein chalti rahegi, taaki pata chale smart exit behtar tha ya nahi.", cat="paper_close")
+    send(f"🏁 SMART EXIT ({t['id']}): {reason}\n{fmt.sline(t)}\n{fmt.live_line(t, px)}\nTrade lamba na chale isliye band kiya. Asli rule (stop/target) wali copy shadow mein chalti rahegi, taaki pata chale smart exit behtar tha ya nahi.", cat="paper_close")
     finalize(P, C, t, now, send); return True
 
 def finalize(P, C, t, now, send):
@@ -165,7 +182,7 @@ def finalize(P, C, t, now, send):
     if C["alerts"].get("paper_close"):
         ex = " + ".join(f"{e['kind']} {e['frac'] * 100:.0f}% @ ${e['price']:,.{D(t)}f}" for e in t["exits"]); act = "SELL (close long)" if t["side"] == 1 else "BUY (cover short)"
         btn = [[{"text": "👍 Achha trade", "callback_data": f"fbgood|{t['id']}"}, {"text": "👎 Galat trade", "callback_data": f"fbbad|{t['id']}"}]] if C["alerts"].get("feedback_buttons") else None
-        send(f"📝 PAPER ORDER CLOSED (virtual)  🕒 {config.ist(now, C)} IST\n{t['label']}\nOrder ID: {t['id']}\nAction: {act}\nQty: {t['qty']} {SY(t)} | opened {config.ist(dt.datetime.fromisoformat(t['created']), C)}\n"
+        send(f"📝 PAPER ORDER CLOSED (virtual)  🕒 {config.ist(now, C)} IST\n{fmt.sline(t)}\nOrder ID: {t['id']}\nAction: {act}\nQty: {t['qty']} {SY(t)} | opened {config.ist(dt.datetime.fromisoformat(t['created']), C)}\n"
              f"Entry ${t['entry']:,.{D(t)}f} → avg exit ${t['exit']:,.{D(t)}f}  [{outcome}]\nExits: {ex}\nGross ${t['gross_usd']:+,.2f} | Fees ${t['fees_usd']:,.2f} | Net {'+' if t['pnl_inr'] >= 0 else '-'}{inr(abs(t['pnl_inr']))} ({R:+.2f}R)\n"
              f"💰 Equity {inr(Wl['cash'] + Wl['margin'])} ({(P['balance'] / Wl['start'] - 1) * 100:+.1f}% since start) | free {inr(Wl['cash'])} | max drawdown {P['max_dd_pct']}%\n"
              f"💬 Kya hua: {t['lesson']}\n📝 Feedback: {t['feedback']['auto']['verdict']}\nRate it with the buttons, or send: /note {t['id']} your remark" + ("\n💡 New filter idea. Send /lessons." if len(P["proposals"]) > npro else ""), buttons=btn)
@@ -196,7 +213,7 @@ def open_position(P, C, name, sg, now, h15, fxr, send, sym="BTC"):
     d_ = D(t); plan = (f"Stop-loss ${t['sl']:,.{d_}f} | Target ${t['tp']:,.{d_}f} ({sc.get('target_r')}R)" if sg["mode"] == "fixed" else
             f"Stop-loss ${t['sl']:,.{d_}f} | T1 ${t['t1']:,.{d_}f} ({sc['partial_pct']}% booked, stop to entry) | T2 ${t['t2']:,.{d_}f} (rest)")
     if C["alerts"].get("paper_open"):
-        send(f"📝 PAPER ORDER PLACED (virtual)  🕒 {config.ist(now, C)} IST\n{t['label']} | Grade {t['grade']}\nOrder ID: {tid}\nAction: {'BUY' if k == 1 else 'SELL'} ({side}) {sym}USDT Perpetual\nQty: {qty} {sym} @ ${e:,.{d_}f}\n"
+        send(f"📝 PAPER ORDER PLACED (virtual)  🕒 {config.ist(now, C)} IST\n{fmt.sline(t)} | Grade {t['grade']}\nOrder ID: {tid}\nAction: {'BUY' if k == 1 else 'SELL'} ({side}) {sym}USDT Perpetual\nQty: {qty} {sym} @ ${e:,.{d_}f}\n"
              f"Position value ${config.pf(notional)} ({inr(notional * fxr)}) | margin locked {inr(margin)} ({lev}x) | entry fee {inr(fee_usd * fxr)}\n{plan}\n"
              f"Risk {inr(t['risk_inr'])} ({sc['risk_pct']}% of equity)" + (" | size capped by free balance" if capped else "") + f"\n💬 Kyun liya: {t['why']}\n🧩 Doosri raay: {(t.get('entry_ctx') or {}).get('methods_text', 'n/a')}\n"
              f"💰 Wallet: free {inr(Wl['cash'])} | in trades {inr(Wl['margin'])} | equity {inr(Wl['cash'] + Wl['margin'])}")
@@ -301,6 +318,8 @@ def run(S, send, now, scan=None):
         if SY(t) == "BTC":
             try: CF.step(S, P, C, t, px, now, send, ev, config.ist)
             except Exception as ex: print("confirm error", ex)
+    try: P["last_px_btc"] = px; digest(P, C, now, send)
+    except Exception as ex: print("digest error", ex)
     try: review.near_miss_step(S, P, scan, C["strategies"].get("early_signal", {}), h15, now, fee)
     except Exception as e: print("near-miss error", e)
     mI = mres = None
