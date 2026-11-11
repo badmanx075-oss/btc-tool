@@ -28689,7 +28689,7 @@
     "move_class": "VERY LARGE",
     "risk": "Medium",
     "created": "2026-11-10T16:20:02+00:00",
-    "last_ts": 1794413100000.0,
+    "last_ts": 1794413400000.0,
     "mfe": 928.0,
     "mae": 720.0,
     "status": "EARLY SETUP",
@@ -28955,20 +28955,28 @@
    },
    "entry_context": null,
    "grade": "A",
-   "status": "OPEN",
-   "outcome": "",
-   "closed": null,
-   "closed_ist": "",
-   "exit": null,
-   "R": null,
-   "pnl_inr": null,
-   "fees_usd": 0.017444085,
-   "hold_h": null,
-   "best_R": 1.7603587443946156,
-   "worst_R": 0.05775784753363397,
-   "exits": [],
-   "lesson": "",
-   "auto_feedback": "",
+   "status": "CLOSED",
+   "outcome": "SMART EXIT",
+   "closed": "2026-11-11T16:11:41+00:00",
+   "closed_ist": "11 Nov 2026, 09:41 PM IST",
+   "exit": 986.4,
+   "R": 1.752,
+   "pnl_inr": 249.68,
+   "fees_usd": 0.04,
+   "hold_h": 15.1,
+   "best_R": 1.79,
+   "worst_R": 0.06,
+   "exits": [
+    {
+     "ts": "2026-11-11T16:11:41+00:00",
+     "kind": "SMART EXIT",
+     "price": 986.4,
+     "frac": 1.0,
+     "pnl_inr": 253.09
+    }
+   ],
+   "lesson": "Smart exit (move poora hone ke sanket (thakaan 10/100, +1.8R)): +1.8R par band kiya, taaki trade lamba na chale. Fixed rule se tulna review pack mein hoti hai.",
+   "auto_feedback": "\u2705 Achha trade: plan ke mutabik +1.8R. Best move +1.8R tak gayi, uska 98% pakda.",
    "user_rating": "",
    "user_note": "",
    "user_feedback_ist": "",
@@ -28979,6 +28987,18 @@
      "type": "OPENED",
      "price": 915.7,
      "note": "qty 0.0381 SKHYNIX, margin \u20b91,093"
+    },
+    {
+     "time_ist": "11 Nov 2026, 09:41 PM IST",
+     "type": "SMART EXIT",
+     "price": 986.4,
+     "note": "100% of position, P/L \u20b9253"
+    },
+    {
+     "time_ist": "11 Nov 2026, 09:41 PM IST",
+     "type": "CLOSED",
+     "price": 986.4,
+     "note": "SMART EXIT"
     }
    ],
    "raw": {
@@ -29002,24 +29022,44 @@
     "qty_btc": 0.0381,
     "notional_usd": 34.89,
     "margin_inr": 1092.65,
-    "margin_released": 0.0,
-    "rem_wallet": 1.0,
+    "margin_released": 1092.65,
+    "rem_wallet": 0.0,
     "leverage": 3,
     "fx": 93.955805,
     "risk_inr": 142.55,
-    "fees_usd": 0.017444085,
-    "realized_usd": 0.0,
+    "fees_usd": 0.04,
+    "realized_usd": 2.6936699999999973,
     "stage": 0,
-    "remaining": 1.0,
-    "mfe_R": 1.7603587443946156,
-    "mae_R": 0.05775784753363397,
-    "exits": [],
+    "remaining": 0,
+    "mfe_R": 1.79,
+    "mae_R": 0.06,
+    "exits": [
+     {
+      "ts": "2026-11-11T16:11:41+00:00",
+      "kind": "SMART EXIT",
+      "price": 986.4,
+      "frac": 1.0,
+      "pnl_inr": 253.09
+     }
+    ],
     "events": [
      {
       "ts": "2026-11-11T01:06:39+00:00",
       "type": "OPENED",
       "price": 915.7,
       "note": "qty 0.0381 SKHYNIX, margin \u20b91,093"
+     },
+     {
+      "ts": "2026-11-11T16:11:41+00:00",
+      "type": "SMART EXIT",
+      "price": 986.4,
+      "note": "100% of position, P/L \u20b9253"
+     },
+     {
+      "ts": "2026-11-11T16:11:41+00:00",
+      "type": "CLOSED",
+      "price": 986.4,
+      "note": "SMART EXIT"
      }
     ],
     "created": "2026-11-11T01:06:39+00:00",
@@ -29056,12 +29096,12 @@
     "grade": "A",
     "why": "Pichle 6 ghante bhaav ek tang box mein (1.9 ATR) ghoom raha tha. Ab 1H candle ne box ke upar mazboot band di, volume normal ka 2.3 guna tha, aur bade (4H) trend ne iska virodh nahi kiya. Active samay mein breakout hone se follow-through ki sambhavna behtar hoti hai. Isliye BUY liya. Stop box ke doosri taraf, target 2.0R. Ye experimental hai: backtest se pehle isse sabit nahi maana jaata.",
     "capped": false,
-    "last_px": 983.2,
+    "last_px": 986.4,
     "mgmt": {
-     "status": "\ud83d\udfe1 HOLD BUT PROTECT PROFIT",
-     "stage": "TARGET APPROACHING",
-     "uR": 1.7,
-     "mfe_R": 1.76,
+     "status": "\ud83d\udfe0 PROFIT-BOOKING ZONE",
+     "stage": "PROFIT BOOKING",
+     "uR": 1.78,
+     "mfe_R": 1.78,
      "exhaustion": 10,
      "reversal_flags": {
       "structure_break": false,
@@ -29070,17 +29110,38 @@
      },
      "reasons": [
       "Momentum trend ke saath chal raha hai (pichle 3 ghante +1.6 ATR)",
-      "Volume theek hai (normal ka 1.2 guna)"
+      "Volume theek hai (normal ka 1.2 guna)",
+      "Target bahut paas hai"
      ],
      "stop_advice": "Stop structure ke neeche $949.79 tak le ja sakte ho",
      "suggested_sl": 949.8,
-     "hold_vs_book": "Hold: target 0.3R door, stop tak 0.8R (R/R 0.4). Abhi book karo to +1.7R pakka.",
+     "hold_vs_book": "Hold: target 0.2R door, stop tak 0.9R (R/R 0.2). Abhi book karo to +1.8R pakka.",
      "next_zone": 975.4,
      "momentum_atr": 1.56,
      "volume_ratio": 1.21
     },
-    "mstatus": "\ud83d\udfe1 HOLD BUT PROTECT PROFIT",
-    "mts": "2026-11-11T15:21:33+00:00"
+    "mstatus": "\ud83d\udfe0 PROFIT-BOOKING ZONE",
+    "mts": "2026-11-11T16:11:41+00:00",
+    "smart_reason": "move poora hone ke sanket (thakaan 10/100, +1.8R)",
+    "closed": "2026-11-11T16:11:41+00:00",
+    "outcome": "SMART EXIT",
+    "exit": 986.4,
+    "R": 1.752,
+    "pnl_inr": 249.68,
+    "net_usd": 2.66,
+    "gross_usd": 2.69,
+    "hold_h": 15.1,
+    "lesson": "Smart exit (move poora hone ke sanket (thakaan 10/100, +1.8R)): +1.8R par band kiya, taaki trade lamba na chale. Fixed rule se tulna review pack mein hoti hai.",
+    "feedback": {
+     "auto": {
+      "result": "WIN",
+      "verdict": "\u2705 Achha trade: plan ke mutabik +1.8R. Best move +1.8R tak gayi, uska 98% pakda.",
+      "plan_followed": true,
+      "best_R": 1.79,
+      "worst_R": 0.06
+     },
+     "user": null
+    }
    }
   },
   "TP-CL-SHORT-20261111-001": {
@@ -29645,11 +29706,11 @@
     "grade": "B",
     "why": "Bade (4H) chart pe PONS ka trend neeche hai (taakat 0.36, kam se kam 0.30 chahiye thi). Us trend ke beech bhaav thoda upar chadha (2.1 ATR ki halchal) aur ab trend ki taraf palat raha hai (pichli 1H candle trend ke saath band hui). Isliye trend ke saath SELL liya. Stop-loss 3.0\u00d7ATR door rakha taaki chhoti uthal-puthal se na toote, target risk ka 4.0 guna. Backtest mein har 3 mein ~2 trade harte hain, isliye loss normal hai.",
     "capped": false,
-    "last_px": 0.1569,
+    "last_px": 0.1578,
     "mgmt": {
      "status": "\ud83d\udfe1 REVERSAL WATCH",
      "stage": "ENTRY",
-     "uR": -0.62,
+     "uR": -0.68,
      "mfe_R": 0.21,
      "exhaustion": 0,
      "reversal_flags": {
@@ -29664,7 +29725,7 @@
      ],
      "stop_advice": "Stop jaisa hai waisa rakho",
      "suggested_sl": 0.2,
-     "hold_vs_book": "Hold: target 4.6R door, stop tak 0.4R (R/R 12.1). Abhi book karo to +-0.6R pakka.",
+     "hold_vs_book": "Hold: target 4.7R door, stop tak 0.3R (R/R 14.9). Abhi book karo to +-0.7R pakka.",
      "next_zone": 0.1,
      "momentum_atr": -0.91,
      "volume_ratio": 0.88
@@ -29802,11 +29863,11 @@
     "grade": "B",
     "why": "Bade (4H) chart pe HYPE ka trend neeche hai (taakat 0.30, kam se kam 0.30 chahiye thi). Us trend ke beech bhaav thoda upar chadha (2.7 ATR ki halchal) aur ab trend ki taraf palat raha hai (pichli 1H candle trend ke saath band hui). Isliye trend ke saath SELL liya. Stop-loss 3.0\u00d7ATR door rakha taaki chhoti uthal-puthal se na toote, target risk ka 4.0 guna. Backtest mein har 3 mein ~2 trade harte hain, isliye loss normal hai.",
     "capped": false,
-    "last_px": 73.255,
+    "last_px": 73.458,
     "mgmt": {
      "status": "\ud83d\udfe2 HOLD: THESIS INTACT",
      "stage": "ENTRY",
-     "uR": -0.39,
+     "uR": -0.48,
      "mfe_R": 0.05,
      "exhaustion": 0,
      "reversal_flags": {
@@ -29820,7 +29881,7 @@
      ],
      "stop_advice": "Stop jaisa hai waisa rakho",
      "suggested_sl": 74.6,
-     "hold_vs_book": "Hold: target 4.4R door, stop tak 0.6R (R/R 7.2). Abhi book karo to +-0.4R pakka.",
+     "hold_vs_book": "Hold: target 4.5R door, stop tak 0.5R (R/R 8.7). Abhi book karo to +-0.5R pakka.",
      "next_zone": 65.6,
      "momentum_atr": -0.95,
      "volume_ratio": 1.44
@@ -29958,11 +30019,11 @@
     "grade": "B",
     "why": "Bade (4H) chart pe SOL ka trend neeche hai (taakat 0.33, kam se kam 0.30 chahiye thi). Us trend ke beech bhaav thoda upar chadha (3.4 ATR ki halchal) aur ab trend ki taraf palat raha hai (pichli 1H candle trend ke saath band hui). Isliye trend ke saath SELL liya. Stop-loss 3.0\u00d7ATR door rakha taaki chhoti uthal-puthal se na toote, target risk ka 4.0 guna. Backtest mein har 3 mein ~2 trade harte hain, isliye loss normal hai.",
     "capped": false,
-    "last_px": 84.49,
+    "last_px": 84.8,
     "mgmt": {
      "status": "\ud83d\udfe1 REVERSAL WATCH",
      "stage": "ENTRY",
-     "uR": -0.26,
+     "uR": -0.4,
      "mfe_R": 0.12,
      "exhaustion": 0,
      "reversal_flags": {
@@ -29977,7 +30038,7 @@
      ],
      "stop_advice": "Stop jaisa hai waisa rakho",
      "suggested_sl": 86.2,
-     "hold_vs_book": "Hold: target 4.3R door, stop tak 0.7R (R/R 5.8). Abhi book karo to +-0.3R pakka.",
+     "hold_vs_book": "Hold: target 4.4R door, stop tak 0.6R (R/R 7.3). Abhi book karo to +-0.4R pakka.",
      "next_zone": 76.9,
      "momentum_atr": -1.06,
      "volume_ratio": 1.63
@@ -30115,11 +30176,11 @@
     "grade": "B",
     "why": "Bade (4H) chart pe ETH ka trend neeche hai (taakat 0.39, kam se kam 0.30 chahiye thi). Us trend ke beech bhaav thoda upar chadha (3.4 ATR ki halchal) aur ab trend ki taraf palat raha hai (pichli 1H candle trend ke saath band hui). Isliye trend ke saath SELL liya. Stop-loss 3.0\u00d7ATR door rakha taaki chhoti uthal-puthal se na toote, target risk ka 4.0 guna. Backtest mein har 3 mein ~2 trade harte hain, isliye loss normal hai.",
     "capped": false,
-    "last_px": 2067.73,
+    "last_px": 2076.28,
     "mgmt": {
      "status": "\ud83d\udfe1 REVERSAL WATCH",
      "stage": "ENTRY",
-     "uR": -0.31,
+     "uR": -0.51,
      "mfe_R": 0.0,
      "exhaustion": 0,
      "reversal_flags": {
@@ -30134,7 +30195,7 @@
      ],
      "stop_advice": "Stop jaisa hai waisa rakho",
      "suggested_sl": 2098.4,
-     "hold_vs_book": "Hold: target 4.3R door, stop tak 0.7R (R/R 6.3). Abhi book karo to +-0.3R pakka.",
+     "hold_vs_book": "Hold: target 4.5R door, stop tak 0.5R (R/R 9.1). Abhi book karo to +-0.5R pakka.",
      "next_zone": 1919.9,
      "momentum_atr": -1.36,
      "volume_ratio": 1.97
@@ -30142,7 +30203,143 @@
     "mstatus": "\ud83d\udfe1 REVERSAL WATCH",
     "mts": "2026-11-11T16:01:41+00:00"
    }
+  },
+  "SB-MU-LONG-20261111-001": {
+   "id": "SB-MU-LONG-20261111-001",
+   "source": "PAPER",
+   "sym": "MU",
+   "strategy": "session_breakout",
+   "label": "Session Breakout (experimental) \u00b7 MU",
+   "side": "LONG",
+   "opened": "2026-11-11T16:11:41+00:00",
+   "opened_ist": "11 Nov 2026, 09:41 PM IST",
+   "entry": 821.9,
+   "stop": 792.5482142857143,
+   "targets": [
+    880.6035714285715
+   ],
+   "qty_btc": 0.0516,
+   "margin_inr": 1328.22,
+   "leverage": 3,
+   "risk_inr": 142.3,
+   "why": "Pichle 6 ghante bhaav ek tang box mein (2.5 ATR) ghoom raha tha. Ab 1H candle ne box ke upar mazboot band di, volume normal ka 3.7 guna tha, aur bade (4H) trend ne iska virodh nahi kiya. Active samay mein breakout hone se follow-through ki sambhavna behtar hoti hai. Isliye BUY liya. Stop box ke doosri taraf, target 2.0R. Ye experimental hai: backtest se pehle isse sabit nahi maana jaata.",
+   "context": {
+    "side_n": 1,
+    "side": "LONG",
+    "hour": 16,
+    "wd": 2,
+    "atr_pct": 1.428,
+    "vol_ratio": 3.69,
+    "box_atr": 2.46,
+    "tcls": "HIGH",
+    "regime": null,
+    "funding": 0.0
+   },
+   "entry_context": null,
+   "grade": "A",
+   "status": "OPEN",
+   "outcome": "",
+   "closed": null,
+   "closed_ist": "",
+   "exit": null,
+   "R": null,
+   "pnl_inr": null,
+   "fees_usd": 0.02120502,
+   "hold_h": null,
+   "best_R": 0.0,
+   "worst_R": 0.0,
+   "exits": [],
+   "lesson": "",
+   "auto_feedback": "",
+   "user_rating": "",
+   "user_note": "",
+   "user_feedback_ist": "",
+   "user_exit": null,
+   "timeline": [
+    {
+     "time_ist": "11 Nov 2026, 09:41 PM IST",
+     "type": "OPENED",
+     "price": 821.9,
+     "note": "qty 0.0516 MU, margin \u20b91,328"
+    }
+   ],
+   "raw": {
+    "id": "SB-MU-LONG-20261111-001",
+    "strategy": "session_breakout",
+    "sym": "MU",
+    "key": "session_breakout@MU",
+    "label": "Session Breakout (experimental) \u00b7 MU",
+    "side": 1,
+    "entry": 821.9,
+    "sl0": 792.5482142857143,
+    "sl": 792.5482142857143,
+    "risk": 29.351785714285757,
+    "mode": "fixed",
+    "tp": 880.6035714285715,
+    "t1": null,
+    "t2": null,
+    "t3": null,
+    "partial": 0.5,
+    "qty": 0.0516,
+    "qty_btc": 0.0516,
+    "notional_usd": 42.41,
+    "margin_inr": 1328.22,
+    "margin_released": 0.0,
+    "rem_wallet": 1.0,
+    "leverage": 3,
+    "fx": 93.955805,
+    "risk_inr": 142.3,
+    "fees_usd": 0.02120502,
+    "realized_usd": 0.0,
+    "stage": 0,
+    "remaining": 1.0,
+    "mfe_R": 0.0,
+    "mae_R": 0.0,
+    "exits": [],
+    "events": [
+     {
+      "ts": "2026-11-11T16:11:41+00:00",
+      "type": "OPENED",
+      "price": 821.9,
+      "note": "qty 0.0516 MU, margin \u20b91,328"
+     }
+    ],
+    "created": "2026-11-11T16:11:41+00:00",
+    "last_ts": 1794412800000.0,
+    "expiry_h": 24,
+    "cfg": {
+     "enabled": true,
+     "label": "Session Breakout (experimental)",
+     "risk_pct": 0.3,
+     "box_hours": 6,
+     "vol_mult": 1.3,
+     "stop_min_atr": 1.0,
+     "stop_max_atr": 2.5,
+     "target_r": 2.0,
+     "expiry_hours": 24,
+     "cooldown_hours": 6,
+     "leverage": 3,
+     "fee_per_side": 0.0005
+    },
+    "ctx": {
+     "side_n": 1,
+     "side": "LONG",
+     "hour": 16,
+     "wd": 2,
+     "atr_pct": 1.428,
+     "vol_ratio": 3.69,
+     "box_atr": 2.46,
+     "tcls": "HIGH",
+     "regime": null,
+     "funding": 0.0
+    },
+    "entry_ctx": null,
+    "confirm_lvl": 827.7703571428572,
+    "grade": "A",
+    "why": "Pichle 6 ghante bhaav ek tang box mein (2.5 ATR) ghoom raha tha. Ab 1H candle ne box ke upar mazboot band di, volume normal ka 3.7 guna tha, aur bade (4H) trend ne iska virodh nahi kiya. Active samay mein breakout hone se follow-through ki sambhavna behtar hoti hai. Isliye BUY liya. Stop box ke doosri taraf, target 2.0R. Ye experimental hai: backtest se pehle isse sabit nahi maana jaata.",
+    "capped": false
+   }
   }
  },
- "updated": "2026-11-11T16:07:02+00:00"
+ "updated": "2026-11-11T16:12:04+00:00"
 }
