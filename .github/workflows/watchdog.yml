@@ -1,0 +1,31 @@
+name: watchdog
+
+# A scan run can freeze on GitHub's side (seen twice: stuck forever inside "pip install", even though the step/job timeouts were set; GitHub never enforced them).
+# While it is frozen, every new scan run waits behind it and NOTHING is scanned. This tiny separate job checks every 20 minutes and cancels (then force-cancels) any scan run that
+# has been in progress longer than 6h15m (a healthy run lasts at most 5h40m), so the queued scan can start.
+on:
+  schedule:
+    - cron: "*/20 * * * *"
+  workflow_dispatch:
+
+permissions:
+  actions: write
+  contents: read
+
+jobs:
+  guard:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Cancel hung scan runs
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          ids=$(gh run list --repo "$GITHUB_REPOSITORY" --workflow scan.yml --status in_progress --limit 20 --json databaseId,startedAt --jq '.[] | select((now - (.startedAt | fromdateiso8601)) > 22500) | .databaseId')
+          if [ -z "$ids" ]; then echo "no hung scan run"; exit 0; fi
+          for id in $ids; do
+            echo "scan run $id is older than 6h15m: cancelling"
+            gh run cancel "$id" --repo "$GITHUB_REPOSITORY" || true
+            sleep 30
+            gh api -X POST "repos/$GITHUB_REPOSITORY/actions/runs/$id/force-cancel" || true
+          done
