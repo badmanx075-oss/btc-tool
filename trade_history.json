@@ -40393,20 +40393,28 @@
    },
    "entry_context": null,
    "grade": "B",
-   "status": "OPEN",
-   "outcome": "",
-   "closed": null,
-   "closed_ist": "",
-   "exit": null,
-   "R": null,
-   "pnl_inr": null,
-   "fees_usd": 0.0101328123438,
-   "hold_h": null,
-   "best_R": 0.5022754854368933,
-   "worst_R": 0.32458535598705485,
-   "exits": [],
-   "lesson": "",
-   "auto_feedback": "",
+   "status": "CLOSED",
+   "outcome": "SMART EXIT",
+   "closed": "2026-11-16T21:00:21+00:00",
+   "closed_ist": "17 Nov 2026, 02:30 AM IST",
+   "exit": 0.010223,
+   "R": -0.297,
+   "pnl_inr": -145.34,
+   "fees_usd": 0.02,
+   "hold_h": 10.0,
+   "best_R": 0.5,
+   "worst_R": 0.32,
+   "exits": [
+    {
+     "ts": "2026-11-16T21:00:21+00:00",
+     "kind": "SMART EXIT",
+     "price": 0.010223,
+     "frac": 1.0,
+     "pnl_inr": -143.5
+    }
+   ],
+   "lesson": "Smart exit (10 ghante mein trade ne kuch nahi kiya (stall, -0.3R)): -0.3R par band kiya, taaki trade lamba na chale. Fixed rule se tulna review pack mein hoti hai.",
+   "auto_feedback": "\ud83d\udfe1 Normal haar: sirf tay risk (-0.3R) gaya. Is tarah ki strategy mein aksar 3 mein 2 trade harte hain.",
    "user_rating": "",
    "user_note": "",
    "user_feedback_ist": "",
@@ -40417,6 +40425,18 @@
      "type": "OPENED",
      "price": 0.011052,
      "note": "qty 1833.6613 AKE, margin \u20b9638"
+    },
+    {
+     "time_ist": "17 Nov 2026, 02:30 AM IST",
+     "type": "SMART EXIT",
+     "price": 0.010223,
+     "note": "100% of position, P/L -\u20b9143"
+    },
+    {
+     "time_ist": "17 Nov 2026, 02:30 AM IST",
+     "type": "CLOSED",
+     "price": 0.010223,
+     "note": "SMART EXIT"
     }
    ],
    "raw": {
@@ -40440,28 +40460,48 @@
     "qty_btc": 1833.6613,
     "notional_usd": 20.27,
     "margin_inr": 637.69,
-    "margin_released": 0.0,
-    "rem_wallet": 1.0,
+    "margin_released": 637.69,
+    "rem_wallet": 0.0,
     "leverage": 3,
     "fx": 94.399626,
     "risk_inr": 489.02,
-    "fees_usd": 0.0101328123438,
-    "realized_usd": 0.0,
+    "fees_usd": 0.02,
+    "realized_usd": -1.5201052176999998,
     "stage": 0,
-    "remaining": 1.0,
-    "mfe_R": 0.5022754854368933,
-    "mae_R": 0.32458535598705485,
-    "exits": [],
+    "remaining": 0,
+    "mfe_R": 0.5,
+    "mae_R": 0.32,
+    "exits": [
+     {
+      "ts": "2026-11-16T21:00:21+00:00",
+      "kind": "SMART EXIT",
+      "price": 0.010223,
+      "frac": 1.0,
+      "pnl_inr": -143.5
+     }
+    ],
     "events": [
      {
       "ts": "2026-11-16T10:57:40+00:00",
       "type": "OPENED",
       "price": 0.011052,
       "note": "qty 1833.6613 AKE, margin \u20b9638"
+     },
+     {
+      "ts": "2026-11-16T21:00:21+00:00",
+      "type": "SMART EXIT",
+      "price": 0.010223,
+      "note": "100% of position, P/L -\u20b9143"
+     },
+     {
+      "ts": "2026-11-16T21:00:21+00:00",
+      "type": "CLOSED",
+      "price": 0.010223,
+      "note": "SMART EXIT"
      }
     ],
     "created": "2026-11-16T10:57:40+00:00",
-    "last_ts": 1794861000000.0,
+    "last_ts": 1794861900000.0,
     "expiry_h": 120,
     "cfg": {
      "enabled": true,
@@ -40490,32 +40530,52 @@
     "grade": "B",
     "why": "Bade (4H) chart pe AKE ka trend upar hai (taakat 0.31, kam se kam 0.30 chahiye thi). Us trend ke beech bhaav thoda neeche gira (1.7 ATR ki halchal) aur ab trend ki taraf palat raha hai (pichli 1H candle trend ke saath band hui). Isliye trend ke saath BUY liya. Stop-loss 3.0\u00d7ATR door rakha taaki chhoti uthal-puthal se na toote, target risk ka 4.0 guna. Backtest mein har 3 mein ~2 trade harte hain, isliye loss normal hai.",
     "capped": false,
-    "last_px": 0.010261,
+    "last_px": 0.010223,
     "mgmt": {
-     "status": "\ud83d\udfe1 REVERSAL WATCH",
+     "status": "\ud83d\udfe2 HOLD: THESIS INTACT",
      "stage": "ENTRY",
-     "uR": -0.28,
+     "uR": -0.29,
      "mfe_R": 0.5,
-     "exhaustion": 25,
+     "exhaustion": 45,
      "reversal_flags": {
-      "structure_break": true,
-      "momentum_negative": true,
+      "structure_break": false,
+      "momentum_negative": false,
       "gave_back": false
      },
      "reasons": [
-      "Momentum dheema pad raha hai (pichle 3 ghante -0.8 ATR)",
+      "Momentum dheema pad raha hai (pichle 3 ghante -0.3 ATR)",
       "Volume kam ho raha hai (normal ka 0.2 guna)",
-      "Bhaav ne pichla chhota swing trend ke khilaaf tod diya"
+      "Pichli candle mein upar (trend ki taraf) se rejection wick hai: bhaav wahan tik nahi paya"
      ],
      "stop_advice": "Stop jaisa hai waisa rakho",
      "suggested_sl": 0.0,
-     "hold_vs_book": "Hold: target 4.3R door, stop tak 0.7R (R/R 5.9). Abhi book karo to +-0.3R pakka.",
+     "hold_vs_book": "Hold: target 4.3R door, stop tak 0.7R (R/R 6.1). Abhi book karo to +-0.3R pakka.",
      "next_zone": 0.0,
-     "momentum_atr": -0.82,
-     "volume_ratio": 0.24
+     "momentum_atr": -0.28,
+     "volume_ratio": 0.19
     },
-    "mstatus": "\ud83d\udfe1 REVERSAL WATCH",
-    "mts": "2026-11-16T20:00:13+00:00"
+    "mstatus": "\ud83d\udfe2 HOLD: THESIS INTACT",
+    "mts": "2026-11-16T21:00:21+00:00",
+    "smart_reason": "10 ghante mein trade ne kuch nahi kiya (stall, -0.3R)",
+    "closed": "2026-11-16T21:00:21+00:00",
+    "outcome": "SMART EXIT",
+    "exit": 0.010223,
+    "R": -0.297,
+    "pnl_inr": -145.34,
+    "net_usd": -1.54,
+    "gross_usd": -1.52,
+    "hold_h": 10.0,
+    "lesson": "Smart exit (10 ghante mein trade ne kuch nahi kiya (stall, -0.3R)): -0.3R par band kiya, taaki trade lamba na chale. Fixed rule se tulna review pack mein hoti hai.",
+    "feedback": {
+     "auto": {
+      "result": "LOSS",
+      "verdict": "\ud83d\udfe1 Normal haar: sirf tay risk (-0.3R) gaya. Is tarah ki strategy mein aksar 3 mein 2 trade harte hain.",
+      "plan_followed": true,
+      "best_R": 0.5,
+      "worst_R": 0.32
+     },
+     "user": null
+    }
    }
   },
   "SB-SNDK-SHORT-20261116-001": {
@@ -40619,7 +40679,7 @@
      }
     ],
     "created": "2026-11-16T12:13:25+00:00",
-    "last_ts": 1794861000000.0,
+    "last_ts": 1794861900000.0,
     "expiry_h": 24,
     "cfg": {
      "enabled": true,
@@ -40652,29 +40712,28 @@
     "grade": "B",
     "why": "Pichle 6 ghante bhaav ek tang box mein (1.4 ATR) ghoom raha tha. Ab 1H candle ne box ke neeche mazboot band di, volume normal ka 2.0 guna tha, aur bade (4H) trend ne iska virodh nahi kiya. Theek-thaak samay mein breakout hone se follow-through ki sambhavna behtar hoti hai. Isliye SELL liya. Stop box ke doosri taraf, target 2.0R. Ye experimental hai: backtest se pehle isse sabit nahi maana jaata.",
     "capped": false,
-    "last_px": 813.4,
+    "last_px": 811.4,
     "mgmt": {
      "status": "\ud83d\udfe2 HOLD: MORE UPSIDE POSSIBLE",
      "stage": "PROFIT DEVELOPING",
-     "uR": 0.52,
+     "uR": 0.6,
      "mfe_R": 1.0,
-     "exhaustion": 45,
+     "exhaustion": 25,
      "reversal_flags": {
       "structure_break": false,
       "momentum_negative": false,
       "gave_back": false
      },
      "reasons": [
-      "Momentum trend ke saath chal raha hai (pichle 3 ghante +0.4 ATR)",
-      "Volume kam ho raha hai (normal ka 0.7 guna)",
-      "Pichli candle mein upar (trend ki taraf) se rejection wick hai: bhaav wahan tik nahi paya"
+      "Momentum trend ke saath chal raha hai (pichle 3 ghante +0.8 ATR)",
+      "Volume kam ho raha hai (normal ka 0.7 guna)"
      ],
      "stop_advice": "Stop jaisa hai waisa rakho",
      "suggested_sl": 854.4,
-     "hold_vs_book": "Hold: target 1.5R door, stop tak 1.5R (R/R 1.0). Abhi book karo to +0.5R pakka.",
+     "hold_vs_book": "Hold: target 1.4R door, stop tak 1.6R (R/R 0.9). Abhi book karo to +0.6R pakka.",
      "next_zone": 787.2,
-     "momentum_atr": 0.37,
-     "volume_ratio": 0.69
+     "momentum_atr": 0.77,
+     "volume_ratio": 0.68
     },
     "mstatus": "\ud83d\udfe2 HOLD: MORE UPSIDE POSSIBLE",
     "mts": "2026-11-16T16:49:21+00:00"
@@ -40780,7 +40839,7 @@
      }
     ],
     "created": "2026-11-16T13:33:44+00:00",
-    "last_ts": 1794861000000.0,
+    "last_ts": 1794861900000.0,
     "expiry_h": 120,
     "cfg": {
      "enabled": true,
@@ -40809,11 +40868,11 @@
     "grade": "B",
     "why": "Bade (4H) chart pe XAU ka trend neeche hai (taakat 0.32, kam se kam 0.30 chahiye thi). Us trend ke beech bhaav thoda upar chadha (2.0 ATR ki halchal) aur ab trend ki taraf palat raha hai (pichli 1H candle trend ke saath band hui). Isliye trend ke saath SELL liya. Stop-loss 3.0\u00d7ATR door rakha taaki chhoti uthal-puthal se na toote, target risk ka 4.0 guna. Backtest mein har 3 mein ~2 trade harte hain, isliye loss normal hai.",
     "capped": false,
-    "last_px": 3858.3,
+    "last_px": 3857.3,
     "mgmt": {
      "status": "\ud83d\udfe2 HOLD: MORE UPSIDE POSSIBLE",
      "stage": "ENTRY",
-     "uR": 0.28,
+     "uR": 0.29,
      "mfe_R": 0.45,
      "exhaustion": 25,
      "reversal_flags": {
@@ -40822,15 +40881,15 @@
       "gave_back": false
      },
      "reasons": [
-      "Momentum dheema pad raha hai (pichle 3 ghante -0.0 ATR)",
+      "Momentum trend ke saath chal raha hai (pichle 3 ghante +0.3 ATR)",
       "Volume kam ho raha hai (normal ka 0.5 guna)"
      ],
      "stop_advice": "Stop jaisa hai waisa rakho",
      "suggested_sl": 3936.0,
      "hold_vs_book": "Hold: target 3.7R door, stop tak 1.3R (R/R 2.9). Abhi book karo to +0.3R pakka.",
      "next_zone": 3692.8,
-     "momentum_atr": -0.04,
-     "volume_ratio": 0.5
+     "momentum_atr": 0.32,
+     "volume_ratio": 0.46
     },
     "mstatus": "\ud83d\udfe2 HOLD: MORE UPSIDE POSSIBLE",
     "mts": "2026-11-16T17:39:50+00:00"
@@ -40936,7 +40995,7 @@
      }
     ],
     "created": "2026-11-16T13:43:47+00:00",
-    "last_ts": 1794861000000.0,
+    "last_ts": 1794861900000.0,
     "expiry_h": 120,
     "cfg": {
      "enabled": true,
@@ -40965,29 +41024,28 @@
     "grade": "A",
     "why": "Bade (4H) chart pe LIT ka trend neeche hai (taakat 0.47, kam se kam 0.30 chahiye thi). Us trend ke beech bhaav thoda upar chadha (2.5 ATR ki halchal) aur ab trend ki taraf palat raha hai (pichli 1H candle trend ke saath band hui). Isliye trend ke saath SELL liya. Stop-loss 3.0\u00d7ATR door rakha taaki chhoti uthal-puthal se na toote, target risk ka 4.0 guna. Backtest mein har 3 mein ~2 trade harte hain, isliye loss normal hai.",
     "capped": false,
-    "last_px": 2.7128,
+    "last_px": 2.7082,
     "mgmt": {
      "status": "\ud83d\udfe2 HOLD: THESIS INTACT",
      "stage": "ENTRY",
-     "uR": -0.57,
+     "uR": -0.55,
      "mfe_R": 0.01,
-     "exhaustion": 20,
+     "exhaustion": 25,
      "reversal_flags": {
       "structure_break": false,
-      "momentum_negative": false,
+      "momentum_negative": true,
       "gave_back": false
      },
      "reasons": [
-      "Momentum dheema pad raha hai (pichle 3 ghante -0.3 ATR)",
-      "Volume theek hai (normal ka 1.0 guna)",
-      "Pichli candle mein upar (trend ki taraf) se rejection wick hai: bhaav wahan tik nahi paya"
+      "Momentum dheema pad raha hai (pichle 3 ghante -0.6 ATR)",
+      "Volume kam ho raha hai (normal ka 0.6 guna)"
      ],
      "stop_advice": "Stop jaisa hai waisa rakho",
      "suggested_sl": 2.8,
-     "hold_vs_book": "Hold: target 4.6R door, stop tak 0.4R (R/R 10.6). Abhi book karo to +-0.6R pakka.",
+     "hold_vs_book": "Hold: target 4.6R door, stop tak 0.4R (R/R 10.1). Abhi book karo to +-0.6R pakka.",
      "next_zone": 1.7,
-     "momentum_atr": -0.34,
-     "volume_ratio": 1.0
+     "momentum_atr": -0.59,
+     "volume_ratio": 0.6
     },
     "mstatus": "\ud83d\udfe2 HOLD: THESIS INTACT",
     "mts": "2026-11-16T20:00:13+00:00"
@@ -41093,7 +41151,7 @@
      }
     ],
     "created": "2026-11-16T14:33:58+00:00",
-    "last_ts": 1794861000000.0,
+    "last_ts": 1794861900000.0,
     "expiry_h": 120,
     "cfg": {
      "enabled": true,
@@ -41122,34 +41180,344 @@
     "grade": "B",
     "why": "Bade (4H) chart pe UNITREE ka trend neeche hai (taakat 0.39, kam se kam 0.30 chahiye thi). Us trend ke beech bhaav thoda upar chadha (3.2 ATR ki halchal) aur ab trend ki taraf palat raha hai (pichli 1H candle trend ke saath band hui). Isliye trend ke saath SELL liya. Stop-loss 3.0\u00d7ATR door rakha taaki chhoti uthal-puthal se na toote, target risk ka 4.0 guna. Backtest mein har 3 mein ~2 trade harte hain, isliye loss normal hai.",
     "capped": false,
-    "last_px": 102.51,
+    "last_px": 102.38,
     "mgmt": {
      "status": "\ud83d\udfe2 HOLD: MORE UPSIDE POSSIBLE",
      "stage": "ENTRY",
-     "uR": 0.1,
+     "uR": 0.12,
      "mfe_R": 0.13,
-     "exhaustion": 45,
+     "exhaustion": 25,
      "reversal_flags": {
       "structure_break": false,
       "momentum_negative": false,
       "gave_back": false
      },
      "reasons": [
-      "Momentum trend ke saath chal raha hai (pichle 3 ghante +0.6 ATR)",
-      "Volume kam ho raha hai (normal ka 0.1 guna)",
-      "Pichli candle mein upar (trend ki taraf) se rejection wick hai: bhaav wahan tik nahi paya"
+      "Momentum trend ke saath chal raha hai (pichle 3 ghante +0.8 ATR)",
+      "Volume kam ho raha hai (normal ka 0.1 guna)"
      ],
      "stop_advice": "Stop jaisa hai waisa rakho",
      "suggested_sl": 107.9,
-     "hold_vs_book": "Hold: target 3.9R door, stop tak 1.1R (R/R 3.6). Abhi book karo to +0.1R pakka.",
+     "hold_vs_book": "Hold: target 3.9R door, stop tak 1.1R (R/R 3.5). Abhi book karo to +0.1R pakka.",
      "next_zone": 88.1,
-     "momentum_atr": 0.59,
+     "momentum_atr": 0.8,
      "volume_ratio": 0.07
     },
     "mstatus": "\ud83d\udfe2 HOLD: MORE UPSIDE POSSIBLE",
     "mts": "2026-11-16T16:39:19+00:00"
    }
+  },
+  "TP-SHORT-20261116-006": {
+   "id": "TP-SHORT-20261116-006",
+   "source": "PAPER",
+   "sym": "BTC",
+   "strategy": "trend_pullback",
+   "label": "Trend Pullback",
+   "side": "SHORT",
+   "opened": "2026-11-16T21:00:21+00:00",
+   "opened_ist": "17 Nov 2026, 02:30 AM IST",
+   "entry": 65035.3,
+   "stop": 66822.72142857144,
+   "targets": [
+    57885.61428571427
+   ],
+   "qty_btc": 0.0028,
+   "margin_inr": 5730.02,
+   "leverage": 3,
+   "risk_inr": 472.45,
+   "why": "Bade (4H) chart pe BTC ka trend neeche hai (taakat 0.50, kam se kam 0.30 chahiye thi). Us trend ke beech bhaav thoda upar chadha (1.9 ATR ki halchal) aur ab trend ki taraf palat raha hai (pichli 1H candle trend ke saath band hui). Isliye trend ke saath SELL liya. Stop-loss 3.0\u00d7ATR door rakha taaki chhoti uthal-puthal se na toote, target risk ka 4.0 guna. Backtest mein har 3 mein ~2 trade harte hain, isliye loss normal hai.",
+   "context": {
+    "er4": 0.502,
+    "atr_pct": 0.916,
+    "depth": 1.94,
+    "hour": 20,
+    "wd": 0,
+    "side_n": -1,
+    "side": "SHORT",
+    "funding": 6.15410720562e-05,
+    "regime": "BEARISH TREND"
+   },
+   "entry_context": {
+    "time_utc": "2026-11-16T21:00:21+00:00",
+    "session": "Late (21-24 UTC)",
+    "weekday": "Mon",
+    "regime": "BEARISH TREND",
+    "stage": "Stage 4-5: trade active",
+    "stage_status": "TRADE ACTIVE (see Home)",
+    "direction": "NONE",
+    "scores": {
+     "structure": 50.0,
+     "volume": 51.9,
+     "momentum": 37.1,
+     "order_flow": 68.6,
+     "liquidity": 58.0,
+     "htf": 24.9,
+     "accumulation": 25.0,
+     "distribution": 40.0,
+     "volatility_pct": 57.0,
+     "large_move_potential": 100.0,
+     "continuation": 38.0,
+     "exhaustion_risk": 8.9,
+     "setup": 0.0
+    },
+    "false_signal_risk": "n/a",
+    "range": {
+     "high": 71619.6,
+     "low": 61931.1,
+     "mid": 66775.35,
+     "position_pct": 31.501264385611783
+    },
+    "expected_move": [
+     1367.894255,
+     2457.660842
+    ],
+    "mtf": [
+     [
+      "4H",
+      "DOWN",
+      0.49
+     ],
+     [
+      "1H",
+      "FLAT",
+      0.04
+     ],
+     [
+      "30m",
+      "FLAT",
+      0.1
+     ],
+     [
+      "15m",
+      "FLAT",
+      0.14
+     ],
+     [
+      "5m",
+      "FLAT",
+      0.16
+     ]
+    ],
+    "move_radar": 37,
+    "aggression": "NORMAL / BALANCED",
+    "hour_class": "MEDIUM",
+    "hour_activity": 90,
+    "crowding": "balanced",
+    "oi_quadrant": null,
+    "taker_delta": -0.2,
+    "liquidations": {
+     "long_usd": 8427.0,
+     "short_usd": 1200080.0
+    },
+    "funding": 6.15410720562e-05,
+    "radar": {
+     "LONG": 1,
+     "SHORT": 4
+    },
+    "reversal": "none",
+    "methods": {
+     "verdict": "WAIT",
+     "net": -24.3,
+     "agree": 2,
+     "against": 0,
+     "total": 7,
+     "keys": [
+      "trend",
+      "volume"
+     ]
+    },
+    "methods_text": "2/7 methods trade ke saath, 0 khilaaf (consensus: WAIT)"
+   },
+   "grade": "A",
+   "status": "OPEN",
+   "outcome": "",
+   "closed": null,
+   "closed_ist": "",
+   "exit": null,
+   "R": null,
+   "pnl_inr": null,
+   "fees_usd": 0.09104942,
+   "hold_h": null,
+   "best_R": 0.0,
+   "worst_R": 0.0,
+   "exits": [],
+   "lesson": "",
+   "auto_feedback": "",
+   "user_rating": "",
+   "user_note": "",
+   "user_feedback_ist": "",
+   "user_exit": null,
+   "timeline": [
+    {
+     "time_ist": "17 Nov 2026, 02:30 AM IST",
+     "type": "OPENED",
+     "price": 65035.3,
+     "note": "qty 0.0028 BTC, margin \u20b95,730"
+    }
+   ],
+   "raw": {
+    "id": "TP-SHORT-20261116-006",
+    "strategy": "trend_pullback",
+    "sym": "BTC",
+    "key": "trend_pullback",
+    "label": "Trend Pullback",
+    "side": -1,
+    "entry": 65035.3,
+    "sl0": 66822.72142857144,
+    "sl": 66822.72142857144,
+    "risk": 1787.4214285714338,
+    "mode": "fixed",
+    "tp": 57885.61428571427,
+    "t1": null,
+    "t2": null,
+    "t3": null,
+    "partial": 0.5,
+    "qty": 0.0028,
+    "qty_btc": 0.0028,
+    "notional_usd": 182.1,
+    "margin_inr": 5730.02,
+    "margin_released": 0.0,
+    "rem_wallet": 1.0,
+    "leverage": 3,
+    "fx": 94.399626,
+    "risk_inr": 472.45,
+    "fees_usd": 0.09104942,
+    "realized_usd": 0.0,
+    "stage": 0,
+    "remaining": 1.0,
+    "mfe_R": 0.0,
+    "mae_R": 0.0,
+    "exits": [],
+    "events": [
+     {
+      "ts": "2026-11-16T21:00:21+00:00",
+      "type": "OPENED",
+      "price": 65035.3,
+      "note": "qty 0.0028 BTC, margin \u20b95,730"
+     }
+    ],
+    "created": "2026-11-16T21:00:21+00:00",
+    "last_ts": 1794862800000.0,
+    "expiry_h": 120,
+    "cfg": {
+     "enabled": true,
+     "label": "Trend Pullback",
+     "risk_pct": 1.0,
+     "stop_atr": 3.0,
+     "target_r": 4.0,
+     "expiry_hours": 120,
+     "cooldown_hours": 24,
+     "leverage": 3,
+     "fee_per_side": 0.0005
+    },
+    "ctx": {
+     "er4": 0.502,
+     "atr_pct": 0.916,
+     "depth": 1.94,
+     "hour": 20,
+     "wd": 0,
+     "side_n": -1,
+     "side": "SHORT",
+     "funding": 6.15410720562e-05,
+     "regime": "BEARISH TREND"
+    },
+    "entry_ctx": {
+     "time_utc": "2026-11-16T21:00:21+00:00",
+     "session": "Late (21-24 UTC)",
+     "weekday": "Mon",
+     "regime": "BEARISH TREND",
+     "stage": "Stage 4-5: trade active",
+     "stage_status": "TRADE ACTIVE (see Home)",
+     "direction": "NONE",
+     "scores": {
+      "structure": 50.0,
+      "volume": 51.9,
+      "momentum": 37.1,
+      "order_flow": 68.6,
+      "liquidity": 58.0,
+      "htf": 24.9,
+      "accumulation": 25.0,
+      "distribution": 40.0,
+      "volatility_pct": 57.0,
+      "large_move_potential": 100.0,
+      "continuation": 38.0,
+      "exhaustion_risk": 8.9,
+      "setup": 0.0
+     },
+     "false_signal_risk": "n/a",
+     "range": {
+      "high": 71619.6,
+      "low": 61931.1,
+      "mid": 66775.35,
+      "position_pct": 31.501264385611783
+     },
+     "expected_move": [
+      1367.894255,
+      2457.660842
+     ],
+     "mtf": [
+      [
+       "4H",
+       "DOWN",
+       0.49
+      ],
+      [
+       "1H",
+       "FLAT",
+       0.04
+      ],
+      [
+       "30m",
+       "FLAT",
+       0.1
+      ],
+      [
+       "15m",
+       "FLAT",
+       0.14
+      ],
+      [
+       "5m",
+       "FLAT",
+       0.16
+      ]
+     ],
+     "move_radar": 37,
+     "aggression": "NORMAL / BALANCED",
+     "hour_class": "MEDIUM",
+     "hour_activity": 90,
+     "crowding": "balanced",
+     "oi_quadrant": null,
+     "taker_delta": -0.2,
+     "liquidations": {
+      "long_usd": 8427.0,
+      "short_usd": 1200080.0
+     },
+     "funding": 6.15410720562e-05,
+     "radar": {
+      "LONG": 1,
+      "SHORT": 4
+     },
+     "reversal": "none",
+     "methods": {
+      "verdict": "WAIT",
+      "net": -24.3,
+      "agree": 2,
+      "against": 0,
+      "total": 7,
+      "keys": [
+       "trend",
+       "volume"
+      ]
+     },
+     "methods_text": "2/7 methods trade ke saath, 0 khilaaf (consensus: WAIT)"
+    },
+    "confirm_lvl": null,
+    "grade": "A",
+    "why": "Bade (4H) chart pe BTC ka trend neeche hai (taakat 0.50, kam se kam 0.30 chahiye thi). Us trend ke beech bhaav thoda upar chadha (1.9 ATR ki halchal) aur ab trend ki taraf palat raha hai (pichli 1H candle trend ke saath band hui). Isliye trend ke saath SELL liya. Stop-loss 3.0\u00d7ATR door rakha taaki chhoti uthal-puthal se na toote, target risk ka 4.0 guna. Backtest mein har 3 mein ~2 trade harte hain, isliye loss normal hai.",
+    "capped": false
+   }
   }
  },
- "updated": "2026-11-16T20:55:46+00:00"
+ "updated": "2026-11-16T21:00:50+00:00"
 }
