@@ -224,3 +224,21 @@ Early signal OFF karne se purane 27 trades ka -10.4R hata ke ginte to baaki 41->
 - Telegram: har trade message (order open, T1, position update, smart exit, close) me "🧠 Strategy | 🪙 coin | ID" aur BUY/SELL price -> live price -> P/L (profit 🟢, loss 🔴), stop, target dikhta hai.
 - Naya "📈 OPEN TRADES UPDATE": har 3 ghante me sab open trades strategy ke hisaab se (buy price, live price, P/L). Band karna: /set digest_hours 0 ya /notify digest off. Ghanta badalna: /set digest_hours 2.
 - Naye Telegram commands: /report (total + strategy + coin), /strategies, /perps.
+
+## Update: watchdog (11 Nov)
+Scan run #1803 GitHub ke runner par 9 ghante se "Install" me atka raha (timeouts bhi kaam nahi kiye). Naya `.github/workflows/watchdog.yml` har 20 minute me check karta hai aur 6h15m se purane scan run ko cancel + force-cancel kar deta hai, taaki agla scan shuru ho sake.
+
+## Fix (12 Nov): Trade History me alag win rate
+Trade History ka "Show details for" filter selected coin (BTC) par khulta tha, isliye wahan sirf BTC ka win rate (~26%) dikhta tha, jabki Reports me saare coins ka (~36%). Ab default "All" hai, caption batata hai ki numbers kis filter ke hain, aur win ki definition dono jagah R > 0 hai.
+
+## Update: 75-trade review (12 Nov)
+Numbers (khud recompute kiye): 75 trades, win 36%, mean -0.30R, net -Rs3,107. 
+- Purani (ES + CF, ab OFF) 36 trades: -0.48R. Abhi chalne wali (TP + SB + BB) 39 trades: win 46%, mean -0.137R (t = -1.06): zero se alag saabit nahi, par profitable bhi nahi.
+- Smart exit (paired, wahi trades): 21/30 me behtar (p=0.02). Trend Pullback me 15/16: smart exit +0.10R vs fixed rule -0.72R. Yaani entry me khud edge nahi, smart exit loss kaat raha hai.
+- Full stop-loss (12 trades) -1.05R aur sab ka best move 0.2R se kam: stop chhota nahi, entry hi kaam nahi karti. Fees ka asar chhota (-1.05R, ideal -1.0R).
+Badlav: (1) trend_pullback risk 1.0% -> 0.5% (sabse bada risk bina saboot wali strategy par; R wahi rehta hai, sirf Rs ka ghata aadha). /set trend_pullback.risk_pct 1 se wapas. (2) Har trade ab 1/2/4/6/8 ghante par best/worst move save karta hai (review pack me `path`). (3) early_exit_test.py: jab 30+ trades me path data ho, `python early_exit_test.py review_pack.json` batayega ki "X ghante me kaam na kare to nikal jao" rule asli data par kaam karta hai ya nahi.
+Jo nahi badla (data nahi): LONG/SHORT bias (market gir raha tha), coin-class filter (n kam), score/grade filters.
+
+## Update: 100-trade review (16 Nov 2026)
+- `trend_pullback.long_risk_mult = 0.5`: LONG trades of Trend Pullback now risk half (0.25% instead of 0.5%); SHORT unchanged. Reason: LONG 13 trades, 15% win, -0.48R (z about -2.6), SHORT 29 trades -0.04R. This is a probation size cut, NOT a block and NOT a proven edge; the market was falling this period. Revert: `/set trend_pullback.long_risk_mult 1`.
+- Smart exit: earlier "p=0.02" was a sign test (it wins more often: 32 of 49) but on the mean it is NOT better: smart +0.25R vs fixed rule +0.33R. Stall exits give up the rare 4R winners. Kept as is (lower variance); `path` data will test a better stall rule.

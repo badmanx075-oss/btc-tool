@@ -112,7 +112,7 @@ def readiness(S, rows=None):
 def _trade_row(r):
     raw = r.get("raw") or {}
     return dict(id=r["id"], strategy=r.get("strategy"), side=r.get("side"), opened_ist=r.get("opened_ist"), closed_ist=r.get("closed_ist"), entry=r.get("entry"), stop=r.get("stop"), targets=r.get("targets"),
-                exit=r.get("exit"), outcome=r.get("outcome"), R=r.get("R"), pnl_inr=r.get("pnl_inr"), hold_h=r.get("hold_h"), best_R=r.get("best_R"), worst_R=r.get("worst_R"), grade=grade(r.get("strategy"), raw.get("ctx")),
+                exit=r.get("exit"), outcome=r.get("outcome"), R=r.get("R"), pnl_inr=r.get("pnl_inr"), hold_h=r.get("hold_h"), best_R=r.get("best_R"), worst_R=r.get("worst_R"), path=(r.get("raw") or {}).get("path"), grade=grade(r.get("strategy"), raw.get("ctx")),
                 setup_ctx=raw.get("ctx"), entry_context=raw.get("entry_ctx"), why=r.get("why"), exits=r.get("exits"), lesson=r.get("lesson"), auto_feedback=r.get("auto_feedback"),
                 user_rating=r.get("user_rating"), user_note=r.get("user_note"), user_exit=r.get("user_exit"), config_at_entry=raw.get("cfg"))
 

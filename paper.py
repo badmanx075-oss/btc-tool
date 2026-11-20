@@ -193,13 +193,18 @@ def manage(P, C, t, h15, px, now, send):
         if t["remaining"] <= 1e-9: break
     if t["remaining"] > 1e-9 and (now - dt.datetime.fromisoformat(t["created"])).total_seconds() / 3600 >= t["expiry_h"]:
         frac = t["remaining"]; t["remaining"] = 0; apply_exit(P, C, t, "EXPIRED", px, frac, now, send)
+    try:                                                         # progress snapshots (best/worst move so far) at 1/2/4/6/8 h: lets a later review test "exit early if the trade has not worked by hour X" on REAL paths, not guesses
+        h_ = (now - dt.datetime.fromisoformat(t["created"])).total_seconds() / 3600; pth = t.setdefault("path", {})
+        for cp in (1, 2, 4, 6, 8):
+            if h_ >= cp and f"{cp}h" not in pth and t["remaining"] > 1e-9: pth[f"{cp}h"] = dict(mfe=round(float(t.get("mfe_R", 0)), 2), mae=round(float(t.get("mae_R", 0)), 2), uR=round((px - t["entry"]) * t["side"] / t["risk"], 2))
+    except Exception as ex: print("path log error", ex)
     if len(h15) > 1: t["last_ts"] = max(t["last_ts"], float(h15.ts.iloc[-2]))
     if t["remaining"] <= 1e-9: finalize(P, C, t, now, send)
 
 # ---------------------------------------------------------------- entries
 def open_position(P, C, name, sg, now, h15, fxr, send, sym="BTC"):
     key = name if sym == "BTC" else f"{name}@{sym}"; sc = C["strategies"][name]; Wl = P["wallet"]; k, e = sg["side"], sg["entry"]; fee, lev = C["wallet"]["fee_rate_per_side"], C["wallet"]["leverage"]
-    qty = (Wl["cash"] + Wl["margin"]) * sc["risk_pct"] / 100 / (sg["risk"] * fxr); cap = Wl["cash"] * 0.99 / (e * fxr * (1 / lev + fee)); capped = qty > cap; qty = min(qty, cap)
+    rpct = sc["risk_pct"] * (float(sc.get("long_risk_mult", 1.0)) if k == 1 else 1.0); qty = (Wl["cash"] + Wl["margin"]) * rpct / 100 / (sg["risk"] * fxr); cap = Wl["cash"] * 0.99 / (e * fxr * (1 / lev + fee)); capped = qty > cap; qty = min(qty, cap)
     step = C["wallet"].get("qty_step", 0.0001); qty = round(int(qty / step) * step, 6)
     if qty < step: jlog(P, now, "SKIPPED", f"{name} {'LONG' if k == 1 else 'SHORT'} signal skipped: not enough free balance"); return False
     P["n"][key] = P["n"].get(key, 0) + 1; side = "LONG" if k == 1 else "SHORT"; tid = f"{ {'trend_pullback': 'TP', 'session_breakout': 'SB', 'confluence': 'CF', 'analog_edge': 'AE', 'bb_rsi_vol': 'BB'}.get(name, 'ES') }{'' if sym == 'BTC' else '-' + sym}-{side}-{now.strftime('%Y%m%d')}-{P['n'][key]:03d}"
@@ -215,7 +220,7 @@ def open_position(P, C, name, sg, now, h15, fxr, send, sym="BTC"):
     if C["alerts"].get("paper_open"):
         send(f"📝 PAPER ORDER PLACED (virtual)  🕒 {config.ist(now, C)} IST\n{fmt.sline(t)} | Grade {t['grade']}\nOrder ID: {tid}\nAction: {'BUY' if k == 1 else 'SELL'} ({side}) {sym}USDT Perpetual\nQty: {qty} {sym} @ ${e:,.{d_}f}\n"
              f"Position value ${config.pf(notional)} ({inr(notional * fxr)}) | margin locked {inr(margin)} ({lev}x) | entry fee {inr(fee_usd * fxr)}\n{plan}\n"
-             f"Risk {inr(t['risk_inr'])} ({sc['risk_pct']}% of equity)" + (" | size capped by free balance" if capped else "") + f"\n💬 Kyun liya: {t['why']}\n🧩 Doosri raay: {(t.get('entry_ctx') or {}).get('methods_text', 'n/a')}\n"
+             f"Risk {inr(t['risk_inr'])} ({round(rpct, 3)}% of equity)" + (" | size capped by free balance" if capped else "") + f"\n💬 Kyun liya: {t['why']}\n🧩 Doosri raay: {(t.get('entry_ctx') or {}).get('methods_text', 'n/a')}\n"
              f"💰 Wallet: free {inr(Wl['cash'])} | in trades {inr(Wl['margin'])} | equity {inr(Wl['cash'] + Wl['margin'])}")
     return True
 
