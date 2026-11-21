@@ -51419,20 +51419,28 @@
    },
    "entry_context": null,
    "grade": "B",
-   "status": "OPEN",
-   "outcome": "",
-   "closed": null,
-   "closed_ist": "",
-   "exit": null,
-   "R": null,
-   "pnl_inr": null,
-   "fees_usd": 0.00400158,
-   "hold_h": null,
-   "best_R": 0.40730498905403834,
-   "worst_R": 0.12420785804816276,
-   "exits": [],
-   "lesson": "",
-   "auto_feedback": "",
+   "status": "CLOSED",
+   "outcome": "SMART EXIT",
+   "closed": "2026-11-21T10:02:33+00:00",
+   "closed_ist": "21 Nov 2026, 03:32 PM IST",
+   "exit": 81.02,
+   "R": 0.286,
+   "pnl_inr": 34.19,
+   "fees_usd": 0.01,
+   "hold_h": 10.0,
+   "best_R": 0.41,
+   "worst_R": 0.12,
+   "exits": [
+    {
+     "ts": "2026-11-21T10:02:33+00:00",
+     "kind": "SMART EXIT",
+     "price": 81.02,
+     "frac": 1.0,
+     "pnl_inr": 34.95
+    }
+   ],
+   "lesson": "Smart exit (10 ghante mein trade ne kuch nahi kiya (stall, +0.3R)): +0.3R par band kiya, taaki trade lamba na chale. Fixed rule se tulna review pack mein hoti hai.",
+   "auto_feedback": "\u2705 Achha trade: plan ke mutabik +0.3R. Best move +0.4R tak gayi, uska 70% pakda.",
    "user_rating": "",
    "user_note": "",
    "user_feedback_ist": "",
@@ -51443,6 +51451,18 @@
      "type": "OPENED",
      "price": 77.4,
      "note": "qty 0.1034 SOXS, margin \u20b9249"
+    },
+    {
+     "time_ist": "21 Nov 2026, 03:32 PM IST",
+     "type": "SMART EXIT",
+     "price": 81.02,
+     "note": "100% of position, P/L \u20b935"
+    },
+    {
+     "time_ist": "21 Nov 2026, 03:32 PM IST",
+     "type": "CLOSED",
+     "price": 81.02,
+     "note": "SMART EXIT"
     }
    ],
    "raw": {
@@ -51466,28 +51486,48 @@
     "qty_btc": 0.1034,
     "notional_usd": 8.0,
     "margin_inr": 249.09,
-    "margin_released": 0.0,
-    "rem_wallet": 1.0,
+    "margin_released": 249.09,
+    "rem_wallet": 0.0,
     "leverage": 3,
     "fx": 93.372746,
     "risk_inr": 119.71,
-    "fees_usd": 0.00400158,
-    "realized_usd": 0.0,
+    "fees_usd": 0.01,
+    "realized_usd": 0.37430799999999903,
     "stage": 0,
-    "remaining": 1.0,
-    "mfe_R": 0.40730498905403834,
-    "mae_R": 0.12420785804816276,
-    "exits": [],
+    "remaining": 0,
+    "mfe_R": 0.41,
+    "mae_R": 0.12,
+    "exits": [
+     {
+      "ts": "2026-11-21T10:02:33+00:00",
+      "kind": "SMART EXIT",
+      "price": 81.02,
+      "frac": 1.0,
+      "pnl_inr": 34.95
+     }
+    ],
     "events": [
      {
       "ts": "2026-11-21T00:00:21+00:00",
       "type": "OPENED",
       "price": 77.4,
       "note": "qty 0.1034 SOXS, margin \u20b9249"
+     },
+     {
+      "ts": "2026-11-21T10:02:33+00:00",
+      "type": "SMART EXIT",
+      "price": 81.02,
+      "note": "100% of position, P/L \u20b935"
+     },
+     {
+      "ts": "2026-11-21T10:02:33+00:00",
+      "type": "CLOSED",
+      "price": 81.02,
+      "note": "SMART EXIT"
      }
     ],
     "created": "2026-11-21T00:00:21+00:00",
-    "last_ts": 1795253400000.0,
+    "last_ts": 1795254300000.0,
     "expiry_h": 120,
     "cfg": {
      "enabled": true,
@@ -51517,7 +51557,7 @@
     "grade": "B",
     "why": "Bade (4H) chart pe SOXS ka trend upar hai (taakat 0.33, kam se kam 0.30 chahiye thi). Us trend ke beech bhaav thoda neeche gira (1.9 ATR ki halchal) aur ab trend ki taraf palat raha hai (pichli 1H candle trend ke saath band hui). Isliye trend ke saath BUY liya. Stop-loss 3.0\u00d7ATR door rakha taaki chhoti uthal-puthal se na toote, target risk ka 4.0 guna. Backtest mein har 3 mein ~2 trade harte hain, isliye loss normal hai.",
     "capped": false,
-    "last_px": 81.47,
+    "last_px": 81.02,
     "path": {
      "1h": {
       "mfe": 0.05,
@@ -51547,28 +51587,49 @@
     },
     "mgmt": {
      "status": "\ud83d\udfe2 HOLD: MORE UPSIDE POSSIBLE",
-     "stage": "PROFIT DEVELOPING",
-     "uR": 0.33,
+     "stage": "ENTRY",
+     "uR": 0.29,
      "mfe_R": 0.41,
-     "exhaustion": 25,
+     "exhaustion": 45,
      "reversal_flags": {
       "structure_break": false,
       "momentum_negative": false,
       "gave_back": false
      },
      "reasons": [
-      "Momentum dheema pad raha hai (pichle 3 ghante +0.2 ATR)",
-      "Volume kam ho raha hai (normal ka 0.2 guna)"
+      "Momentum trend ke saath chal raha hai (pichle 3 ghante +1.1 ATR)",
+      "Volume kam ho raha hai (normal ka 0.2 guna)",
+      "Pichli candle mein upar (trend ki taraf) se rejection wick hai: bhaav wahan tik nahi paya"
      ],
      "stop_advice": "Stop jaisa hai waisa rakho",
      "suggested_sl": 65.0,
-     "hold_vs_book": "Hold: target 3.7R door, stop tak 1.3R (R/R 2.8). Abhi book karo to +0.3R pakka.",
+     "hold_vs_book": "Hold: target 3.7R door, stop tak 1.3R (R/R 2.9). Abhi book karo to +0.3R pakka.",
      "next_zone": 114.6,
-     "momentum_atr": 0.24,
-     "volume_ratio": 0.22
+     "momentum_atr": 1.12,
+     "volume_ratio": 0.19
     },
     "mstatus": "\ud83d\udfe2 HOLD: MORE UPSIDE POSSIBLE",
-    "mts": "2026-11-21T03:30:53+00:00"
+    "mts": "2026-11-21T03:30:53+00:00",
+    "smart_reason": "10 ghante mein trade ne kuch nahi kiya (stall, +0.3R)",
+    "closed": "2026-11-21T10:02:33+00:00",
+    "outcome": "SMART EXIT",
+    "exit": 81.02,
+    "R": 0.286,
+    "pnl_inr": 34.19,
+    "net_usd": 0.37,
+    "gross_usd": 0.37,
+    "hold_h": 10.0,
+    "lesson": "Smart exit (10 ghante mein trade ne kuch nahi kiya (stall, +0.3R)): +0.3R par band kiya, taaki trade lamba na chale. Fixed rule se tulna review pack mein hoti hai.",
+    "feedback": {
+     "auto": {
+      "result": "WIN",
+      "verdict": "\u2705 Achha trade: plan ke mutabik +0.3R. Best move +0.4R tak gayi, uska 70% pakda.",
+      "plan_followed": true,
+      "best_R": 0.41,
+      "worst_R": 0.12
+     },
+     "user": null
+    }
    }
   },
   "TP-QQQ-SHORT-20261121-002": {
@@ -51671,7 +51732,7 @@
      }
     ],
     "created": "2026-11-21T02:50:48+00:00",
-    "last_ts": 1795253400000.0,
+    "last_ts": 1795254300000.0,
     "expiry_h": 120,
     "cfg": {
      "enabled": true,
@@ -51701,7 +51762,7 @@
     "grade": "A",
     "why": "Bade (4H) chart pe QQQ ka trend neeche hai (taakat 0.45, kam se kam 0.30 chahiye thi). Us trend ke beech bhaav thoda upar chadha (1.9 ATR ki halchal) aur ab trend ki taraf palat raha hai (pichli 1H candle trend ke saath band hui). Isliye trend ke saath SELL liya. Stop-loss 3.0\u00d7ATR door rakha taaki chhoti uthal-puthal se na toote, target risk ka 4.0 guna. Backtest mein har 3 mein ~2 trade harte hain, isliye loss normal hai.",
     "capped": false,
-    "last_px": 618.21,
+    "last_px": 618.4,
     "path": {
      "1h": {
       "mfe": 0.41,
@@ -51727,24 +51788,24 @@
     "mgmt": {
      "status": "\ud83d\udfe2 HOLD: MORE UPSIDE POSSIBLE",
      "stage": "ENTRY",
-     "uR": 0.08,
+     "uR": 0.07,
      "mfe_R": 0.44,
      "exhaustion": 25,
      "reversal_flags": {
       "structure_break": false,
-      "momentum_negative": true,
+      "momentum_negative": false,
       "gave_back": false
      },
      "reasons": [
-      "Momentum dheema pad raha hai (pichle 3 ghante -0.8 ATR)",
-      "Volume kam ho raha hai (normal ka 0.5 guna)"
+      "Momentum dheema pad raha hai (pichle 3 ghante -0.2 ATR)",
+      "Volume kam ho raha hai (normal ka 0.4 guna)"
      ],
      "stop_advice": "Stop jaisa hai waisa rakho",
      "suggested_sl": 639.0,
-     "hold_vs_book": "Hold: target 3.9R door, stop tak 1.1R (R/R 3.6). Abhi book karo to +0.1R pakka.",
+     "hold_vs_book": "Hold: target 3.9R door, stop tak 1.1R (R/R 3.7). Abhi book karo to +0.1R pakka.",
      "next_zone": 562.2,
-     "momentum_atr": -0.8,
-     "volume_ratio": 0.49
+     "momentum_atr": -0.19,
+     "volume_ratio": 0.42
     },
     "mstatus": "\ud83d\udfe2 HOLD: MORE UPSIDE POSSIBLE",
     "mts": "2026-11-21T02:55:48+00:00"
@@ -51850,7 +51911,7 @@
      }
     ],
     "created": "2026-11-21T02:50:48+00:00",
-    "last_ts": 1795253400000.0,
+    "last_ts": 1795254300000.0,
     "expiry_h": 120,
     "cfg": {
      "enabled": true,
@@ -51880,7 +51941,7 @@
     "grade": "B",
     "why": "Bade (4H) chart pe KORU ka trend neeche hai (taakat 0.38, kam se kam 0.30 chahiye thi). Us trend ke beech bhaav thoda upar chadha (1.7 ATR ki halchal) aur ab trend ki taraf palat raha hai (pichli 1H candle trend ke saath band hui). Isliye trend ke saath SELL liya. Stop-loss 3.0\u00d7ATR door rakha taaki chhoti uthal-puthal se na toote, target risk ka 4.0 guna. Backtest mein har 3 mein ~2 trade harte hain, isliye loss normal hai.",
     "capped": false,
-    "last_px": 4.944,
+    "last_px": 4.958,
     "path": {
      "1h": {
       "mfe": 0.29,
@@ -51906,7 +51967,7 @@
     "mgmt": {
      "status": "\ud83d\udfe2 HOLD: MORE UPSIDE POSSIBLE",
      "stage": "ENTRY",
-     "uR": 0.11,
+     "uR": 0.09,
      "mfe_R": 0.36,
      "exhaustion": 25,
      "reversal_flags": {
@@ -51915,15 +51976,15 @@
       "gave_back": false
      },
      "reasons": [
-      "Momentum dheema pad raha hai (pichle 3 ghante -0.4 ATR)",
-      "Volume kam ho raha hai (normal ka 0.3 guna)"
+      "Momentum trend ke saath chal raha hai (pichle 3 ghante +0.5 ATR)",
+      "Volume kam ho raha hai (normal ka 0.2 guna)"
      ],
      "stop_advice": "Stop jaisa hai waisa rakho",
      "suggested_sl": 5.8,
-     "hold_vs_book": "Hold: target 3.9R door, stop tak 1.1R (R/R 3.5). Abhi book karo to +0.1R pakka.",
+     "hold_vs_book": "Hold: target 3.9R door, stop tak 1.1R (R/R 3.6). Abhi book karo to +0.1R pakka.",
      "next_zone": 2.7,
-     "momentum_atr": -0.39,
-     "volume_ratio": 0.33
+     "momentum_atr": 0.51,
+     "volume_ratio": 0.21
     },
     "mstatus": "\ud83d\udfe2 HOLD: MORE UPSIDE POSSIBLE",
     "mts": "2026-11-21T02:55:48+00:00"
@@ -52029,7 +52090,7 @@
      }
     ],
     "created": "2026-11-21T04:21:33+00:00",
-    "last_ts": 1795253400000.0,
+    "last_ts": 1795254300000.0,
     "expiry_h": 120,
     "cfg": {
      "enabled": true,
@@ -52059,7 +52120,7 @@
     "grade": "A",
     "why": "Bade (4H) chart pe UVXY ka trend upar hai (taakat 0.51, kam se kam 0.30 chahiye thi). Us trend ke beech bhaav thoda neeche gira (2.1 ATR ki halchal) aur ab trend ki taraf palat raha hai (pichli 1H candle trend ke saath band hui). Isliye trend ke saath BUY liya. Stop-loss 3.0\u00d7ATR door rakha taaki chhoti uthal-puthal se na toote, target risk ka 4.0 guna. Backtest mein har 3 mein ~2 trade harte hain, isliye loss normal hai.",
     "capped": false,
-    "last_px": 29.42,
+    "last_px": 29.31,
     "path": {
      "1h": {
       "mfe": 0.12,
@@ -52080,7 +52141,7 @@
     "mgmt": {
      "status": "\ud83d\udfe2 HOLD: MORE UPSIDE POSSIBLE",
      "stage": "ENTRY",
-     "uR": 0.04,
+     "uR": 0.02,
      "mfe_R": 0.18,
      "exhaustion": 25,
      "reversal_flags": {
@@ -52089,15 +52150,15 @@
       "gave_back": false
      },
      "reasons": [
-      "Momentum dheema pad raha hai (pichle 3 ghante -0.4 ATR)",
+      "Momentum dheema pad raha hai (pichle 3 ghante -0.3 ATR)",
       "Volume kam ho raha hai (normal ka 0.2 guna)"
      ],
      "stop_advice": "Stop jaisa hai waisa rakho",
      "suggested_sl": 24.3,
-     "hold_vs_book": "Hold: target 4.0R door, stop tak 1.0R (R/R 3.8). Abhi book karo to +0.0R pakka.",
+     "hold_vs_book": "Hold: target 4.0R door, stop tak 1.0R (R/R 3.9). Abhi book karo to +0.0R pakka.",
      "next_zone": 43.8,
-     "momentum_atr": -0.35,
-     "volume_ratio": 0.23
+     "momentum_atr": -0.26,
+     "volume_ratio": 0.17
     },
     "mstatus": "\ud83d\udfe2 HOLD: MORE UPSIDE POSSIBLE",
     "mts": "2026-11-21T04:26:34+00:00"
@@ -52203,7 +52264,7 @@
      }
     ],
     "created": "2026-11-21T06:01:42+00:00",
-    "last_ts": 1795253400000.0,
+    "last_ts": 1795254300000.0,
     "expiry_h": 120,
     "cfg": {
      "enabled": true,
@@ -52233,7 +52294,7 @@
     "grade": "B",
     "why": "Bade (4H) chart pe ENSO ka trend upar hai (taakat 0.37, kam se kam 0.30 chahiye thi). Us trend ke beech bhaav thoda neeche gira (2.7 ATR ki halchal) aur ab trend ki taraf palat raha hai (pichli 1H candle trend ke saath band hui). Isliye trend ke saath BUY liya. Stop-loss 3.0\u00d7ATR door rakha taaki chhoti uthal-puthal se na toote, target risk ka 4.0 guna. Backtest mein har 3 mein ~2 trade harte hain, isliye loss normal hai.",
     "capped": false,
-    "last_px": 0.4433,
+    "last_px": 0.4457,
     "path": {
      "1h": {
       "mfe": 0.2,
@@ -52244,35 +52305,171 @@
       "mfe": 0.2,
       "mae": 0.22,
       "uR": -0.19
+     },
+     "4h": {
+      "mfe": 0.2,
+      "mae": 0.37,
+      "uR": -0.19
      }
     },
     "mgmt": {
-     "status": "\ud83d\udfe1 REVERSAL WATCH",
+     "status": "\ud83d\udfe2 HOLD: THESIS INTACT",
      "stage": "ENTRY",
-     "uR": -0.23,
+     "uR": -0.19,
      "mfe_R": 0.11,
      "exhaustion": 0,
      "reversal_flags": {
-      "structure_break": true,
+      "structure_break": false,
       "momentum_negative": true,
       "gave_back": false
      },
      "reasons": [
-      "Momentum dheema pad raha hai (pichle 3 ghante -0.8 ATR)",
-      "Volume theek hai (normal ka 1.4 guna)",
-      "Bhaav ne pichla chhota swing trend ke khilaaf tod diya"
+      "Momentum dheema pad raha hai (pichle 3 ghante -0.9 ATR)",
+      "Volume theek hai (normal ka 1.0 guna)"
      ],
      "stop_advice": "Stop jaisa hai waisa rakho",
      "suggested_sl": 0.4,
-     "hold_vs_book": "Hold: target 4.2R door, stop tak 0.8R (R/R 5.5). Abhi book karo to +-0.2R pakka.",
+     "hold_vs_book": "Hold: target 4.2R door, stop tak 0.8R (R/R 5.2). Abhi book karo to +-0.2R pakka.",
      "next_zone": 0.7,
-     "momentum_atr": -0.8,
-     "volume_ratio": 1.39
+     "momentum_atr": -0.88,
+     "volume_ratio": 1.02
     },
-    "mstatus": "\ud83d\udfe1 REVERSAL WATCH",
-    "mts": "2026-11-21T09:02:03+00:00"
+    "mstatus": "\ud83d\udfe2 HOLD: THESIS INTACT",
+    "mts": "2026-11-21T10:02:33+00:00"
+   }
+  },
+  "TP-SOXL-SHORT-20261121-002": {
+   "id": "TP-SOXL-SHORT-20261121-002",
+   "source": "PAPER",
+   "sym": "SOXL",
+   "strategy": "trend_pullback",
+   "label": "Trend Pullback \u00b7 SOXL",
+   "side": "SHORT",
+   "opened": "2026-11-21T10:02:33+00:00",
+   "opened_ist": "21 Nov 2026, 03:32 PM IST",
+   "entry": 31.66,
+   "stop": 35.04357142857143,
+   "targets": [
+    18.12571428571427
+   ],
+   "qty_btc": 0.7571,
+   "margin_inr": 746.04,
+   "leverage": 3,
+   "risk_inr": 239.19,
+   "why": "Bade (4H) chart pe SOXL ka trend neeche hai (taakat 0.35, kam se kam 0.30 chahiye thi). Us trend ke beech bhaav thoda upar chadha (1.6 ATR ki halchal) aur ab trend ki taraf palat raha hai (pichli 1H candle trend ke saath band hui). Isliye trend ke saath SELL liya. Stop-loss 3.0\u00d7ATR door rakha taaki chhoti uthal-puthal se na toote, target risk ka 4.0 guna. Backtest mein har 3 mein ~2 trade harte hain, isliye loss normal hai.",
+   "context": {
+    "er4": 0.353,
+    "atr_pct": 3.562,
+    "depth": 1.58,
+    "hour": 9,
+    "wd": 5,
+    "side_n": -1,
+    "side": "SHORT",
+    "funding": 0.0,
+    "regime": null
+   },
+   "entry_context": null,
+   "grade": "B",
+   "status": "OPEN",
+   "outcome": "",
+   "closed": null,
+   "closed_ist": "",
+   "exit": null,
+   "R": null,
+   "pnl_inr": null,
+   "fees_usd": 0.011984893,
+   "hold_h": null,
+   "best_R": 0.0,
+   "worst_R": 0.0,
+   "exits": [],
+   "lesson": "",
+   "auto_feedback": "",
+   "user_rating": "",
+   "user_note": "",
+   "user_feedback_ist": "",
+   "user_exit": null,
+   "timeline": [
+    {
+     "time_ist": "21 Nov 2026, 03:32 PM IST",
+     "type": "OPENED",
+     "price": 31.66,
+     "note": "qty 0.7571 SOXL, margin \u20b9746"
+    }
+   ],
+   "raw": {
+    "id": "TP-SOXL-SHORT-20261121-002",
+    "strategy": "trend_pullback",
+    "sym": "SOXL",
+    "key": "trend_pullback@SOXL",
+    "label": "Trend Pullback \u00b7 SOXL",
+    "side": -1,
+    "entry": 31.66,
+    "sl0": 35.04357142857143,
+    "sl": 35.04357142857143,
+    "risk": 3.3835714285714324,
+    "mode": "fixed",
+    "tp": 18.12571428571427,
+    "t1": null,
+    "t2": null,
+    "t3": null,
+    "partial": 0.5,
+    "qty": 0.7571,
+    "qty_btc": 0.7571,
+    "notional_usd": 23.97,
+    "margin_inr": 746.04,
+    "margin_released": 0.0,
+    "rem_wallet": 1.0,
+    "leverage": 3,
+    "fx": 93.372746,
+    "risk_inr": 239.19,
+    "fees_usd": 0.011984893,
+    "realized_usd": 0.0,
+    "stage": 0,
+    "remaining": 1.0,
+    "mfe_R": 0.0,
+    "mae_R": 0.0,
+    "exits": [],
+    "events": [
+     {
+      "ts": "2026-11-21T10:02:33+00:00",
+      "type": "OPENED",
+      "price": 31.66,
+      "note": "qty 0.7571 SOXL, margin \u20b9746"
+     }
+    ],
+    "created": "2026-11-21T10:02:33+00:00",
+    "last_ts": 1795255200000.0,
+    "expiry_h": 120,
+    "cfg": {
+     "enabled": true,
+     "label": "Trend Pullback",
+     "risk_pct": 0.5,
+     "long_risk_mult": 0.5,
+     "stop_atr": 3.0,
+     "target_r": 4.0,
+     "expiry_hours": 120,
+     "cooldown_hours": 24,
+     "leverage": 3,
+     "fee_per_side": 0.0005
+    },
+    "ctx": {
+     "er4": 0.353,
+     "atr_pct": 3.562,
+     "depth": 1.58,
+     "hour": 9,
+     "wd": 5,
+     "side_n": -1,
+     "side": "SHORT",
+     "funding": 0.0,
+     "regime": null
+    },
+    "entry_ctx": null,
+    "confirm_lvl": null,
+    "grade": "B",
+    "why": "Bade (4H) chart pe SOXL ka trend neeche hai (taakat 0.35, kam se kam 0.30 chahiye thi). Us trend ke beech bhaav thoda upar chadha (1.6 ATR ki halchal) aur ab trend ki taraf palat raha hai (pichli 1H candle trend ke saath band hui). Isliye trend ke saath SELL liya. Stop-loss 3.0\u00d7ATR door rakha taaki chhoti uthal-puthal se na toote, target risk ka 4.0 guna. Backtest mein har 3 mein ~2 trade harte hain, isliye loss normal hai.",
+    "capped": false
    }
   }
  },
- "updated": "2026-11-21T09:57:56+00:00"
+ "updated": "2026-11-21T10:03:02+00:00"
 }
