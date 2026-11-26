@@ -242,3 +242,11 @@ Jo nahi badla (data nahi): LONG/SHORT bias (market gir raha tha), coin-class fil
 ## Update: 100-trade review (16 Nov 2026)
 - `trend_pullback.long_risk_mult = 0.5`: LONG trades of Trend Pullback now risk half (0.25% instead of 0.5%); SHORT unchanged. Reason: LONG 13 trades, 15% win, -0.48R (z about -2.6), SHORT 29 trades -0.04R. This is a probation size cut, NOT a block and NOT a proven edge; the market was falling this period. Revert: `/set trend_pullback.long_risk_mult 1`.
 - Smart exit: earlier "p=0.02" was a sign test (it wins more often: 32 of 49) but on the mean it is NOT better: smart +0.25R vs fixed rule +0.33R. Stall exits give up the rare 4R winners. Kept as is (lower variance); `path` data will test a better stall rule.
+
+## Update: Auto-gate (25 Nov 2026)
+Har (strategy, LONG/SHORT) bucket apne hi live results se khud band/chalu hota hai. Market ka nature guess nahi karta.
+- **Band:** bucket ke last 20 live trades (re-open ke baad wale) ka avg ≤ -0.2R aur z ≤ -1.5 → naye signals trade nahi hote, shadow me chalte hain (Telegram: 🚦 AUTO-GATE ... BAND).
+- **Dobara chalu:** shadow ke last 10 finished signals ka avg ≥ +0.15R → bucket khud chalu (probation, naye sire se judge).
+- Settings `config.json` ke `auto_gate` me: enabled, window, min_trades, max_mean_R, max_z, reopen_shadows, reopen_mean_R. Band karne ke liye `{"auto_gate": {"enabled": false}}`.
+- Shadow plain stop/target par chalte hain (smart exit nahi), isliye ye sirf mota andaza hai. Koi data delete nahi hota. Review pack me `auto_gate` status aata hai.
+- Pehle se maujooda data par: Trend Pullback LONG (last 20: -0.22R, z -2.1) turant band hoga.

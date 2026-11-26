@@ -135,6 +135,7 @@ def pack(S, now=None, records=None):
         generated_utc=now.isoformat(timespec="seconds"), readiness=readiness(S, rows), overall=stats._block(ok_) if ok_ else dict(n=0),
         wallet=dict(start=W.get("start"), cash=W.get("cash"), margin=W.get("margin"), balance=P.get("balance"), max_drawdown_pct=P.get("max_dd_pct")),
         calibration=calibration(rows), shadows=shadow_summary(P), smart_exit_compare=smart_compare(P), move_radar_log=(S.get("move_log") or [])[-40:], settings=config.load(),
+        auto_gate=P.get("gate"),
         learning=dict(filters=P.get("filters"), proposals=P.get("proposals"), lessons=P.get("lessons")),
         open_trades=[dict(id=t["id"], side=t["side"], entry=t["entry"], sl=t["sl"], mgmt=t.get("mgmt"), why=t.get("why")) for t in (P.get("pos") or {}).values() if t],
         health=dict(telegram={k: v for k, v in (S.get("telegram") or {}).items() if k != "log"}, last_price=S.get("last_price")),

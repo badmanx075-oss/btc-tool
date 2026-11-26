@@ -1,7 +1,7 @@
 """Paper trading engine: virtual wallet with ledger, strategy registry, staged exits, remarks + feedback. NO real orders are ever placed.
 Rules live in config.json (settings), strategies.py (entries) and lifecycle.py (exits)."""
 import datetime as dt, requests, time
-import universe, fmt
+import universe, fmt, gate
 import moveradar as MR, methods as MT, timing as TM, confirm as CF, engine as E, backtest_v4 as W4, learn, config, wallet, lifecycle, advisor, review, strategies as ST
 from config import inr
 
@@ -335,6 +335,8 @@ def run(S, send, now, scan=None):
         TS_ = TM.load(); rm = MR.live(S, mI, i, now, TM.cls_of(TS_, now.hour), TM.cls_of(TS_, (now.hour + 1) % 24)); P["radar_move"] = rm; MR.watch(S, rm, px, mI, i, now, send)
     except Exception as ex: print("move radar error", ex)
     tcls = TM.cls_of(TM.load(), now.hour); loss_hit = daily_loss_hit(P, C, now, send)
+    try: gate.update(P, C, now, send)
+    except Exception as ex: print("gate error", ex)
     SETS = [("BTC", h1, i, (lambda: h15), scan, mI, mres)] + [(sy, v["h1"], len(v["h1"]) - 2, (lambda v=v: v["h15"]), None, None, None) for sy, v in XA.items()]
     for sym, h1_, i_, h15_, scan_, mI_, mres_ in SETS:
         for name, sc in C["strategies"].items():
@@ -354,11 +356,12 @@ def run(S, send, now, scan=None):
             bh = (sc.get("block_hours_utc") or []) if name == "early_signal" else []
             if bh and not blk and now.hour in bh:                                         # 30 Oct review: early_signal in 01-07 UTC (Asia) won 1/13 paper + 2/12 alerts; blocked trades are tracked as shadows so the data keeps coming
                 blk = dict(id="hour", text=f"{now.hour:02d}:00 UTC (Asia ghante): is strategy ne in ghanto mein ~15% trade jite (50 mein se ~10 nahi)")
+            if not blk and gate.closed(P, C, name, sg["side"]): blk = dict(id="gate", text=f"auto-gate: {gate.bucket(name, sg['side'])} abhi band (haar raha hai)")
             if blk:
                 sh = lifecycle.new_state(sg["side"], sg["entry"], sg["sl"], sg["mode"], sg.get("tp"), sg.get("t1"), sg.get("t2"), sc.get("partial_pct", 50) / 100)
-                sh.update(sym=sym, id=f"SHADOW-{name[:2].upper()}{'' if sym == 'BTC' else '-' + sym}-{now.strftime('%Y%m%d%H%M')}", strategy=name, filter=blk["text"], ctx=sg["ctx"], exits=[], last_ts=float(h15_().ts.iloc[-1]), created=iso(now), expiry_h=sc["expiry_hours"])
+                sh.update(sym=sym, id=f"SHADOW-{name[:2].upper()}{'' if sym == 'BTC' else '-' + sym}-{now.strftime('%Y%m%d%H%M')}", strategy=name, filter=blk["text"], gate=(gate.bucket(name, sg["side"]) if blk["id"] == "gate" else None), ctx=sg["ctx"], exits=[], last_ts=float(h15_().ts.iloc[-1]), created=iso(now), expiry_h=sc["expiry_hours"])
                 P["shadow"].append(sh); jlog(P, now, "FILTERED", f"{name} signal skipped by filter #{blk['id']}")
-                send(f"🧠 Signal skipped by {'tight-stop rule' if blk['id'] == 'stop' else 'hour rule' if blk['id'] == 'hour' else 'learned filter #' + str(blk['id'])}: {blk['text']}\nIt is tracked as a shadow trade to check whether the filter really helps.", cat="setup"); continue
+                (blk["id"] != "gate") and send(f"🧠 Signal skipped by {'tight-stop rule' if blk['id'] == 'stop' else 'hour rule' if blk['id'] == 'hour' else 'learned filter #' + str(blk['id'])}: {blk['text']}\nIt is tracked as a shadow trade to check whether the filter really helps.", cat="setup"); continue
             if sym == "BTC":
                 try: sg["entry_ctx"] = review.entry_ctx(S, now)
                 except Exception as e: print("ctx error", e)
@@ -366,8 +369,8 @@ def run(S, send, now, scan=None):
                 k_ = sg["side"]; ag, op = (mres_["long"], mres_["short"]) if k_ == 1 else (mres_["short"], mres_["long"])
                 sg["entry_ctx"] = dict(sg.get("entry_ctx") or {}, methods=dict(verdict=mres_["verdict"], net=mres_["net"], agree=ag, against=op, total=mres_["total"], keys=[v["key"] for v in mres_["votes"] if v["dir"] == k_]),
                                        methods_text=f"{ag}/{mres_['total']} methods trade ke saath, {op} khilaaf (consensus: {mres_['verdict']})")
-                gate = C.get("risk", {}).get("min_methods_agree", 0)
-                if gate and ag < gate:
-                    jlog(P, now, "FILTERED", f"{name} skipped: only {ag} methods agree (need {gate})"); send(f"🧩 Signal skipped: sirf {ag}/{mres_['total']} methods trade ke saath ({gate} chahiye). {name} {'BUY' if k_ == 1 else 'SELL'} chhoda gaya.", cat="setup"); continue
+                mg_ = C.get("risk", {}).get("min_methods_agree", 0)
+                if mg_ and ag < mg_:
+                    jlog(P, now, "FILTERED", f"{name} skipped: only {ag} methods agree (need {mg_})"); send(f"🧩 Signal skipped: sirf {ag}/{mres_['total']} methods trade ke saath ({mg_} chahiye). {name} {'BUY' if k_ == 1 else 'SELL'} chhoda gaya.", cat="setup"); continue
             jlog(P, now, "SIGNAL", f"{name} {'LONG' if sg['side'] == 1 else 'SHORT'} signal at ${sg['entry']:,.{0 if sg['entry'] >= 1000 else 2}f}")
             if not open_position(P, C, name, sg, now, h15_(), fx(P), send, sym=sym): P["last_entry"][key] = now.timestamp() * 1000 - max(sc.get("cooldown_hours", 1) - 1, 0) * 3.6e6

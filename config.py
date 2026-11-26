@@ -7,6 +7,7 @@ DEFAULTS = {
                "learning": True, "digest": True, "setup": True, "move": True, "flow": True, "confirm": True, "timing": True, "milestone": True, "morning": True, "evening": True, "weekly": True},
     "assets": {"extra": ["ETH", "SOL"], "strategies": ["trend_pullback", "session_breakout", "bb_rsi_vol"]},      # extra coins traded from the SAME wallet (data: OKX/Bybit public, no key). extra = full analysis stored for these
     "universe": {"enabled": True, "max_coins": 100, "min_vol_usd": 5000000, "fetch_budget_s": 150},        # ALL liquid USDT perpetuals (top by 24h volume) get indication + paper trading; raise max_coins up to 300 for everything
+    "auto_gate": {"enabled": True, "window": 20, "min_trades": 20, "max_mean_R": -0.2, "max_z": -1.5, "reopen_shadows": 10, "reopen_mean_R": 0.15},      # each (strategy, side) bucket is paused automatically when its own last 20 live trades are clearly losing; shadows decide when it re-opens (gate.py)
     "schedule": {"morning_hour": 8, "evening_hour": 20, "listen_seconds": 210, "digest_hours": 3},
     "timing": {"skip_low_activity": False, "window_alerts": True},
     "risk": {"max_daily_loss_pct": 3.0, "min_methods_agree": 0, "min_stop_pct": 0.5},
