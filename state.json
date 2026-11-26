@@ -4054,7 +4054,7 @@
    "move_class": "LARGE",
    "risk": "Medium",
    "created": "2026-11-26T02:38:16+00:00",
-   "last_ts": 1795692600000.0,
+   "last_ts": 1795692900000.0,
    "mfe": 493.8000000000029,
    "mae": 283.0,
    "status": "EARLY SETUP",
@@ -4112,23 +4112,23 @@
   "morning": "2026-11-26",
   "weekly": "2026-11-22"
  },
- "last_price": 60610.4,
+ "last_price": 60627.2,
  "market": {
-  "price": 60610.4,
+  "price": 60627.2,
   "regime": "RANGE",
   "signal": "NO TRADE",
-  "side": "SHORT",
-  "score": 40,
+  "side": "LONG",
+  "score": 30,
   "scores": {
-   "LONG": 25,
-   "SHORT": 40
+   "LONG": 30,
+   "SHORT": 30
   },
   "atr1h": 461.72857142857225,
   "atr4h": 1038.892857142857,
   "reversal": "none",
   "tf": {
    "5m": {
-    "er": 0.17,
+    "er": 0.12,
     "label": "FLAT"
    },
    "15m": {
@@ -4148,19 +4148,19 @@
     "label": "FLAT"
    }
   },
-  "funding": 7.18660664732e-05,
-  "oi": 1904952495.5217068,
+  "funding": 7.10226344905e-05,
+  "oi": 1906195789.1070068,
   "pro": [
-   "lower high forming",
-   "buying volume fading",
-   "volatility compression"
+   "higher low forming",
+   "momentum turning up"
   ],
   "con": [
    "price not at range edge (mid-range risk)",
-   "no sweep of prior highs",
-   "momentum not turning"
+   "no sweep of prior lows",
+   "selling volume not fading",
+   "no compression"
   ],
-  "ts": "2026-11-26T11:30:12+00:00"
+  "ts": "2026-11-26T11:35:13+00:00"
  },
  "paper": {
   "closed": [
@@ -41293,6 +41293,171 @@
      },
      "user": null
     }
+   },
+   {
+    "id": "TP-IRYS-SHORT-20261126-002",
+    "strategy": "trend_pullback",
+    "sym": "IRYS",
+    "key": "trend_pullback@IRYS",
+    "label": "Trend Pullback \u00b7 IRYS",
+    "side": -1,
+    "entry": 0.01616,
+    "sl0": 0.016965714285714285,
+    "sl": 0.016965714285714285,
+    "risk": 0.0008057142857142846,
+    "mode": "fixed",
+    "tp": 0.012937142857142862,
+    "t1": null,
+    "t2": null,
+    "t3": null,
+    "partial": 0.5,
+    "qty": 3128.3809,
+    "qty_btc": 3128.3809,
+    "notional_usd": 50.55,
+    "margin_inr": 1565.93,
+    "margin_released": 1565.93,
+    "rem_wallet": 0.0,
+    "leverage": 3,
+    "fx": 92.925233,
+    "risk_inr": 234.23,
+    "fees_usd": 0.05,
+    "realized_usd": 0.09385142700000704,
+    "stage": 0,
+    "remaining": 0,
+    "mfe_R": 0.34,
+    "mae_R": 0.91,
+    "exits": [
+     {
+      "ts": "2026-11-26T11:35:13+00:00",
+      "kind": "SMART EXIT",
+      "price": 0.01613,
+      "frac": 1.0,
+      "pnl_inr": 8.72
+     }
+    ],
+    "events": [
+     {
+      "ts": "2026-11-26T01:33:09+00:00",
+      "type": "OPENED",
+      "price": 0.01616,
+      "note": "qty 3128.3809 IRYS, margin \u20b91,566"
+     },
+     {
+      "ts": "2026-11-26T11:35:13+00:00",
+      "type": "SMART EXIT",
+      "price": 0.01613,
+      "note": "100% of position, P/L \u20b99"
+     },
+     {
+      "ts": "2026-11-26T11:35:13+00:00",
+      "type": "CLOSED",
+      "price": 0.01613,
+      "note": "SMART EXIT"
+     }
+    ],
+    "created": "2026-11-26T01:33:09+00:00",
+    "last_ts": 1795691700000.0,
+    "expiry_h": 120,
+    "cfg": {
+     "enabled": true,
+     "label": "Trend Pullback",
+     "risk_pct": 0.5,
+     "long_risk_mult": 0.5,
+     "stop_atr": 3.0,
+     "target_r": 4.0,
+     "expiry_hours": 120,
+     "cooldown_hours": 24,
+     "leverage": 3,
+     "fee_per_side": 0.0005
+    },
+    "ctx": {
+     "er4": 0.346,
+     "atr_pct": 1.662,
+     "depth": 2.72,
+     "hour": 0,
+     "wd": 3,
+     "side_n": -1,
+     "side": "SHORT",
+     "funding": 0.0,
+     "regime": null
+    },
+    "entry_ctx": null,
+    "confirm_lvl": null,
+    "grade": "B",
+    "why": "Bade (4H) chart pe IRYS ka trend neeche hai (taakat 0.35, kam se kam 0.30 chahiye thi). Us trend ke beech bhaav thoda upar chadha (2.7 ATR ki halchal) aur ab trend ki taraf palat raha hai (pichli 1H candle trend ke saath band hui). Isliye trend ke saath SELL liya. Stop-loss 3.0\u00d7ATR door rakha taaki chhoti uthal-puthal se na toote, target risk ka 4.0 guna. Backtest mein har 3 mein ~2 trade harte hain, isliye loss normal hai.",
+    "capped": false,
+    "last_px": 0.01613,
+    "path": {
+     "1h": {
+      "mfe": 0.27,
+      "mae": 0.0,
+      "uR": 0.14
+     },
+     "2h": {
+      "mfe": 0.34,
+      "mae": 0.0,
+      "uR": 0.22
+     },
+     "4h": {
+      "mfe": 0.34,
+      "mae": 0.42,
+      "uR": -0.14
+     },
+     "6h": {
+      "mfe": 0.34,
+      "mae": 0.91,
+      "uR": -0.43
+     },
+     "8h": {
+      "mfe": 0.34,
+      "mae": 0.91,
+      "uR": 0.05
+     }
+    },
+    "mgmt": {
+     "status": "\ud83d\udfe2 HOLD: MORE UPSIDE POSSIBLE",
+     "stage": "ENTRY",
+     "uR": 0.04,
+     "mfe_R": 0.34,
+     "exhaustion": 25,
+     "reversal_flags": {
+      "structure_break": false,
+      "momentum_negative": false,
+      "gave_back": false
+     },
+     "reasons": [
+      "Momentum trend ke saath chal raha hai (pichle 3 ghante +1.1 ATR)",
+      "Volume kam ho raha hai (normal ka 0.5 guna)"
+     ],
+     "stop_advice": "Stop jaisa hai waisa rakho",
+     "suggested_sl": 0.0,
+     "hold_vs_book": "Hold: target 4.0R door, stop tak 1.0R (R/R 3.8). Abhi book karo to +0.0R pakka.",
+     "next_zone": 0.0,
+     "momentum_atr": 1.12,
+     "volume_ratio": 0.52
+    },
+    "mstatus": "\ud83d\udfe2 HOLD: MORE UPSIDE POSSIBLE",
+    "mts": "2026-11-26T10:40:07+00:00",
+    "smart_reason": "10 ghante mein trade ne kuch nahi kiya (stall, +0.0R)",
+    "closed": "2026-11-26T11:35:13+00:00",
+    "outcome": "SMART EXIT",
+    "exit": 0.01613,
+    "R": 0.017,
+    "pnl_inr": 4.03,
+    "net_usd": 0.04,
+    "gross_usd": 0.09,
+    "hold_h": 10.0,
+    "lesson": "Smart exit (10 ghante mein trade ne kuch nahi kiya (stall, +0.0R)): +0.0R par band kiya, taaki trade lamba na chale. Fixed rule se tulna review pack mein hoti hai.",
+    "feedback": {
+     "auto": {
+      "result": "FLAT",
+      "verdict": "\u26aa Lagbhag barabari: fees ke baad profit/loss ~0.",
+      "plan_followed": true,
+      "best_R": 0.34,
+      "worst_R": 0.91
+     },
+     "user": null
+    }
    }
   ],
   "n": {
@@ -41392,19 +41557,11 @@
    "trend_pullback@BTW": 1,
    "trend_pullback@MOODENG": 1
   },
-  "balance": 46759.85,
+  "balance": 46766.23,
   "start": 50000.0,
   "peak": 49549.88,
   "max_dd_pct": 9.95,
   "orders": [
-   {
-    "ts": "2026-11-11T02:03:02+00:00",
-    "order_id": "TP-CL-SHORT-20261111-001",
-    "action": "SELL",
-    "qty_btc": 2.6613,
-    "price": 85.47,
-    "note": "entry (market, paper fill)"
-   },
    {
     "ts": "2026-11-11T02:03:02+00:00",
     "order_id": "TP-BZ-SHORT-20261111-001",
@@ -43796,6 +43953,14 @@
     "qty_btc": 404.8772,
     "price": 0.02938,
     "note": "entry (market, paper fill)"
+   },
+   {
+    "ts": "2026-11-26T11:35:13+00:00",
+    "order_id": "TP-IRYS-SHORT-20261126-002",
+    "action": "BUY",
+    "qty_btc": 3128.3809,
+    "price": 0.01613,
+    "note": "exit: SMART EXIT"
    }
   ],
   "filters": [],
@@ -45197,7 +45362,7 @@
   ],
   "lessons": {
    "trend_pullback": {
-    "n": 133,
+    "n": 134,
     "patterns": [
      {
       "feature": "direction",
@@ -45205,10 +45370,10 @@
       "key": "side_n",
       "lo": -2.0,
       "hi": 0.0,
-      "n": 102,
+      "n": 103,
       "mean_R": -0.02,
       "rest_R": -0.32,
-      "z": 2.22
+      "z": 2.23
      },
      {
       "feature": "direction",
@@ -45219,7 +45384,7 @@
       "n": 31,
       "mean_R": -0.32,
       "rest_R": -0.02,
-      "z": -2.22
+      "z": -2.23
      },
      {
       "feature": "day type",
@@ -45227,10 +45392,10 @@
       "key": "wd",
       "lo": 0.0,
       "hi": 5.0,
-      "n": 97,
+      "n": 98,
       "mean_R": -0.0,
       "rest_R": -0.31,
-      "z": 1.96
+      "z": 1.97
      },
      {
       "feature": "day type",
@@ -45241,27 +45406,27 @@
       "n": 36,
       "mean_R": -0.31,
       "rest_R": -0.0,
-      "z": -1.96
+      "z": -1.97
      },
      {
       "feature": "volatility (ATR%)",
       "bucket": "mid",
       "key": "atr_pct",
-      "lo": 1.0322079999999998,
-      "hi": 1.8981000000000003,
-      "n": 45,
-      "mean_R": 0.08,
-      "rest_R": -0.17,
-      "z": 1.73
+      "lo": 1.033289,
+      "hi": 1.8877519999999999,
+      "n": 44,
+      "mean_R": 0.11,
+      "rest_R": -0.18,
+      "z": 1.96
      },
      {
       "feature": "volatility (ATR%)",
       "bucket": "low",
       "key": "atr_pct",
       "lo": -1000000000.0,
-      "hi": 1.0322079999999998,
-      "n": 44,
-      "mean_R": -0.28,
+      "hi": 1.033289,
+      "n": 45,
+      "mean_R": -0.27,
       "rest_R": 0.01,
       "z": -1.59
      },
@@ -45274,7 +45439,7 @@
       "n": 45,
       "mean_R": -0.2,
       "rest_R": -0.03,
-      "z": -1.23
+      "z": -1.24
      },
      {
       "feature": "session (UTC)",
@@ -45285,15 +45450,15 @@
       "n": 48,
       "mean_R": 0.04,
       "rest_R": -0.16,
-      "z": 1.2
+      "z": 1.19
      },
      {
       "feature": "pullback depth",
       "bucket": "mid",
       "key": "depth",
-      "lo": 1.93956,
-      "hi": 3.0108800000000002,
-      "n": 45,
+      "lo": 1.9486699999999997,
+      "hi": 3.00711,
+      "n": 44,
       "mean_R": 0.04,
       "rest_R": -0.15,
       "z": 1.18
@@ -45303,11 +45468,22 @@
       "bucket": "low",
       "key": "er4",
       "lo": -1000000000.0,
-      "hi": 0.34682399999999997,
-      "n": 44,
+      "hi": 0.34628899999999996,
+      "n": 45,
       "mean_R": 0.01,
       "rest_R": -0.13,
-      "z": 0.79
+      "z": 0.81
+     },
+     {
+      "feature": "pullback depth",
+      "bucket": "high",
+      "key": "depth",
+      "lo": 3.00711,
+      "hi": 1000000000.0,
+      "n": 45,
+      "mean_R": -0.17,
+      "rest_R": -0.05,
+      "z": -0.75
      },
      {
       "feature": "funding",
@@ -45315,54 +45491,43 @@
       "key": "funding",
       "lo": -1000000000.0,
       "hi": 1e-12,
-      "n": 128,
+      "n": 129,
       "mean_R": -0.08,
       "rest_R": -0.25,
       "z": 0.71
      },
      {
-      "feature": "pullback depth",
-      "bucket": "high",
-      "key": "depth",
-      "lo": 3.0108800000000002,
-      "hi": 1000000000.0,
-      "n": 44,
-      "mean_R": -0.16,
-      "rest_R": -0.05,
-      "z": -0.7
-     },
-     {
       "feature": "4H trend strength",
       "bucket": "high",
       "key": "er4",
-      "lo": 0.412264,
+      "lo": 0.412,
       "hi": 1000000000.0,
-      "n": 44,
-      "mean_R": -0.15,
-      "rest_R": -0.05,
-      "z": -0.66
+      "n": 46,
+      "mean_R": -0.14,
+      "rest_R": -0.06,
+      "z": -0.55
      },
      {
       "feature": "pullback depth",
       "bucket": "low",
       "key": "depth",
       "lo": -1000000000.0,
-      "hi": 1.93956,
-      "n": 44,
-      "mean_R": -0.14,
+      "hi": 1.9486699999999997,
+      "n": 45,
+      "mean_R": -0.13,
       "rest_R": -0.06,
-      "z": -0.48
+      "z": -0.43
      },
      {
       "feature": "4H trend strength",
       "bucket": "mid",
       "key": "er4",
-      "lo": 0.34682399999999997,
-      "hi": 0.412264,
-      "n": 45,
-      "mean_R": -0.12,
+      "lo": 0.34628899999999996,
+      "hi": 0.412,
+      "n": 43,
+      "mean_R": -0.13,
       "rest_R": -0.07,
-      "z": -0.29
+      "z": -0.41
      },
      {
       "feature": "session (UTC)",
@@ -45370,21 +45535,21 @@
       "key": "hour",
       "lo": 0.0,
       "hi": 8.0,
-      "n": 40,
+      "n": 41,
       "mean_R": -0.11,
       "rest_R": -0.08,
-      "z": -0.22
+      "z": -0.2
      },
      {
       "feature": "volatility (ATR%)",
       "bucket": "high",
       "key": "atr_pct",
-      "lo": 1.8981000000000003,
+      "lo": 1.8877519999999999,
       "hi": 1000000000.0,
-      "n": 44,
-      "mean_R": -0.07,
-      "rest_R": -0.09,
-      "z": 0.17
+      "n": 45,
+      "mean_R": -0.09,
+      "rest_R": -0.08,
+      "z": -0.06
      }
     ],
     "note": "z beyond +-2.5 is only a hint: about 20 buckets are tested, so a few false alarms are expected."
@@ -45396,8 +45561,8 @@
    }
   },
   "radar": {
-   "ts": "2026-11-26T11:30:12+00:00",
-   "price": 60610.3,
+   "ts": "2026-11-26T11:35:13+00:00",
+   "price": 60627.2,
    "LONG": [
     [
      "4H trend up",
@@ -45539,7 +45704,7 @@
     "grade": "A",
     "why": "Pichle 6 ghante bhaav ek tang box mein (2.3 ATR) ghoom raha tha. Ab 1H candle ne box ke upar mazboot band di, volume normal ka 3.0 guna tha, aur bade (4H) trend ne iska virodh nahi kiya. Active samay mein breakout hone se follow-through ki sambhavna behtar hoti hai. Isliye BUY liya. Stop box ke doosri taraf, target 2.0R. Ye experimental hai: backtest se pehle isse sabit nahi maana jaata.",
     "capped": false,
-    "last_px": 783.3,
+    "last_px": 784.7,
     "path": {
      "1h": {
       "mfe": 0.21,
@@ -45570,7 +45735,7 @@
     "mgmt": {
      "status": "\ud83d\udfe1 REVERSAL WATCH",
      "stage": "ENTRY",
-     "uR": -0.5,
+     "uR": -0.47,
      "mfe_R": 0.0,
      "exhaustion": 25,
      "reversal_flags": {
@@ -45585,7 +45750,7 @@
      ],
      "stop_advice": "Stop jaisa hai waisa rakho",
      "suggested_sl": 761.5,
-     "hold_vs_book": "Hold: target 2.5R door, stop tak 0.5R (R/R 5.0). Abhi book karo to +-0.5R pakka.",
+     "hold_vs_book": "Hold: target 2.5R door, stop tak 0.5R (R/R 4.6). Abhi book karo to +-0.5R pakka.",
      "next_zone": 869.9,
      "momentum_atr": -0.82,
      "volume_ratio": 0.5
@@ -45639,131 +45804,7 @@
    "trend_pullback@PENGU": null,
    "trend_pullback@PUMP": null,
    "trend_pullback@PIPPIN": null,
-   "trend_pullback@IRYS": {
-    "id": "TP-IRYS-SHORT-20261126-002",
-    "strategy": "trend_pullback",
-    "sym": "IRYS",
-    "key": "trend_pullback@IRYS",
-    "label": "Trend Pullback \u00b7 IRYS",
-    "side": -1,
-    "entry": 0.01616,
-    "sl0": 0.016965714285714285,
-    "sl": 0.016965714285714285,
-    "risk": 0.0008057142857142846,
-    "mode": "fixed",
-    "tp": 0.012937142857142862,
-    "t1": null,
-    "t2": null,
-    "t3": null,
-    "partial": 0.5,
-    "qty": 3128.3809,
-    "qty_btc": 3128.3809,
-    "notional_usd": 50.55,
-    "margin_inr": 1565.93,
-    "margin_released": 0.0,
-    "rem_wallet": 1.0,
-    "leverage": 3,
-    "fx": 92.925233,
-    "risk_inr": 234.23,
-    "fees_usd": 0.025277317672,
-    "realized_usd": 0.0,
-    "stage": 0,
-    "remaining": 1.0,
-    "mfe_R": 0.33510638297872314,
-    "mae_R": 0.906028368794325,
-    "exits": [],
-    "events": [
-     {
-      "ts": "2026-11-26T01:33:09+00:00",
-      "type": "OPENED",
-      "price": 0.01616,
-      "note": "qty 3128.3809 IRYS, margin \u20b91,566"
-     }
-    ],
-    "created": "2026-11-26T01:33:09+00:00",
-    "last_ts": 1795691700000.0,
-    "expiry_h": 120,
-    "cfg": {
-     "enabled": true,
-     "label": "Trend Pullback",
-     "risk_pct": 0.5,
-     "long_risk_mult": 0.5,
-     "stop_atr": 3.0,
-     "target_r": 4.0,
-     "expiry_hours": 120,
-     "cooldown_hours": 24,
-     "leverage": 3,
-     "fee_per_side": 0.0005
-    },
-    "ctx": {
-     "er4": 0.346,
-     "atr_pct": 1.662,
-     "depth": 2.72,
-     "hour": 0,
-     "wd": 3,
-     "side_n": -1,
-     "side": "SHORT",
-     "funding": 0.0,
-     "regime": null
-    },
-    "entry_ctx": null,
-    "confirm_lvl": null,
-    "grade": "B",
-    "why": "Bade (4H) chart pe IRYS ka trend neeche hai (taakat 0.35, kam se kam 0.30 chahiye thi). Us trend ke beech bhaav thoda upar chadha (2.7 ATR ki halchal) aur ab trend ki taraf palat raha hai (pichli 1H candle trend ke saath band hui). Isliye trend ke saath SELL liya. Stop-loss 3.0\u00d7ATR door rakha taaki chhoti uthal-puthal se na toote, target risk ka 4.0 guna. Backtest mein har 3 mein ~2 trade harte hain, isliye loss normal hai.",
-    "capped": false,
-    "last_px": 0.01615,
-    "path": {
-     "1h": {
-      "mfe": 0.27,
-      "mae": 0.0,
-      "uR": 0.14
-     },
-     "2h": {
-      "mfe": 0.34,
-      "mae": 0.0,
-      "uR": 0.22
-     },
-     "4h": {
-      "mfe": 0.34,
-      "mae": 0.42,
-      "uR": -0.14
-     },
-     "6h": {
-      "mfe": 0.34,
-      "mae": 0.91,
-      "uR": -0.43
-     },
-     "8h": {
-      "mfe": 0.34,
-      "mae": 0.91,
-      "uR": 0.05
-     }
-    },
-    "mgmt": {
-     "status": "\ud83d\udfe2 HOLD: MORE UPSIDE POSSIBLE",
-     "stage": "ENTRY",
-     "uR": 0.01,
-     "mfe_R": 0.34,
-     "exhaustion": 25,
-     "reversal_flags": {
-      "structure_break": false,
-      "momentum_negative": false,
-      "gave_back": false
-     },
-     "reasons": [
-      "Momentum trend ke saath chal raha hai (pichle 3 ghante +1.1 ATR)",
-      "Volume kam ho raha hai (normal ka 0.5 guna)"
-     ],
-     "stop_advice": "Stop jaisa hai waisa rakho",
-     "suggested_sl": 0.0,
-     "hold_vs_book": "Hold: target 4.0R door, stop tak 1.0R (R/R 3.9). Abhi book karo to +0.0R pakka.",
-     "next_zone": 0.0,
-     "momentum_atr": 1.12,
-     "volume_ratio": 0.52
-    },
-    "mstatus": "\ud83d\udfe2 HOLD: MORE UPSIDE POSSIBLE",
-    "mts": "2026-11-26T10:40:07+00:00"
-   },
+   "trend_pullback@IRYS": null,
    "session_breakout@SNXX": null,
    "trend_pullback@SKY": null,
    "bb_rsi_vol": null,
@@ -45854,7 +45895,7 @@
     "grade": "B",
     "why": "Bade (4H) chart pe VVV ka trend upar hai (taakat 0.36, kam se kam 0.30 chahiye thi). Us trend ke beech bhaav thoda neeche gira (2.2 ATR ki halchal) aur ab trend ki taraf palat raha hai (pichli 1H candle trend ke saath band hui). Isliye trend ke saath BUY liya. Stop-loss 3.0\u00d7ATR door rakha taaki chhoti uthal-puthal se na toote, target risk ka 4.0 guna. Backtest mein har 3 mein ~2 trade harte hain, isliye loss normal hai.",
     "capped": false,
-    "last_px": 27.598,
+    "last_px": 27.646,
     "path": {
      "1h": {
       "mfe": 0.08,
@@ -45875,7 +45916,7 @@
     "mgmt": {
      "status": "\ud83d\udfe2 HOLD: THESIS INTACT",
      "stage": "ENTRY",
-     "uR": -0.04,
+     "uR": -0.03,
      "mfe_R": 0.08,
      "exhaustion": 25,
      "reversal_flags": {
@@ -45889,7 +45930,7 @@
      ],
      "stop_advice": "Stop jaisa hai waisa rakho",
      "suggested_sl": 23.8,
-     "hold_vs_book": "Hold: target 4.0R door, stop tak 1.0R (R/R 4.2). Abhi book karo to +-0.0R pakka.",
+     "hold_vs_book": "Hold: target 4.0R door, stop tak 1.0R (R/R 4.1). Abhi book karo to +-0.0R pakka.",
      "next_zone": 39.5,
      "momentum_atr": 0.0,
      "volume_ratio": 0.33
@@ -45974,7 +46015,7 @@
     "grade": "B",
     "why": "Bade (4H) chart pe OPG ka trend upar hai (taakat 0.38, kam se kam 0.30 chahiye thi). Us trend ke beech bhaav thoda neeche gira (1.5 ATR ki halchal) aur ab trend ki taraf palat raha hai (pichli 1H candle trend ke saath band hui). Isliye trend ke saath BUY liya. Stop-loss 3.0\u00d7ATR door rakha taaki chhoti uthal-puthal se na toote, target risk ka 4.0 guna. Backtest mein har 3 mein ~2 trade harte hain, isliye loss normal hai.",
     "capped": false,
-    "last_px": 0.1574,
+    "last_px": 0.15675,
     "path": {
      "1h": {
       "mfe": 0.19,
@@ -46005,7 +46046,7 @@
     "mgmt": {
      "status": "\ud83d\udfe2 HOLD: THESIS INTACT",
      "stage": "ENTRY",
-     "uR": -0.51,
+     "uR": -0.53,
      "mfe_R": 0.18,
      "exhaustion": 25,
      "reversal_flags": {
@@ -46019,7 +46060,7 @@
      ],
      "stop_advice": "Stop jaisa hai waisa rakho",
      "suggested_sl": 0.1,
-     "hold_vs_book": "Hold: target 4.5R door, stop tak 0.5R (R/R 9.2). Abhi book karo to +-0.5R pakka.",
+     "hold_vs_book": "Hold: target 4.5R door, stop tak 0.5R (R/R 9.7). Abhi book karo to +-0.5R pakka.",
      "next_zone": 0.2,
      "momentum_atr": -0.2,
      "volume_ratio": 0.27
@@ -46101,7 +46142,7 @@
     "grade": "B",
     "why": "Bade (4H) chart pe MOODENG ka trend upar hai (taakat 0.37, kam se kam 0.30 chahiye thi). Us trend ke beech bhaav thoda neeche gira (1.8 ATR ki halchal) aur ab trend ki taraf palat raha hai (pichli 1H candle trend ke saath band hui). Isliye trend ke saath BUY liya. Stop-loss 3.0\u00d7ATR door rakha taaki chhoti uthal-puthal se na toote, target risk ka 4.0 guna. Backtest mein har 3 mein ~2 trade harte hain, isliye loss normal hai.",
     "capped": false,
-    "last_px": 0.02983,
+    "last_px": 0.03014,
     "path": {
      "1h": {
       "mfe": 0.18,
@@ -46122,7 +46163,7 @@
     "mgmt": {
      "status": "\ud83d\udfe2 HOLD: MORE UPSIDE POSSIBLE",
      "stage": "ENTRY",
-     "uR": 0.14,
+     "uR": 0.24,
      "mfe_R": 0.55,
      "exhaustion": 0,
      "reversal_flags": {
@@ -46136,7 +46177,7 @@
      ],
      "stop_advice": "Stop jaisa hai waisa rakho",
      "suggested_sl": 0.0,
-     "hold_vs_book": "Hold: target 3.9R door, stop tak 1.1R (R/R 3.4). Abhi book karo to +0.1R pakka.",
+     "hold_vs_book": "Hold: target 3.8R door, stop tak 1.2R (R/R 3.0). Abhi book karo to +0.2R pakka.",
      "next_zone": 0.0,
      "momentum_atr": -0.77,
      "volume_ratio": 1.0
@@ -46243,21 +46284,6 @@
    "trend_pullback@MOODENG": 1795675153549.652
   },
   "journal": [
-   {
-    "ts": "2026-11-15T17:48:48+00:00",
-    "kind": "OPENED",
-    "text": "TP-XAG-SHORT-20261115-002 SHORT 8.5847 XAG at $47.78 (margin \u20b912,888)"
-   },
-   {
-    "ts": "2026-11-15T21:04:35+00:00",
-    "kind": "SMART EXIT",
-    "text": "TP-SHORT-20261113-005: move poora hone ke sanket (thakaan 75/100, +1.8R)"
-   },
-   {
-    "ts": "2026-11-15T21:04:35+00:00",
-    "kind": "EXIT",
-    "text": "TP-SHORT-20261113-005 SMART EXIT at $65,110 (100%)"
-   },
    {
     "ts": "2026-11-15T21:04:35+00:00",
     "kind": "CLOSED",
@@ -48742,12 +48768,27 @@
     "ts": "2026-11-26T06:39:13+00:00",
     "kind": "OPENED",
     "text": "TP-MOODENG-LONG-20261126-001 LONG 404.8772 MOODENG at $0.02938 (margin \u20b9368)"
+   },
+   {
+    "ts": "2026-11-26T11:35:13+00:00",
+    "kind": "SMART EXIT",
+    "text": "TP-IRYS-SHORT-20261126-002: 10 ghante mein trade ne kuch nahi kiya (stall, +0.0R)"
+   },
+   {
+    "ts": "2026-11-26T11:35:13+00:00",
+    "kind": "EXIT",
+    "text": "TP-IRYS-SHORT-20261126-002 SMART EXIT at $0.01613 (100%)"
+   },
+   {
+    "ts": "2026-11-26T11:35:13+00:00",
+    "kind": "CLOSED",
+    "text": "TP-IRYS-SHORT-20261126-002 SMART EXIT +0.02R \u20b94"
    }
   ],
   "wallet": {
    "start": 50000.0,
-   "cash": 43423.9,
-   "margin": 3335.95,
+   "cash": 44996.21,
+   "margin": 1770.02,
    "touched": true,
    "ledger": [
     {
@@ -59779,6 +59820,36 @@
      "margin": 3335.95,
      "equity": 46759.85,
      "note": "Entry fee"
+    },
+    {
+     "ts": "2026-11-26T11:35:13+00:00",
+     "type": "MARGIN_RELEASE",
+     "trade_id": "TP-IRYS-SHORT-20261126-002",
+     "amount": 1565.93,
+     "cash": 44989.83,
+     "margin": 1770.02,
+     "equity": 46759.85,
+     "note": "Margin released: SMART EXIT (100% of position)"
+    },
+    {
+     "ts": "2026-11-26T11:35:13+00:00",
+     "type": "PNL_REALIZED",
+     "trade_id": "TP-IRYS-SHORT-20261126-002",
+     "amount": 8.72,
+     "cash": 44998.55,
+     "margin": 1770.02,
+     "equity": 46768.57,
+     "note": "Gross profit/loss: SMART EXIT (100% of position)"
+    },
+    {
+     "ts": "2026-11-26T11:35:13+00:00",
+     "type": "FEE_EXIT",
+     "trade_id": "TP-IRYS-SHORT-20261126-002",
+     "amount": -2.34,
+     "cash": 44996.21,
+     "margin": 1770.02,
+     "equity": 46766.23,
+     "note": "Exit fee"
     }
    ]
   },
@@ -59845,12 +59916,12 @@
     {
      "name": "Order flow (taker)",
      "dir": -1,
-     "why": "Taker delta -0.07: sellers aggressive"
+     "why": "Taker delta -0.10: sellers aggressive"
     },
     {
      "name": "Aggression (60 min)",
      "dir": 0,
-     "why": "NORMAL / BALANCED (delta -6%, bade orders 15%)"
+     "why": "NORMAL / BALANCED (delta -5%, bade orders 14%)"
     },
     {
      "name": "Multi-timeframe",
@@ -59858,11 +59929,11 @@
      "why": "0 timeframe UP, 0 DOWN (5m..4H)"
     }
    ],
-   "ts": "2026-11-26T11:30:12+00:00",
-   "price": 60610.3
+   "ts": "2026-11-26T11:35:13+00:00",
+   "price": 60627.2
   },
   "radar_move": {
-   "ts": "2026-11-26T11:30:12+00:00",
+   "ts": "2026-11-26T11:35:13+00:00",
    "score": 37,
    "state": "QUIET",
    "lean": 0,
@@ -59878,43 +59949,13 @@
    "box_hi": 61119.8,
    "box_lo": 60343.0,
    "atr": 541.8,
-   "exp_pts": 810,
+   "exp_pts": 811,
    "tm": {
     "now": "LOW",
     "next": "MEDIUM"
    }
   },
   "smartshadow": [
-   {
-    "side": -1,
-    "entry": 102.99,
-    "sl": 107.94214285714285,
-    "risk": 4.9521428571428565,
-    "mode": "fixed",
-    "tp": 83.18142857142857,
-    "t1": null,
-    "t2": null,
-    "partial": 0.5,
-    "stage": 0,
-    "remaining": 0,
-    "mfe_R": 0.2503966536852723,
-    "mae_R": 13021.940574066062,
-    "id": "SMARTSH-TP-UNITREE-SHORT-20261116-003",
-    "strategy": "trend_pullback",
-    "created": "2026-11-16T14:33:58+00:00",
-    "expiry_h": 120,
-    "last_ts": 1794874500000.0,
-    "exits": [
-     [
-      "STOP-LOSS",
-      107.94214285714285,
-      1.0
-     ]
-    ],
-    "smart_R_at_exit": 0.25,
-    "reason": "10 ghante mein trade ne kuch nahi kiya (stall, +0.2R)",
-    "R": -1.021
-   },
    {
     "side": -1,
     "entry": 65035.3,
@@ -61684,12 +61725,35 @@
     "smart_R_at_exit": 0.27,
     "reason": "12 ghante mein trade ne kuch nahi kiya (stall, +0.3R)",
     "R": 1.974
+   },
+   {
+    "side": -1,
+    "entry": 0.01616,
+    "sl": 0.016965714285714285,
+    "risk": 0.0008057142857142846,
+    "mode": "fixed",
+    "tp": 0.012937142857142862,
+    "t1": null,
+    "t2": null,
+    "partial": 0.5,
+    "stage": 0,
+    "remaining": 1.0,
+    "mfe_R": 0.33510638297872314,
+    "mae_R": 0.906028368794325,
+    "id": "SMARTSH-TP-IRYS-SHORT-20261126-002",
+    "strategy": "trend_pullback",
+    "created": "2026-11-26T01:33:09+00:00",
+    "expiry_h": 120,
+    "last_ts": 1795691700000.0,
+    "exits": [],
+    "smart_R_at_exit": 0.04,
+    "reason": "10 ghante mein trade ne kuch nahi kiya (stall, +0.0R)"
    }
   ],
   "coins": {
    "ETH": {
-    "ts": "2026-11-26T11:30:12+00:00",
-    "price": 1698.49,
+    "ts": "2026-11-26T11:35:13+00:00",
+    "price": 1699.28,
     "methods": {
      "verdict": "WAIT",
      "net": 10.3,
@@ -61797,8 +61861,8 @@
     }
    },
    "SOL": {
-    "ts": "2026-11-26T11:30:12+00:00",
-    "price": 70.73,
+    "ts": "2026-11-26T11:35:13+00:00",
+    "price": 70.7,
     "methods": {
      "verdict": "WAIT",
      "net": 10.3,
@@ -61906,7 +61970,7 @@
     }
    }
   },
-  "last_px_btc": 60610.3,
+  "last_px_btc": 60627.2,
   "last_digest": "2026-11-26T11:20:11+00:00",
   "loss_guard_day": "2026-11-23",
   "gate": {
@@ -61983,23 +62047,11 @@
   "bot": "btcstochbot",
   "poll_error": "",
   "last_error": "",
-  "last_send_ok": "2026-11-26T11:20:35+00:00",
-  "last_run": "2026-11-26T11:30:12+00:00",
+  "last_send_ok": "2026-11-26T11:35:37+00:00",
+  "last_run": "2026-11-26T11:35:13+00:00",
   "last_cmd_ts": "2026-11-25T02:59:18+00:00",
   "last_cmd": "/set",
   "log": [
-   {
-    "ts": "2026-11-26T06:19:34+00:00",
-    "cat": "paper_close",
-    "ok": true,
-    "text": "\ud83c\udfc1 SMART EXIT (SB-UNI-LONG-20261125-001): 12 ghante mein trade ne kuch "
-   },
-   {
-    "ts": "2026-11-26T06:19:34+00:00",
-    "cat": "-",
-    "ok": true,
-    "text": "\ud83d\udcdd PAPER ORDER CLOSED (virtual)  \ud83d\udd52 26 Nov 11:49 IST \ud83e\udde0 Strategy: Session"
-   },
    {
     "ts": "2026-11-26T06:19:35+00:00",
     "cat": "-",
@@ -62167,11 +62219,23 @@
     "cat": "digest",
     "ok": true,
     "text": "\ud83d\udcc8 OPEN TRADES UPDATE  \ud83d\udd52 26 Nov 16:50 IST  \ud83e\udde0 Session Breakout (experime"
+   },
+   {
+    "ts": "2026-11-26T11:35:36+00:00",
+    "cat": "paper_close",
+    "ok": true,
+    "text": "\ud83c\udfc1 SMART EXIT (TP-IRYS-SHORT-20261126-002): 10 ghante mein trade ne kuc"
+   },
+   {
+    "ts": "2026-11-26T11:35:37+00:00",
+    "cat": "-",
+    "ok": true,
+    "text": "\ud83d\udcdd PAPER ORDER CLOSED (virtual)  \ud83d\udd52 26 Nov 17:05 IST \ud83e\udde0 Strategy: Trend P"
    }
   ]
  },
  "analysis": {
-  "price": 60610.3,
+  "price": 60627.2,
   "regime": "RANGE",
   "stage": "Stage 4-5: trade active",
   "status": "TRADE ACTIVE (see Home)",
@@ -62180,11 +62244,11 @@
    "structure": 50,
    "volume": 62.24996258868474,
    "momentum": 27.699077251582548,
-   "order_flow": 20.67,
-   "liquidity": 48.83413406543113,
+   "order_flow": 28.53,
+   "liquidity": 48.11240753450787,
    "htf": 58.06533524624507,
-   "accumulation": 25,
-   "distribution": 40,
+   "accumulation": 30,
+   "distribution": 30,
    "volatility_pct": 11.5,
    "large_move_potential": 57,
    "continuation": 49.33812502883745,
@@ -62194,16 +62258,16 @@
   "levels": null,
   "expected_move": {
    "expected": [
-    810.3597110000001,
-    1516.4697059999999
+    810.585664,
+    1516.8925439999998
    ],
    "strong": [
-    1516.4697059999999,
-    2465.627004
+    1516.8925439999998,
+    2466.3144959999995
    ],
    "extended": [
-    2465.627004,
-    3260.8341400000004
+    2466.3144959999995,
+    3261.74336
    ],
    "side": "up",
    "sample": 16000,
@@ -62217,7 +62281,7 @@
      0.452
     ],
     "2000": [
-     0.157,
+     0.158,
      0.178
     ],
     "5000": [
@@ -62236,49 +62300,49 @@
    "high": 64570.0,
    "low": 57257.8,
    "mid": 60913.9,
-   "position_pct": 45.84803479117094
+   "position_pct": 46.07915538415245
   },
   "breakout": "none",
   "notes": {
-   "order_flow": "book imbalance -0.17, OI +0.36% (4h)",
+   "order_flow": "book imbalance +0.14, OI +0.24% (4h)",
    "atr": 468.32142857142907,
-   "funding": 7.18660664732e-05,
-   "oi": 1904952495.5217068
+   "funding": 7.10226344905e-05,
+   "oi": 1906195789.1070068
   }
  },
  "desk": {
-  "price": 60610.3,
+  "price": 60627.2,
   "atr1h": 468.32142857142907,
   "atr4h": 1155.985714285714,
   "derivs": {
    "crowding": "balanced",
    "quadrant": null,
-   "oi_change_4h": 0.36,
-   "oi_change_24h": 1.48,
-   "price_change_4h": 0.1,
-   "taker_delta": -0.069,
+   "oi_change_4h": 0.24,
+   "oi_change_24h": 1.85,
+   "price_change_4h": 0.17,
+   "taker_delta": -0.098,
    "liquidations": null,
-   "bias": -0.21,
+   "bias": -0.29,
    "items": [
-    "Funding 0.0072% per 8h is normal: no obvious crowding",
-    "Open interest +0.36% over 4h with small price change: no clear signal",
-    "Taker flow (last ~1h of samples): sellers (-0.07)"
+    "Funding 0.0071% per 8h is normal: no obvious crowding",
+    "Open interest +0.24% over 4h with small price change: no clear signal",
+    "Taker flow (last ~1h of samples): sellers (-0.10)"
    ]
   },
   "levels": {
-   "price": 60610.3,
+   "price": 60627.2,
    "resistance": [
     {
-     "price": 60709.6,
+     "price": 60709.5,
      "names": [
       "Swing high",
       "Today's VWAP"
      ],
      "count": 2,
      "strength": "medium",
-     "dist_pts": 99.3,
-     "dist_pct": 0.16,
-     "dist_atr1h": 0.21,
+     "dist_pts": 82.3,
+     "dist_pct": 0.14,
+     "dist_atr1h": 0.18,
      "side": "resistance"
     },
     {
@@ -62288,9 +62352,9 @@
      ],
      "count": 1,
      "strength": "light",
-     "dist_pts": 389.7,
-     "dist_pct": 0.64,
-     "dist_atr1h": 0.83,
+     "dist_pts": 372.8,
+     "dist_pct": 0.61,
+     "dist_atr1h": 0.8,
      "side": "resistance"
     },
     {
@@ -62300,9 +62364,9 @@
      ],
      "count": 1,
      "strength": "light",
-     "dist_pts": 509.5,
-     "dist_pct": 0.84,
-     "dist_atr1h": 1.09,
+     "dist_pts": 492.6,
+     "dist_pct": 0.81,
+     "dist_atr1h": 1.05,
      "side": "resistance"
     },
     {
@@ -62312,9 +62376,9 @@
      ],
      "count": 1,
      "strength": "light",
-     "dist_pts": 889.7,
-     "dist_pct": 1.47,
-     "dist_atr1h": 1.9,
+     "dist_pts": 872.8,
+     "dist_pct": 1.44,
+     "dist_atr1h": 1.86,
      "side": "resistance"
     }
    ],
@@ -62326,9 +62390,9 @@
      ],
      "count": 1,
      "strength": "medium",
-     "dist_pts": -66.0,
-     "dist_pct": -0.11,
-     "dist_atr1h": -0.14,
+     "dist_pts": -82.9,
+     "dist_pct": -0.14,
+     "dist_atr1h": -0.18,
      "side": "support"
     },
     {
@@ -62342,21 +62406,21 @@
      ],
      "count": 5,
      "strength": "strong",
-     "dist_pts": -200.3,
-     "dist_pct": -0.33,
-     "dist_atr1h": -0.43,
+     "dist_pts": -217.2,
+     "dist_pct": -0.36,
+     "dist_atr1h": -0.46,
      "side": "support"
     },
     {
-     "price": 60220.7,
+     "price": 60220.8,
      "names": [
       "7-day VWAP"
      ],
      "count": 1,
      "strength": "light",
-     "dist_pts": -389.6,
-     "dist_pct": -0.64,
-     "dist_atr1h": -0.83,
+     "dist_pts": -406.4,
+     "dist_pct": -0.67,
+     "dist_atr1h": -0.87,
      "side": "support"
     },
     {
@@ -62367,28 +62431,28 @@
      ],
      "count": 2,
      "strength": "medium",
-     "dist_pts": -574.0,
-     "dist_pct": -0.95,
-     "dist_atr1h": -1.23,
+     "dist_pts": -590.9,
+     "dist_pct": -0.97,
+     "dist_atr1h": -1.26,
      "side": "support"
     }
    ],
    "vwap": {
-    "vwap": 60753.1,
-    "dev_atr": -0.3,
+    "vwap": 60752.9,
+    "dev_atr": -0.27,
     "note": "near VWAP (not stretched)"
    },
    "nearest_resistance": {
-    "price": 60709.6,
+    "price": 60709.5,
     "names": [
      "Swing high",
      "Today's VWAP"
     ],
     "count": 2,
     "strength": "medium",
-    "dist_pts": 99.3,
-    "dist_pct": 0.16,
-    "dist_atr1h": 0.21,
+    "dist_pts": 82.3,
+    "dist_pct": 0.14,
+    "dist_atr1h": 0.18,
     "side": "resistance"
    },
    "nearest_support": {
@@ -62398,9 +62462,9 @@
     ],
     "count": 1,
     "strength": "medium",
-    "dist_pts": -66.0,
-    "dist_pct": -0.11,
-    "dist_atr1h": -0.14,
+    "dist_pts": -82.9,
+    "dist_pct": -0.14,
+    "dist_atr1h": -0.18,
     "side": "support"
    }
   },
@@ -62437,7 +62501,7 @@
      "atr4h_multiple": 1.73,
      "size_class": "MEDIUM",
      "atr1h_multiple": 4.3,
-     "up_24h": 0.157,
+     "up_24h": 0.158,
      "dn_24h": 0.178,
      "up_72h": 0.37,
      "dn_72h": 0.412
@@ -62455,7 +62519,7 @@
     },
     {
      "points": 10000,
-     "pct": 16.5,
+     "pct": 16.49,
      "atr4h_multiple": 8.65,
      "size_class": "VERY LARGE / EXTENDED",
      "atr1h_multiple": 21.4,
@@ -62467,16 +62531,16 @@
    ],
    "typical_24h_points": {
     "up": [
-     810,
-     1516,
+     811,
+     1517,
      2466,
-     3261
+     3262
     ],
     "dn": [
      891,
      1621,
-     2621,
-     3362
+     2622,
+     3363
     ]
    },
    "note": "Class is relative to the 4H ATR (SMALL <1x, MEDIUM 1-2x, LARGE 2-4x, VERY LARGE >4x). Probabilities are history, not forecasts."
@@ -62522,7 +62586,7 @@
      "tf": "5m",
      "role": "Entry refinement",
      "direction": "FLAT",
-     "strength": 0.17
+     "strength": 0.12
     }
    ],
    "alignment": "MIXED (timeframes disagree: lower confidence)"
@@ -64706,7 +64770,7 @@
   "next_high": {
    "hr": 13,
    "ist": "18:30-19:30",
-   "in_min": 90,
+   "in_min": 85,
    "avg_range": 614.2,
    "avg_up": 280.3,
    "avg_down": 333.8
@@ -64741,75 +64805,75 @@
   "hist_days": 367
  },
  "sr": {
-  "px": 60610.4,
+  "px": 60627.2,
   "tf": {
    "5m": {
-    "atr": 83.3,
+    "atr": 81.8,
     "supports": [
      {
       "price": 60599.9,
       "touches": 16,
       "recent": false,
-      "dist_pct": -0.02,
-      "dist_atr": -0.1
+      "dist_pct": -0.05,
+      "dist_atr": -0.3
      },
      {
       "price": 60489.9,
       "touches": 14,
       "recent": false,
-      "dist_pct": -0.2,
-      "dist_atr": -1.4
+      "dist_pct": -0.23,
+      "dist_atr": -1.7
      }
     ],
     "resistances": [
      {
       "price": 60644.5,
-      "touches": 20,
+      "touches": 21,
       "recent": false,
-      "dist_pct": 0.06,
-      "dist_atr": 0.4
+      "dist_pct": 0.03,
+      "dist_atr": 0.2
      },
      {
-      "price": 60691.9,
-      "touches": 12,
-      "recent": false,
-      "dist_pct": 0.13,
-      "dist_atr": 1.0
+      "price": 60717.9,
+      "touches": 21,
+      "recent": true,
+      "dist_pct": 0.15,
+      "dist_atr": 1.1
      }
     ]
    },
    "15m": {
-    "atr": 181.8,
+    "atr": 185.6,
     "supports": [
      {
       "price": 60563.1,
-      "touches": 22,
+      "touches": 23,
       "recent": true,
-      "dist_pct": -0.08,
+      "dist_pct": -0.11,
       "dist_atr": -0.3
      },
      {
       "price": 60454.5,
-      "touches": 23,
+      "touches": 24,
       "recent": true,
-      "dist_pct": -0.26,
+      "dist_pct": -0.28,
       "dist_atr": -0.9
      }
     ],
     "resistances": [
      {
       "price": 60649.0,
-      "touches": 20,
+      "touches": 21,
       "recent": false,
-      "dist_pct": 0.06,
-      "dist_atr": 0.2
+      "dist_pct": 0.04,
+      "dist_atr": 0.1
      },
      {
       "price": 60744.3,
       "touches": 16,
       "recent": false,
-      "dist_pct": 0.22,
-      "dist_atr": 0.7
+      "dist_pct": 0.19,
+      "dist_atr": 0.6
      }
     ]
    },
@@ -64820,15 +64884,15 @@
       "price": 60431.2,
       "touches": 31,
       "recent": true,
-      "dist_pct": -0.3,
-      "dist_atr": -0.3
+      "dist_pct": -0.32,
+      "dist_atr": -0.4
      },
      {
       "price": 60072.6,
       "touches": 19,
       "recent": true,
-      "dist_pct": -0.89,
-      "dist_atr": -1.0
+      "dist_pct": -0.91,
+      "dist_atr": -1.1
      }
     ],
     "resistances": [
@@ -64836,14 +64900,14 @@
       "price": 60696.3,
       "touches": 23,
       "recent": false,
-      "dist_pct": 0.14,
-      "dist_atr": 0.2
+      "dist_pct": 0.11,
+      "dist_atr": 0.1
      },
      {
       "price": 61040.0,
       "touches": 29,
       "recent": true,
-      "dist_pct": 0.71,
+      "dist_pct": 0.68,
       "dist_atr": 0.8
      }
     ]
@@ -64855,15 +64919,15 @@
       "price": 60339.6,
       "touches": 14,
       "recent": true,
-      "dist_pct": -0.45,
+      "dist_pct": -0.47,
       "dist_atr": -0.2
      },
      {
       "price": 58731.0,
       "touches": 5,
       "recent": true,
-      "dist_pct": -3.1,
-      "dist_atr": -1.5
+      "dist_pct": -3.13,
+      "dist_atr": -1.6
      }
     ],
     "resistances": [
@@ -64871,14 +64935,14 @@
       "price": 60970.0,
       "touches": 11,
       "recent": true,
-      "dist_pct": 0.59,
+      "dist_pct": 0.57,
       "dist_atr": 0.3
      },
      {
       "price": 61970.2,
       "touches": 9,
       "recent": false,
-      "dist_pct": 2.24,
+      "dist_pct": 2.22,
       "dist_atr": 1.1
      }
     ]
@@ -64890,14 +64954,14 @@
       "price": 59078.4,
       "touches": 8,
       "recent": false,
-      "dist_pct": -2.53,
+      "dist_pct": -2.55,
       "dist_atr": -0.5
      },
      {
       "price": 57890.8,
       "touches": 6,
       "recent": false,
-      "dist_pct": -4.49,
+      "dist_pct": -4.51,
       "dist_atr": -0.9
      }
     ],
@@ -64906,14 +64970,14 @@
       "price": 62137.8,
       "touches": 29,
       "recent": true,
-      "dist_pct": 2.52,
+      "dist_pct": 2.49,
       "dist_atr": 0.5
      },
      {
       "price": 64937.7,
       "touches": 47,
       "recent": true,
-      "dist_pct": 7.14,
+      "dist_pct": 7.11,
       "dist_atr": 1.4
      }
     ]
@@ -64923,7 +64987,7 @@
    {
     "lo": 60339.6,
     "hi": 60744.3,
-    "mid": 60573.1,
+    "mid": 60575.5,
     "tfs": [
      "5m",
      "15m",
@@ -64947,39 +65011,39 @@
   ]
  },
  "orderflow": {
-  "ts": "2026-11-26T11:30:12+00:00",
-  "px": 60610.4,
+  "ts": "2026-11-26T11:35:13+00:00",
+  "px": 60627.2,
   "now": {
    "state": "NORMAL / BALANCED",
-   "buy": 765.1,
-   "sell": 859.0,
+   "buy": 821.8,
+   "sell": 912.4,
    "big_buy": 39.0,
-   "big_sell": 205.2,
-   "vol": 1624.1,
-   "delta": -94.0,
-   "ratio": -0.058,
-   "big_share": 0.15
+   "big_sell": 211.2,
+   "vol": 1734.3,
+   "delta": -90.6,
+   "ratio": -0.052,
+   "big_share": 0.144
   },
   "h4": {
    "state": "NORMAL / BALANCED",
-   "buy": 2087.5,
-   "sell": 2440.9,
+   "buy": 2144.2,
+   "sell": 2494.3,
    "big_buy": 135.2,
-   "big_sell": 324.7,
-   "vol": 4528.4,
-   "delta": -353.5,
-   "ratio": -0.078,
-   "big_share": 0.102
+   "big_sell": 330.7,
+   "vol": 4638.6,
+   "delta": -350.1,
+   "ratio": -0.075,
+   "big_share": 0.1
   },
   "h24": {
    "state": "NORMAL / BALANCED",
-   "buy": 10397.6,
-   "sell": 10326.2,
+   "buy": 10454.4,
+   "sell": 10379.6,
    "big_buy": 1271.9,
-   "big_sell": 1052.6,
-   "vol": 20723.8,
-   "delta": 71.4,
-   "ratio": 0.003,
+   "big_sell": 1058.6,
+   "vol": 20834.0,
+   "delta": 74.7,
+   "ratio": 0.004,
    "big_share": 0.112
   },
   "buy_zones": [],
@@ -65006,13 +65070,13 @@
   "poc": {
    "lo": 60650,
    "hi": 60700,
-   "buy": 353.6,
-   "sell": 329.9,
-   "vol": 683.5,
-   "ratio": 0.03,
-   "big_share": 0.16
+   "buy": 370.3,
+   "sell": 345.2,
+   "vol": 715.5,
+   "ratio": 0.04,
+   "big_share": 0.15
   },
-  "coverage_pct": 2,
+  "coverage_pct": 4,
   "history_h": 24.0
  },
  "chart_ts": "2026-11-26T11:20:11+00:00",
@@ -65431,10 +65495,10 @@
   "5m": {
    "net": -4.3,
    "bucket": 2,
-   "rsi": 45.5,
-   "atr_pct": 0.1466,
-   "price": 60616.3,
-   "ts": 1795692300000.0,
+   "rsi": 47.6,
+   "atr_pct": 0.1437,
+   "price": 60639.8,
+   "ts": 1795692600000.0,
    "votes": [
     [
      "Trend",
@@ -65459,7 +65523,7 @@
     [
      "Momentum",
      0,
-     "RSI 46: momentum saaf nahi"
+     "RSI 48: momentum saaf nahi"
     ],
     [
      "Bollinger bands",
@@ -65690,15 +65754,15 @@
     "open": 59699.9,
     "high": 61620.0,
     "low": 59670.0,
-    "close": 60610.3,
+    "close": 60627.2,
     "up": 1920.1,
     "dn": 29.9,
     "rng": 1950.0,
     "up_pct": 3.22,
     "dn_pct": 0.05,
     "rng_pct": 3.27,
-    "chg": 910.4,
-    "chg_pct": 1.52,
+    "chg": 927.3,
+    "chg_pct": 1.55,
     "full": false
    }
   ],
@@ -65711,7 +65775,7 @@
    "max_rng": 5870.0,
    "min_rng": 2045.0
   },
-  "ts": "2026-11-26T11:30:12+00:00"
+  "ts": "2026-11-26T11:35:13+00:00"
  },
  "ask_log": [],
  "analog": {
@@ -65892,9 +65956,9 @@
  "coindesk": {
   "ETH": {
    "sym": "ETH",
-   "ts": "2026-11-26T11:30:12+00:00",
+   "ts": "2026-11-26T11:35:13+00:00",
    "market": {
-    "price": 1698.69,
+    "price": 1699.42,
     "regime": "RANGE",
     "signal": "NO TRADE",
     "side": "LONG",
@@ -65908,7 +65972,7 @@
     "reversal": "none",
     "tf": {
      "5m": {
-      "er": 0.03,
+      "er": 0.01,
       "label": "FLAT"
      },
      "15m": {
@@ -65924,8 +65988,8 @@
       "label": "FLAT"
      }
     },
-    "funding": 6.16005358469e-05,
-    "oi": 1117581929.4726923,
+    "funding": 6.19483477663e-05,
+    "oi": 1118878871.4996321,
     "pro": [
      "higher low forming",
      "momentum turning up"
@@ -65936,29 +66000,29 @@
      "selling volume not fading",
      "no compression"
     ],
-    "ts": "2026-11-26T11:30:12+00:00"
+    "ts": "2026-11-26T11:35:13+00:00"
    },
    "scan": {
     "signal": "NO TRADE",
     "side": "LONG",
     "score": 30,
-    "entry": 1698.69,
+    "entry": 1699.42,
     "zone": [
-     1697.1507857142858,
-     1699.2030714285715
+     1697.8379285714286,
+     1699.9473571428573
     ],
-    "sl": 1688.1877142857143,
-    "t1": 1714.4434285714287,
-    "t2": 1730.1968571428574,
-    "t3": 1751.201428571429,
-    "ext": 1782.7082857142864,
+    "sl": 1688.1305714285716,
+    "t1": 1716.354142857143,
+    "t2": 1733.2882857142856,
+    "t3": 1755.8671428571427,
+    "ext": 1789.7354285714282,
     "confirm": 1704.53,
     "move_class": "MEDIUM",
     "risk": "High",
     "regime": "RANGE"
    },
    "analysis": {
-    "price": 1698.69,
+    "price": 1699.43,
     "regime": "RANGE",
     "stage": "Stage 0: no clear opportunity",
     "status": "WATCH ONLY (LONG lean, weak)",
@@ -65968,7 +66032,7 @@
      "volume": 59.3797366951645,
      "momentum": 42.8818628498186,
      "order_flow": 50.0,
-     "liquidity": 54.299295022431096,
+     "liquidity": 53.19269386883143,
      "htf": 56.573625047489216,
      "accumulation": 30,
      "distribution": 30,
@@ -65976,12 +66040,12 @@
      "large_move_potential": null,
      "continuation": 52.94507486415745,
      "exhaustion_risk": 41.848518835006715,
-     "setup": 62.90545289858911
+     "setup": 62.78249721485581
     },
     "levels": {
      "early_zone": [
-      1694.6777142857143,
-      1700.0274285714286
+      1695.4177142857143,
+      1700.7674285714286
      ],
      "confirmation": 1706.85,
      "retest_zone": [
@@ -65991,11 +66055,11 @@
      "late_above": 1720.2242857142855,
      "hard_invalidation": 1673.9702857142856,
      "preferred_sl": 1673.9702857142856,
-     "emergency_sl": 1658.567142857143,
-     "t1": 1735.7695714285717,
-     "t2": 1772.8491428571433,
-     "t3": 1822.2885714285721,
-     "extended": 1896.4477142857154,
+     "emergency_sl": 1659.307142857143,
+     "t1": 1737.6195714285718,
+     "t2": 1775.8091428571433,
+     "t3": 1826.7285714285722,
+     "extended": 1903.1077142857155,
      "rr_t1": 1.5,
      "targets_from": "ATR multiples (run research workflow)",
      "entry_state": "inside EARLY entry zone"
@@ -66048,18 +66112,18 @@
      "high": 1844.99,
      "low": 1607.68,
      "mid": 1726.335,
-     "position_pct": 38.350680544435555
+     "position_pct": 38.66250895453206
     },
     "breakout": "none",
     "notes": {
      "order_flow": "no order-flow data yet",
      "atr": 13.374285714285731,
-     "funding": 6.16005358469e-05,
-     "oi": 1117581929.4726923
+     "funding": 6.19483477663e-05,
+     "oi": 1118878871.4996321
     }
    },
    "desk": {
-    "price": 1698.69,
+    "price": 1699.43,
     "atr1h": 13.374285714285731,
     "atr4h": 35.49714285714286,
     "derivs": {
@@ -66078,7 +66142,7 @@
      ]
     },
     "levels": {
-     "price": 1698.69,
+     "price": 1699.43,
      "resistance": [
       {
        "price": 1708.5,
@@ -66087,9 +66151,9 @@
        ],
        "count": 2,
        "strength": "medium",
-       "dist_pts": 9.8,
-       "dist_pct": 0.58,
-       "dist_atr1h": 0.73,
+       "dist_pts": 9.0,
+       "dist_pct": 0.53,
+       "dist_atr1h": 0.68,
        "side": "resistance"
       },
       {
@@ -66100,9 +66164,9 @@
        ],
        "count": 2,
        "strength": "medium",
-       "dist_pts": 31.0,
-       "dist_pct": 1.82,
-       "dist_atr1h": 2.32,
+       "dist_pts": 30.2,
+       "dist_pct": 1.78,
+       "dist_atr1h": 2.26,
        "side": "resistance"
       },
       {
@@ -66113,9 +66177,9 @@
        ],
        "count": 2,
        "strength": "strong",
-       "dist_pts": 146.3,
-       "dist_pct": 8.61,
-       "dist_atr1h": 10.94,
+       "dist_pts": 145.6,
+       "dist_pct": 8.57,
+       "dist_atr1h": 10.88,
        "side": "resistance"
       }
      ],
@@ -66129,9 +66193,9 @@
        ],
        "count": 3,
        "strength": "strong",
-       "dist_pts": -0.3,
-       "dist_pct": -0.02,
-       "dist_atr1h": -0.02,
+       "dist_pts": -1.1,
+       "dist_pct": -0.06,
+       "dist_atr1h": -0.08,
        "side": "support"
       },
       {
@@ -66144,9 +66208,9 @@
        ],
        "count": 4,
        "strength": "strong",
-       "dist_pts": -8.4,
-       "dist_pct": -0.5,
-       "dist_atr1h": -0.63,
+       "dist_pts": -9.2,
+       "dist_pct": -0.54,
+       "dist_atr1h": -0.68,
        "side": "support"
       },
       {
@@ -66157,9 +66221,9 @@
        ],
        "count": 2,
        "strength": "medium",
-       "dist_pts": -17.1,
-       "dist_pct": -1.01,
-       "dist_atr1h": -1.28,
+       "dist_pts": -17.8,
+       "dist_pct": -1.05,
+       "dist_atr1h": -1.33,
        "side": "support"
       },
       {
@@ -66169,15 +66233,15 @@
        ],
        "count": 1,
        "strength": "light",
-       "dist_pts": -26.9,
-       "dist_pct": -1.59,
-       "dist_atr1h": -2.01,
+       "dist_pts": -27.7,
+       "dist_pct": -1.63,
+       "dist_atr1h": -2.07,
        "side": "support"
       }
      ],
      "vwap": {
       "vwap": 1698.4,
-      "dev_atr": 0.02,
+      "dev_atr": 0.08,
       "note": "near VWAP (not stretched)"
      },
      "nearest_resistance": {
@@ -66187,9 +66251,9 @@
       ],
       "count": 2,
       "strength": "medium",
-      "dist_pts": 9.8,
-      "dist_pct": 0.58,
-      "dist_atr1h": 0.73,
+      "dist_pts": 9.0,
+      "dist_pct": 0.53,
+      "dist_atr1h": 0.68,
       "side": "resistance"
      },
      "nearest_support": {
@@ -66201,9 +66265,9 @@
       ],
       "count": 3,
       "strength": "strong",
-      "dist_pts": -0.3,
-      "dist_pct": -0.02,
-      "dist_atr1h": -0.02,
+      "dist_pts": -1.1,
+      "dist_pct": -0.06,
+      "dist_atr1h": -0.08,
       "side": "support"
      }
     },
@@ -66214,35 +66278,35 @@
      "rows": [
       {
        "points": 500,
-       "pct": 29.43,
+       "pct": 29.42,
        "atr4h_multiple": 14.09,
        "size_class": "VERY LARGE / EXTENDED",
        "atr1h_multiple": 37.4
       },
       {
        "points": 1000,
-       "pct": 58.87,
+       "pct": 58.84,
        "atr4h_multiple": 28.17,
        "size_class": "VERY LARGE / EXTENDED",
        "atr1h_multiple": 74.8
       },
       {
        "points": 2000,
-       "pct": 117.74,
+       "pct": 117.69,
        "atr4h_multiple": 56.34,
        "size_class": "VERY LARGE / EXTENDED",
        "atr1h_multiple": 149.5
       },
       {
        "points": 5000,
-       "pct": 294.34,
+       "pct": 294.22,
        "atr4h_multiple": 140.86,
        "size_class": "VERY LARGE / EXTENDED",
        "atr1h_multiple": 373.9
       },
       {
        "points": 10000,
-       "pct": 588.69,
+       "pct": 588.43,
        "atr4h_multiple": 281.71,
        "size_class": "VERY LARGE / EXTENDED",
        "atr1h_multiple": 747.7
@@ -66289,66 +66353,66 @@
        "tf": "5m",
        "role": "Entry refinement",
        "direction": "FLAT",
-       "strength": 0.03
+       "strength": 0.01
       }
      ],
      "alignment": "MIXED (timeframes disagree: lower confidence)"
     }
    },
    "sr": {
-    "px": 1698.7,
+    "px": 1699.4,
     "tf": {
      "5m": {
       "atr": 2.6,
       "supports": [
        {
-        "price": 1697.3,
-        "touches": 18,
-        "recent": true,
-        "dist_pct": -0.08,
-        "dist_atr": -0.5
+        "price": 1698.8,
+        "touches": 25,
+        "recent": false,
+        "dist_pct": -0.03,
+        "dist_atr": -0.2
        },
        {
-        "price": 1695.9,
-        "touches": 13,
-        "recent": false,
-        "dist_pct": -0.17,
-        "dist_atr": -1.1
+        "price": 1697.3,
+        "touches": 17,
+        "recent": true,
+        "dist_pct": -0.13,
+        "dist_atr": -0.8
        }
       ],
       "resistances": [
        {
-        "price": 1698.8,
-        "touches": 24,
-        "recent": false,
-        "dist_pct": 0.01,
-        "dist_atr": 0.1
+        "price": 1700.7,
+        "touches": 20,
+        "recent": true,
+        "dist_pct": 0.07,
+        "dist_atr": 0.5
        },
        {
-        "price": 1700.7,
-        "touches": 19,
-        "recent": true,
-        "dist_pct": 0.12,
-        "dist_atr": 0.8
+        "price": 1702.0,
+        "touches": 32,
+        "recent": false,
+        "dist_pct": 0.15,
+        "dist_atr": 1.0
        }
       ]
      },
      "15m": {
-      "atr": 5.3,
+      "atr": 5.4,
       "supports": [
        {
         "price": 1698.4,
-        "touches": 26,
+        "touches": 27,
         "recent": false,
-        "dist_pct": -0.02,
-        "dist_atr": -0.1
+        "dist_pct": -0.06,
+        "dist_atr": -0.2
        },
        {
         "price": 1696.2,
         "touches": 25,
         "recent": false,
-        "dist_pct": -0.15,
-        "dist_atr": -0.5
+        "dist_pct": -0.19,
+        "dist_atr": -0.6
        }
       ],
       "resistances": [
@@ -66356,15 +66420,15 @@
         "price": 1703.0,
         "touches": 22,
         "recent": false,
-        "dist_pct": 0.25,
-        "dist_atr": 0.8
+        "dist_pct": 0.21,
+        "dist_atr": 0.7
        },
        {
         "price": 1706.5,
         "touches": 17,
         "recent": true,
-        "dist_pct": 0.46,
-        "dist_atr": 1.5
+        "dist_pct": 0.41,
+        "dist_atr": 1.3
        }
       ]
      },
@@ -66375,14 +66439,14 @@
         "price": 1696.9,
         "touches": 23,
         "recent": true,
-        "dist_pct": -0.1,
-        "dist_atr": -0.1
+        "dist_pct": -0.15,
+        "dist_atr": -0.2
        },
        {
         "price": 1689.4,
         "touches": 26,
         "recent": true,
-        "dist_pct": -0.55,
+        "dist_pct": -0.59,
         "dist_atr": -0.6
        }
       ],
@@ -66391,14 +66455,14 @@
         "price": 1712.6,
         "touches": 20,
         "recent": false,
-        "dist_pct": 0.82,
-        "dist_atr": 0.9
+        "dist_pct": 0.77,
+        "dist_atr": 0.8
        },
        {
         "price": 1730.6,
         "touches": 14,
         "recent": true,
-        "dist_pct": 1.88,
+        "dist_pct": 1.84,
         "dist_atr": 2.0
        }
       ]
@@ -66410,14 +66474,14 @@
         "price": 1647.1,
         "touches": 6,
         "recent": true,
-        "dist_pct": -3.04,
-        "dist_atr": -1.3
+        "dist_pct": -3.08,
+        "dist_atr": -1.4
        },
        {
         "price": 1607.7,
         "touches": 2,
         "recent": true,
-        "dist_pct": -5.36,
+        "dist_pct": -5.4,
         "dist_atr": -2.4
        }
       ],
@@ -66426,15 +66490,15 @@
         "price": 1712.5,
         "touches": 16,
         "recent": true,
-        "dist_pct": 0.82,
-        "dist_atr": 0.4
+        "dist_pct": 0.77,
+        "dist_atr": 0.3
        },
        {
         "price": 1731.5,
         "touches": 12,
         "recent": false,
-        "dist_pct": 1.93,
-        "dist_atr": 0.9
+        "dist_pct": 1.89,
+        "dist_atr": 0.8
        }
       ]
      },
@@ -66445,14 +66509,14 @@
         "price": 1670.4,
         "touches": 17,
         "recent": false,
-        "dist_pct": -1.67,
+        "dist_pct": -1.71,
         "dist_atr": -0.3
        },
        {
         "price": 1601.3,
         "touches": 10,
         "recent": false,
-        "dist_pct": -5.73,
+        "dist_pct": -5.77,
         "dist_atr": -0.9
        }
       ],
@@ -66461,14 +66525,14 @@
         "price": 1722.8,
         "touches": 23,
         "recent": true,
-        "dist_pct": 1.42,
+        "dist_pct": 1.38,
         "dist_atr": 0.2
        },
        {
         "price": 1779.4,
         "touches": 13,
         "recent": false,
-        "dist_pct": 4.75,
+        "dist_pct": 4.71,
         "dist_atr": 0.7
        }
       ]
@@ -66476,9 +66540,9 @@
     },
     "zones": [
      {
-      "lo": 1695.9,
+      "lo": 1696.2,
       "hi": 1706.5,
-      "mid": 1699.3,
+      "mid": 1700.0,
       "tfs": [
        "5m",
        "15m",
@@ -66514,9 +66578,9 @@
   },
   "SOL": {
    "sym": "SOL",
-   "ts": "2026-11-26T11:30:12+00:00",
+   "ts": "2026-11-26T11:35:13+00:00",
    "market": {
-    "price": 70.72,
+    "price": 70.71,
     "regime": "RANGE",
     "signal": "NO TRADE",
     "side": "SHORT",
@@ -66530,7 +66594,7 @@
     "reversal": "none",
     "tf": {
      "5m": {
-      "er": 0.14,
+      "er": 0.17,
       "label": "FLAT"
      },
      "15m": {
@@ -66547,7 +66611,7 @@
      }
     },
     "funding": 0.0001,
-    "oi": 195644501.72519994,
+    "oi": 195620279.37919995,
     "pro": [
      "lower high forming",
      "buying volume fading"
@@ -66558,29 +66622,29 @@
      "no compression",
      "momentum not turning"
     ],
-    "ts": "2026-11-26T11:30:12+00:00"
+    "ts": "2026-11-26T11:35:13+00:00"
    },
    "scan": {
     "signal": "NO TRADE",
     "side": "SHORT",
     "score": 30,
-    "entry": 70.72,
+    "entry": 70.71,
     "zone": [
-     70.69735714285714,
-     70.78792857142857
+     70.68685714285714,
+     70.77942857142857
     ],
-    "sl": 71.42057142857142,
-    "t1": 69.66914285714287,
-    "t2": 68.61828571428573,
-    "t3": 67.21714285714289,
-    "ext": 65.11542857142862,
+    "sl": 71.42257142857143,
+    "t1": 69.64114285714284,
+    "t2": 68.57228571428568,
+    "t3": 67.14714285714281,
+    "ext": 65.0094285714285,
     "confirm": 70.42,
     "move_class": "LARGE",
     "risk": "High",
     "regime": "RANGE"
    },
    "analysis": {
-    "price": 70.72,
+    "price": 70.71,
     "regime": "RANGE",
     "stage": "Stage 0: no clear opportunity",
     "status": "NO TRADE",
@@ -66590,7 +66654,7 @@
      "volume": 60.86194899104513,
      "momentum": 24.909090909091468,
      "order_flow": 50.0,
-     "liquidity": 53.999999999999986,
+     "liquidity": 50.36363636363655,
      "htf": 56.858846918489064,
      "accumulation": 25,
      "distribution": 30,
@@ -66608,18 +66672,18 @@
      "high": 78.46,
      "low": 65.78,
      "mid": 72.12,
-     "position_pct": 38.958990536277604
+     "position_pct": 38.88012618296526
     },
     "breakout": "none",
     "notes": {
      "order_flow": "no order-flow data yet",
      "atr": 0.5499999999999992,
      "funding": 0.0001,
-     "oi": 195644501.72519994
+     "oi": 195620279.37919995
     }
    },
    "desk": {
-    "price": 70.72,
+    "price": 70.71,
     "atr1h": 0.5499999999999992,
     "atr4h": 1.7135714285714283,
     "derivs": {
@@ -66638,7 +66702,7 @@
      ]
     },
     "levels": {
-     "price": 70.72,
+     "price": 70.71,
      "resistance": [
       {
        "price": 71.0,
@@ -66650,8 +66714,8 @@
        "count": 3,
        "strength": "strong",
        "dist_pts": 0.3,
-       "dist_pct": 0.45,
-       "dist_atr1h": 0.57,
+       "dist_pct": 0.46,
+       "dist_atr1h": 0.59,
        "side": "resistance"
       },
       {
@@ -66662,8 +66726,8 @@
        "count": 1,
        "strength": "light",
        "dist_pts": 0.8,
-       "dist_pct": 1.16,
-       "dist_atr1h": 1.49,
+       "dist_pct": 1.17,
+       "dist_atr1h": 1.51,
        "side": "resistance"
       },
       {
@@ -66675,8 +66739,8 @@
        "count": 2,
        "strength": "medium",
        "dist_pts": 1.2,
-       "dist_pct": 1.67,
-       "dist_atr1h": 2.15,
+       "dist_pct": 1.68,
+       "dist_atr1h": 2.16,
        "side": "resistance"
       },
       {
@@ -66687,8 +66751,8 @@
        "count": 1,
        "strength": "light",
        "dist_pts": 1.9,
-       "dist_pct": 2.73,
-       "dist_atr1h": 3.51,
+       "dist_pct": 2.74,
+       "dist_atr1h": 3.53,
        "side": "resistance"
       }
      ],
@@ -66702,8 +66766,8 @@
        "count": 2,
        "strength": "medium",
        "dist_pts": -0.1,
-       "dist_pct": -0.11,
-       "dist_atr1h": -0.14,
+       "dist_pct": -0.1,
+       "dist_atr1h": -0.12,
        "side": "support"
       },
       {
@@ -66717,8 +66781,8 @@
        "count": 4,
        "strength": "strong",
        "dist_pts": -0.3,
-       "dist_pct": -0.4,
-       "dist_atr1h": -0.52,
+       "dist_pct": -0.39,
+       "dist_atr1h": -0.5,
        "side": "support"
       },
       {
@@ -66730,8 +66794,8 @@
        "count": 2,
        "strength": "medium",
        "dist_pts": -0.7,
-       "dist_pct": -0.95,
-       "dist_atr1h": -1.22,
+       "dist_pct": -0.93,
+       "dist_atr1h": -1.2,
        "side": "support"
       },
       {
@@ -66741,15 +66805,15 @@
        ],
        "count": 1,
        "strength": "light",
-       "dist_pts": -1.9,
-       "dist_pct": -2.63,
-       "dist_atr1h": -3.38,
+       "dist_pts": -1.8,
+       "dist_pct": -2.62,
+       "dist_atr1h": -3.36,
        "side": "support"
       }
      ],
      "vwap": {
       "vwap": 71.0,
-      "dev_atr": -0.45,
+      "dev_atr": -0.46,
       "note": "near VWAP (not stretched)"
      },
      "nearest_resistance": {
@@ -66762,8 +66826,8 @@
       "count": 3,
       "strength": "strong",
       "dist_pts": 0.3,
-      "dist_pct": 0.45,
-      "dist_atr1h": 0.57,
+      "dist_pct": 0.46,
+      "dist_atr1h": 0.59,
       "side": "resistance"
      },
      "nearest_support": {
@@ -66775,8 +66839,8 @@
       "count": 2,
       "strength": "medium",
       "dist_pts": -0.1,
-      "dist_pct": -0.11,
-      "dist_atr1h": -0.14,
+      "dist_pct": -0.1,
+      "dist_atr1h": -0.12,
       "side": "support"
      }
     },
@@ -66787,35 +66851,35 @@
      "rows": [
       {
        "points": 500,
-       "pct": 707.01,
+       "pct": 707.11,
        "atr4h_multiple": 291.79,
        "size_class": "VERY LARGE / EXTENDED",
        "atr1h_multiple": 909.1
       },
       {
        "points": 1000,
-       "pct": 1414.03,
+       "pct": 1414.23,
        "atr4h_multiple": 583.58,
        "size_class": "VERY LARGE / EXTENDED",
        "atr1h_multiple": 1818.2
       },
       {
        "points": 2000,
-       "pct": 2828.05,
+       "pct": 2828.45,
        "atr4h_multiple": 1167.15,
        "size_class": "VERY LARGE / EXTENDED",
        "atr1h_multiple": 3636.4
       },
       {
        "points": 5000,
-       "pct": 7070.14,
+       "pct": 7071.14,
        "atr4h_multiple": 2917.88,
        "size_class": "VERY LARGE / EXTENDED",
        "atr1h_multiple": 9090.9
       },
       {
        "points": 10000,
-       "pct": 14140.27,
+       "pct": 14142.27,
        "atr4h_multiple": 5835.76,
        "size_class": "VERY LARGE / EXTENDED",
        "atr1h_multiple": 18181.8
@@ -66862,7 +66926,7 @@
        "tf": "5m",
        "role": "Entry refinement",
        "direction": "FLAT",
-       "strength": 0.14
+       "strength": 0.17
       }
      ],
      "alignment": "MIXED (timeframes disagree: lower confidence)"
@@ -66876,17 +66940,17 @@
       "supports": [
        {
         "price": 70.7,
-        "touches": 17,
+        "touches": 19,
         "recent": false,
-        "dist_pct": -0.07,
-        "dist_atr": -0.4
+        "dist_pct": -0.06,
+        "dist_atr": -0.3
        },
        {
         "price": 70.6,
         "touches": 23,
         "recent": false,
-        "dist_pct": -0.14,
-        "dist_atr": -0.8
+        "dist_pct": -0.13,
+        "dist_atr": -0.7
        }
       ],
       "resistances": [
@@ -66894,15 +66958,15 @@
         "price": 70.8,
         "touches": 23,
         "recent": true,
-        "dist_pct": 0.07,
-        "dist_atr": 0.4
+        "dist_pct": 0.09,
+        "dist_atr": 0.5
        },
        {
         "price": 70.9,
         "touches": 29,
         "recent": true,
-        "dist_pct": 0.23,
-        "dist_atr": 1.3
+        "dist_pct": 0.24,
+        "dist_atr": 1.4
        }
       ]
      },
@@ -66913,31 +66977,31 @@
         "price": 70.7,
         "touches": 15,
         "recent": true,
-        "dist_pct": -0.07,
+        "dist_pct": -0.06,
         "dist_atr": -0.2
        },
        {
         "price": 70.5,
-        "touches": 16,
+        "touches": 18,
         "recent": true,
-        "dist_pct": -0.33,
-        "dist_atr": -1.0
+        "dist_pct": -0.31,
+        "dist_atr": -0.9
        }
       ],
       "resistances": [
        {
         "price": 70.9,
-        "touches": 26,
+        "touches": 31,
         "recent": true,
-        "dist_pct": 0.31,
-        "dist_atr": 0.9
+        "dist_pct": 0.33,
+        "dist_atr": 1.0
        },
        {
         "price": 71.1,
         "touches": 20,
         "recent": true,
-        "dist_pct": 0.52,
-        "dist_atr": 1.5
+        "dist_pct": 0.53,
+        "dist_atr": 1.6
        }
       ]
      },
@@ -66948,15 +67012,15 @@
         "price": 70.6,
         "touches": 22,
         "recent": true,
-        "dist_pct": -0.17,
+        "dist_pct": -0.16,
         "dist_atr": -0.2
        },
        {
         "price": 69.9,
         "touches": 19,
         "recent": true,
-        "dist_pct": -1.2,
-        "dist_atr": -1.3
+        "dist_pct": -1.19,
+        "dist_atr": -1.2
        }
       ],
       "resistances": [
@@ -66964,15 +67028,15 @@
         "price": 71.0,
         "touches": 27,
         "recent": true,
-        "dist_pct": 0.43,
-        "dist_atr": 0.4
+        "dist_pct": 0.44,
+        "dist_atr": 0.5
        },
        {
         "price": 71.5,
         "touches": 19,
         "recent": false,
-        "dist_pct": 1.09,
-        "dist_atr": 1.1
+        "dist_pct": 1.11,
+        "dist_atr": 1.2
        }
       ]
      },
@@ -66983,15 +67047,15 @@
         "price": 69.9,
         "touches": 19,
         "recent": false,
-        "dist_pct": -1.2,
+        "dist_pct": -1.19,
         "dist_atr": -0.5
        },
        {
         "price": 68.7,
         "touches": 10,
         "recent": true,
-        "dist_pct": -2.88,
-        "dist_atr": -1.2
+        "dist_pct": -2.87,
+        "dist_atr": -1.1
        }
       ],
       "resistances": [
@@ -66999,14 +67063,14 @@
         "price": 71.0,
         "touches": 21,
         "recent": true,
-        "dist_pct": 0.45,
+        "dist_pct": 0.46,
         "dist_atr": 0.2
        },
        {
         "price": 72.2,
         "touches": 21,
         "recent": false,
-        "dist_pct": 2.04,
+        "dist_pct": 2.05,
         "dist_atr": 0.8
        }
       ]
@@ -67018,14 +67082,14 @@
         "price": 67.6,
         "touches": 15,
         "recent": true,
-        "dist_pct": -4.46,
+        "dist_pct": -4.45,
         "dist_atr": -0.6
        },
        {
         "price": 63.7,
         "touches": 6,
         "recent": true,
-        "dist_pct": -9.95,
+        "dist_pct": -9.93,
         "dist_atr": -1.4
        }
       ],
@@ -67034,15 +67098,15 @@
         "price": 71.4,
         "touches": 21,
         "recent": false,
-        "dist_pct": 0.95,
+        "dist_pct": 0.96,
         "dist_atr": 0.1
        },
        {
         "price": 75.0,
         "touches": 45,
         "recent": true,
-        "dist_pct": 6.08,
-        "dist_atr": 0.8
+        "dist_pct": 6.1,
+        "dist_atr": 0.9
        }
       ]
      }
@@ -67088,21 +67152,21 @@
   }
  },
  "universe": {
-  "ts": "2026-11-26T11:30:12+00:00",
+  "ts": "2026-11-26T11:35:13+00:00",
   "n_listed": 100,
   "n_data": 100,
   "rows": [
    {
     "sym": "ETH",
-    "px": 1698.49,
-    "chg": 3.75,
-    "vol": 7036823521.667979
+    "px": 1699.28,
+    "chg": 3.79,
+    "vol": 7010132252.02048
    },
    {
     "sym": "SOXL",
-    "px": 33.13,
-    "chg": 18.36,
-    "vol": 2162799926.7342005,
+    "px": 33.33,
+    "chg": 18.74,
+    "vol": 2173008530.748,
     "verdict": "WAIT",
     "net": -11.8,
     "long": 1,
@@ -67113,9 +67177,9 @@
    },
    {
     "sym": "ZEC",
-    "px": 730.29,
-    "chg": 1.08,
-    "vol": 1184723132.7426,
+    "px": 730.8,
+    "chg": 1.17,
+    "vol": 1183720980.708,
     "verdict": "WAIT",
     "net": -10.7,
     "long": 0,
@@ -67126,9 +67190,9 @@
    },
    {
     "sym": "XAU",
-    "px": 3572.5,
-    "chg": 1.38,
-    "vol": 978190862.105,
+    "px": 3572.1,
+    "chg": 1.42,
+    "vol": 975684026.2617,
     "verdict": "WAIT",
     "net": -32.3,
     "long": 0,
@@ -67139,9 +67203,9 @@
    },
    {
     "sym": "SNDK",
-    "px": 75.71,
-    "chg": 3.74,
-    "vol": 971184607.3516798,
+    "px": 75.87,
+    "chg": 3.76,
+    "vol": 971425383.9609601,
     "verdict": "WAIT",
     "net": -32.0,
     "long": 0,
@@ -67152,15 +67216,15 @@
    },
    {
     "sym": "SOL",
-    "px": 70.73,
-    "chg": 5.03,
-    "vol": 805163228.2881001
+    "px": 70.71,
+    "chg": 4.94,
+    "vol": 801825980.4620999
    },
    {
     "sym": "NVDA",
-    "px": 150.44,
-    "chg": 1.73,
-    "vol": 603334064.2508,
+    "px": 150.62,
+    "chg": 1.92,
+    "vol": 603615260.595,
     "verdict": "WAIT",
     "net": 4.3,
     "long": 1,
@@ -67171,9 +67235,9 @@
    },
    {
     "sym": "MU",
-    "px": 608.8,
-    "chg": 2.65,
-    "vol": 317486923.088,
+    "px": 609.83,
+    "chg": 2.8,
+    "vol": 317782187.3629,
     "verdict": "WAIT",
     "net": -23.1,
     "long": 1,
@@ -67184,9 +67248,9 @@
    },
    {
     "sym": "SPCX",
-    "px": 128.98,
-    "chg": 4.71,
-    "vol": 282310928.7168,
+    "px": 129.01,
+    "chg": 4.75,
+    "vol": 281835016.3622,
     "verdict": "WAIT",
     "net": 4.3,
     "long": 2,
@@ -67197,9 +67261,9 @@
    },
    {
     "sym": "PIEVERSE",
-    "px": 3.9769,
-    "chg": 29.59,
-    "vol": 272732222.79,
+    "px": 4.0025,
+    "chg": 30.75,
+    "vol": 274345678.95000005,
     "verdict": "WAIT",
     "net": 6.5,
     "long": 1,
@@ -67210,9 +67274,9 @@
    },
    {
     "sym": "SKHYNIX",
-    "px": 783.3,
-    "chg": 4.55,
-    "vol": 259404405.11159998,
+    "px": 784.7,
+    "chg": 4.56,
+    "vol": 259366424.10350004,
     "verdict": "WAIT",
     "net": -27.6,
     "long": 1,
@@ -67223,9 +67287,9 @@
    },
    {
     "sym": "XRP",
-    "px": 0.9519,
-    "chg": 5.12,
-    "vol": 251188563.77879998,
+    "px": 0.9517,
+    "chg": 5.07,
+    "vol": 249980015.4491,
     "verdict": "WAIT",
     "net": 16.3,
     "long": 2,
@@ -67236,9 +67300,9 @@
    },
    {
     "sym": "SOXS",
-    "px": 60.14,
-    "chg": -13.91,
-    "vol": 247357227.276,
+    "px": 59.76,
+    "chg": -14.33,
+    "vol": 245216972.88,
     "verdict": "WAIT",
     "net": -25.4,
     "long": 0,
@@ -67249,9 +67313,9 @@
    },
    {
     "sym": "XAG",
-    "px": 41.63,
-    "chg": 3.76,
-    "vol": 238362400.9201,
+    "px": 41.62,
+    "chg": 3.87,
+    "vol": 237649594.84519997,
     "verdict": "WAIT",
     "net": 6.0,
     "long": 1,
@@ -67262,9 +67326,9 @@
    },
    {
     "sym": "DOGE",
-    "px": 0.05671,
-    "chg": 5.64,
-    "vol": 228349729.65030003,
+    "px": 0.05672,
+    "chg": 5.7,
+    "vol": 226839853.0168,
     "verdict": "WAIT",
     "net": -7.7,
     "long": 1,
@@ -67275,9 +67339,9 @@
    },
    {
     "sym": "HYPE",
-    "px": 60.711,
-    "chg": 5.17,
-    "vol": 196003241.47739998,
+    "px": 60.72,
+    "chg": 5.05,
+    "vol": 195924094.60799998,
     "verdict": "WAIT",
     "net": -27.7,
     "long": 1,
@@ -67288,9 +67352,9 @@
    },
    {
     "sym": "PEPE",
-    "px": 3.5442e-06,
-    "chg": 3.63,
-    "vol": 193916586.16439998,
+    "px": 3.5459e-06,
+    "chg": 3.65,
+    "vol": 193405066.1946,
     "verdict": "WAIT",
     "net": 12.0,
     "long": 1,
@@ -67301,9 +67365,9 @@
    },
    {
     "sym": "ANTHROPIC",
-    "px": 83.64,
-    "chg": 7.92,
-    "vol": 190309689.02184,
+    "px": 83.68,
+    "chg": 7.61,
+    "vol": 190110997.72864,
     "verdict": "WAIT",
     "net": -13.7,
     "long": 1,
@@ -67314,9 +67378,9 @@
    },
    {
     "sym": "MMT",
-    "px": 0.2273,
-    "chg": -8.71,
-    "vol": 160671441.896,
+    "px": 0.2227,
+    "chg": -10.74,
+    "vol": 158025060.532,
     "verdict": "WAIT",
     "net": -16.3,
     "long": 0,
@@ -67327,9 +67391,9 @@
    },
    {
     "sym": "KORU",
-    "px": 5.322,
-    "chg": 9.26,
-    "vol": 122691251.96208,
+    "px": 5.336,
+    "chg": 9.64,
+    "vol": 122709129.55616,
     "verdict": "WAIT",
     "net": -22.4,
     "long": 1,
@@ -67340,9 +67404,9 @@
    },
    {
     "sym": "NEAR",
-    "px": 3.061,
-    "chg": 8.7,
-    "vol": 122139415.92199999,
+    "px": 3.067,
+    "chg": 9.03,
+    "vol": 122118840.21100001,
     "verdict": "WAIT",
     "net": 4.3,
     "long": 2,
@@ -67353,9 +67417,9 @@
    },
    {
     "sym": "SNXX",
-    "px": 1.533,
-    "chg": 7.28,
-    "vol": 111387686.18039998,
+    "px": 1.54,
+    "chg": 7.47,
+    "vol": 111750207.8,
     "verdict": "WAIT",
     "net": -15.7,
     "long": 2,
@@ -67366,9 +67430,9 @@
    },
    {
     "sym": "SKHY",
-    "px": 111.0,
-    "chg": 4.84,
-    "vol": 85859991.83999999,
+    "px": 111.21,
+    "chg": 4.93,
+    "vol": 86064217.932,
     "verdict": "WAIT",
     "net": -26.3,
     "long": 0,
@@ -67379,9 +67443,9 @@
    },
    {
     "sym": "QQQ",
-    "px": 636.86,
-    "chg": 2.48,
-    "vol": 81302203.5658,
+    "px": 637.09,
+    "chg": 2.51,
+    "vol": 81252910.4713,
     "verdict": "WAIT",
     "net": 4.3,
     "long": 1,
@@ -67392,9 +67456,9 @@
    },
    {
     "sym": "CL",
-    "px": 84.59,
-    "chg": 3.63,
-    "vol": 77997097.69500001,
+    "px": 84.86,
+    "chg": 3.82,
+    "vol": 78645422.162,
     "verdict": "WAIT",
     "net": 24.0,
     "long": 2,
@@ -67405,9 +67469,9 @@
    },
    {
     "sym": "UNI",
-    "px": 4.725,
-    "chg": 4.84,
-    "vol": 71572513.94999999,
+    "px": 4.726,
+    "chg": 4.81,
+    "vol": 71556290.384,
     "verdict": "WAIT",
     "net": -1.7,
     "long": 1,
@@ -67418,9 +67482,9 @@
    },
    {
     "sym": "PUMP",
-    "px": 0.002646,
-    "chg": 12.45,
-    "vol": 67751380.368,
+    "px": 0.002639,
+    "chg": 12.25,
+    "vol": 67543914.529,
     "verdict": "WAIT",
     "net": -18.4,
     "long": 1,
@@ -67431,9 +67495,9 @@
    },
    {
     "sym": "MSTR",
-    "px": 82.03,
-    "chg": 9.14,
-    "vol": 64590549.14650001,
+    "px": 82.12,
+    "chg": 9.35,
+    "vol": 64319955.3988,
     "verdict": "WAIT",
     "net": -7.7,
     "long": 1,
@@ -67444,9 +67508,9 @@
    },
    {
     "sym": "TRUMP",
-    "px": 0.8869,
-    "chg": 7.8,
-    "vol": 63199521.86891001,
+    "px": 0.8848,
+    "chg": 7.94,
+    "vol": 63054015.84944,
     "verdict": "WAIT",
     "net": 28.3,
     "long": 3,
@@ -67458,8 +67522,8 @@
    {
     "sym": "WLD",
     "px": 0.244,
-    "chg": 6.92,
-    "vol": 61216748.86,
+    "chg": 7.11,
+    "vol": 61038572.252,
     "verdict": "WAIT",
     "net": 4.3,
     "long": 2,
@@ -67470,9 +67534,9 @@
    },
    {
     "sym": "SUI",
-    "px": 0.6674,
-    "chg": 5.85,
-    "vol": 61110807.3586,
+    "px": 0.6675,
+    "chg": 5.97,
+    "vol": 60956892.99,
     "verdict": "WAIT",
     "net": 16.3,
     "long": 2,
@@ -67483,9 +67547,9 @@
    },
    {
     "sym": "AKE",
-    "px": 0.001449,
-    "chg": -15.31,
-    "vol": 52561469.2491,
+    "px": 0.00145,
+    "chg": -13.9,
+    "vol": 52482136.06999999,
     "verdict": "WAIT",
     "net": -30.3,
     "long": 0,
@@ -67496,9 +67560,9 @@
    },
    {
     "sym": "TQQQ",
-    "px": 45.71,
-    "chg": 7.93,
-    "vol": 51302316.813999996,
+    "px": 45.76,
+    "chg": 7.98,
+    "vol": 51171037.632,
     "verdict": "WAIT",
     "net": -7.7,
     "long": 1,
@@ -67509,9 +67573,9 @@
    },
    {
     "sym": "VVV",
-    "px": 27.598,
-    "chg": 11.1,
-    "vol": 48884514.0272,
+    "px": 27.646,
+    "chg": 11.25,
+    "vol": 48978361.33760001,
     "verdict": "WAIT",
     "net": 29.8,
     "long": 3,
@@ -67522,9 +67586,9 @@
    },
    {
     "sym": "BNB",
-    "px": 551.0,
-    "chg": 2.37,
-    "vol": 42537695.9,
+    "px": 550.99,
+    "chg": 2.42,
+    "vol": 42500426.3134,
     "verdict": "WAIT",
     "net": 4.3,
     "long": 1,
@@ -67536,8 +67600,8 @@
    {
     "sym": "ZHONGJI",
     "px": 66.42,
-    "chg": 7.04,
-    "vol": 42168995.9442,
+    "chg": 7.06,
+    "vol": 42155652.1662,
     "verdict": "WAIT",
     "net": -9.3,
     "long": 2,
@@ -67548,9 +67612,9 @@
    },
    {
     "sym": "ENA",
-    "px": 0.10256,
-    "chg": 8.91,
-    "vol": 40764195.008,
+    "px": 0.1023,
+    "chg": 8.68,
+    "vol": 40489240.275,
     "verdict": "WAIT",
     "net": 16.3,
     "long": 2,
@@ -67561,9 +67625,9 @@
    },
    {
     "sym": "INTC",
-    "px": 54.98,
-    "chg": 4.66,
-    "vol": 38676549.684,
+    "px": 55.09,
+    "chg": 4.73,
+    "vol": 38773355.656,
     "verdict": "WAIT",
     "net": -12.0,
     "long": 0,
@@ -67575,8 +67639,8 @@
    {
     "sym": "ADA",
     "px": 0.1481,
-    "chg": 5.71,
-    "vol": 37321361.429000005,
+    "chg": 5.79,
+    "vol": 37184817.672000006,
     "verdict": "WAIT",
     "net": 16.3,
     "long": 2,
@@ -67587,9 +67651,9 @@
    },
    {
     "sym": "UNITREE",
-    "px": 100.41,
-    "chg": -2.3,
-    "vol": 34795097.382,
+    "px": 100.37,
+    "chg": -2.38,
+    "vol": 34782268.981300004,
     "verdict": "WAIT",
     "net": -6.0,
     "long": 0,
@@ -67600,9 +67664,9 @@
    },
    {
     "sym": "LINK",
-    "px": 9.225,
-    "chg": 7.38,
-    "vol": 34721833.589999996,
+    "px": 9.227,
+    "chg": 7.4,
+    "vol": 34639260.6265,
     "verdict": "WAIT",
     "net": 22.6,
     "long": 3,
@@ -67613,9 +67677,9 @@
    },
    {
     "sym": "FIL",
-    "px": 0.549,
-    "chg": 5.39,
-    "vol": 34135995.2922,
+    "px": 0.5481,
+    "chg": 5.24,
+    "vol": 33993317.55078,
     "verdict": "WAIT",
     "net": 16.3,
     "long": 2,
@@ -67626,9 +67690,9 @@
    },
    {
     "sym": "LTC",
-    "px": 43.47,
-    "chg": 8.43,
-    "vol": 33522616.448999997,
+    "px": 43.43,
+    "chg": 8.36,
+    "vol": 33396610.308,
     "verdict": "WAIT",
     "net": -7.7,
     "long": 1,
@@ -67639,9 +67703,9 @@
    },
    {
     "sym": "LIT",
-    "px": 2.478,
-    "chg": 8.36,
-    "vol": 33227663.070000004,
+    "px": 2.4784,
+    "chg": 8.41,
+    "vol": 33168333.020800002,
     "verdict": "WAIT",
     "net": 12.3,
     "long": 2,
@@ -67652,9 +67716,9 @@
    },
    {
     "sym": "CRCL",
-    "px": 48.83,
-    "chg": 5.26,
-    "vol": 32360104.884999998,
+    "px": 48.86,
+    "chg": 5.37,
+    "vol": 32254015.318000004,
     "verdict": "WAIT",
     "net": -0.0,
     "long": 1,
@@ -67665,9 +67729,9 @@
    },
    {
     "sym": "AAVE",
-    "px": 95.65,
-    "chg": 4.86,
-    "vol": 30373760.802000005,
+    "px": 95.53,
+    "chg": 4.82,
+    "vol": 30267415.682800002,
     "verdict": "WAIT",
     "net": -7.7,
     "long": 1,
@@ -67678,9 +67742,9 @@
    },
    {
     "sym": "GOOGL",
-    "px": 275.53,
+    "px": 275.62,
     "chg": 1.94,
-    "vol": 28772490.269399997,
+    "vol": 28689178.3082,
     "verdict": "WAIT",
     "net": -13.1,
     "long": 1,
@@ -67691,9 +67755,9 @@
    },
    {
     "sym": "AMD",
-    "px": 409.25,
-    "chg": 5.86,
-    "vol": 28700841.645,
+    "px": 409.04,
+    "chg": 5.7,
+    "vol": 28619915.240000002,
     "verdict": "WAIT",
     "net": -25.8,
     "long": 1,
@@ -67704,9 +67768,9 @@
    },
    {
     "sym": "ZHIPU",
-    "px": 38.15,
-    "chg": 15.61,
-    "vol": 25614543.29,
+    "px": 38.21,
+    "chg": 15.86,
+    "vol": 25656739.9323,
     "verdict": "WAIT",
     "net": 16.3,
     "long": 2,
@@ -67717,9 +67781,9 @@
    },
    {
     "sym": "BZ",
-    "px": 91.19,
-    "chg": 3.31,
-    "vol": 25357902.7273,
+    "px": 91.36,
+    "chg": 3.38,
+    "vol": 25473341.4544,
     "verdict": "LONG",
     "net": 38.9,
     "long": 4,
@@ -67730,9 +67794,9 @@
    },
    {
     "sym": "BCH",
-    "px": 207.26,
-    "chg": 6.95,
-    "vol": 25282631.826,
+    "px": 207.31,
+    "chg": 7.08,
+    "vol": 25070970.5839,
     "verdict": "WAIT",
     "net": -7.7,
     "long": 1,
@@ -67743,9 +67807,9 @@
    },
    {
     "sym": "MOVE",
-    "px": 0.005752,
-    "chg": 24.15,
-    "vol": 24978010.5328,
+    "px": 0.005744,
+    "chg": 23.61,
+    "vol": 24993884.08736,
     "verdict": "WAIT",
     "net": 35.6,
     "long": 3,
@@ -67756,9 +67820,9 @@
    },
    {
     "sym": "INIT",
-    "px": 0.11619,
-    "chg": 37.63,
-    "vol": 24584216.8446,
+    "px": 0.11242,
+    "chg": 33.21,
+    "vol": 24576980.474200003,
     "verdict": "WAIT",
     "net": 19.3,
     "long": 2,
@@ -67769,9 +67833,9 @@
    },
    {
     "sym": "BIGTIME",
-    "px": 0.005647,
-    "chg": -13.94,
-    "vol": 24513882.69616,
+    "px": 0.005652,
+    "chg": -12.07,
+    "vol": 24390429.64128,
     "verdict": "WAIT",
     "net": -6.8,
     "long": 1,
@@ -67782,9 +67846,9 @@
    },
    {
     "sym": "SSV",
-    "px": 2.528,
-    "chg": 40.06,
-    "vol": 24201572.643200003,
+    "px": 2.545,
+    "chg": 40.92,
+    "vol": 24381444.593,
     "verdict": "WAIT",
     "net": 18.6,
     "long": 3,
@@ -67795,9 +67859,9 @@
    },
    {
     "sym": "MON",
-    "px": 0.01071,
-    "chg": 8.18,
-    "vol": 23132935.6587,
+    "px": 0.01072,
+    "chg": 8.5,
+    "vol": 23129192.529600002,
     "verdict": "WAIT",
     "net": -43.1,
     "long": 1,
@@ -67808,9 +67872,9 @@
    },
    {
     "sym": "MOODENG",
-    "px": 0.02983,
-    "chg": 8.59,
-    "vol": 22990812.958699998,
+    "px": 0.03014,
+    "chg": 10.08,
+    "vol": 23119757.7446,
     "verdict": "WAIT",
     "net": 22.5,
     "long": 2,
@@ -67821,9 +67885,9 @@
    },
    {
     "sym": "BTW",
-    "px": 0.9392,
-    "chg": 4.48,
-    "vol": 22760693.0176,
+    "px": 0.9517,
+    "chg": 5.99,
+    "vol": 23041871.3692,
     "verdict": "LONG",
     "net": 44.8,
     "long": 4,
@@ -67834,9 +67898,9 @@
    },
    {
     "sym": "TSLA",
-    "px": 382.63,
-    "chg": 2.13,
-    "vol": 22407819.116899997,
+    "px": 382.91,
+    "chg": 2.35,
+    "vol": 22321569.9696,
     "verdict": "WAIT",
     "net": 11.4,
     "long": 1,
@@ -67847,9 +67911,9 @@
    },
    {
     "sym": "NBIS",
-    "px": 87.19,
-    "chg": 7.19,
-    "vol": 22024794.7391,
+    "px": 87.37,
+    "chg": 7.07,
+    "vol": 22043601.2764,
     "verdict": "WAIT",
     "net": 2.7,
     "long": 2,
@@ -67860,9 +67924,9 @@
    },
    {
     "sym": "AAOI",
-    "px": 37.97,
-    "chg": 4.69,
-    "vol": 20847703.402799997,
+    "px": 38.03,
+    "chg": 4.82,
+    "vol": 20878396.221800003,
     "verdict": "WAIT",
     "net": 16.3,
     "long": 2,
@@ -67873,9 +67937,9 @@
    },
    {
     "sym": "TRX",
-    "px": 0.3035,
-    "chg": -1.36,
-    "vol": 20290404.485,
+    "px": 0.30339,
+    "chg": -1.42,
+    "vol": 20277595.5147,
     "verdict": "WAIT",
     "net": -36.3,
     "long": 0,
@@ -67886,9 +67950,9 @@
    },
    {
     "sym": "DRAM",
-    "px": 35.14,
-    "chg": 4.12,
-    "vol": 19393836.28,
+    "px": 35.19,
+    "chg": 4.27,
+    "vol": 19410272.631,
     "verdict": "WAIT",
     "net": -29.5,
     "long": 1,
@@ -67899,9 +67963,9 @@
    },
    {
     "sym": "AAPL",
-    "px": 356.42,
-    "chg": 1.48,
-    "vol": 18457986.6956,
+    "px": 356.35,
+    "chg": 1.56,
+    "vol": 18426224.197,
     "verdict": "WAIT",
     "net": -7.6,
     "long": 2,
@@ -67911,23 +67975,10 @@
     "rs": 3
    },
    {
-    "sym": "AVAX",
-    "px": 6.641,
-    "chg": 3.52,
-    "vol": 17669542.0109,
-    "verdict": "WAIT",
-    "net": -7.7,
-    "long": 1,
-    "short": 1,
-    "total": 7,
-    "rb": 2,
-    "rs": 3
-   },
-   {
     "sym": "MUU",
-    "px": 9.65,
-    "chg": 5.7,
-    "vol": 17595736.7565,
+    "px": 9.69,
+    "chg": 6.13,
+    "vol": 17657137.7676,
     "verdict": "WAIT",
     "net": -25.9,
     "long": 1,
@@ -67937,10 +67988,23 @@
     "rs": 3
    },
    {
+    "sym": "AVAX",
+    "px": 6.644,
+    "chg": 3.75,
+    "vol": 17580828.588400003,
+    "verdict": "WAIT",
+    "net": -7.7,
+    "long": 1,
+    "short": 1,
+    "total": 7,
+    "rb": 2,
+    "rs": 3
+   },
+   {
     "sym": "MRVL",
-    "px": 132.91,
-    "chg": 7.02,
-    "vol": 17359597.0597,
+    "px": 133.13,
+    "chg": 7.12,
+    "vol": 17411625.3832,
     "verdict": "WAIT",
     "net": -9.7,
     "long": 1,
@@ -67951,9 +68015,9 @@
    },
    {
     "sym": "SAMSUNG",
-    "px": 127.85,
-    "chg": 3.23,
-    "vol": 17050572.058,
+    "px": 127.99,
+    "chg": 3.34,
+    "vol": 17034730.497700002,
     "verdict": "WAIT",
     "net": -10.2,
     "long": 1,
@@ -67964,9 +68028,9 @@
    },
    {
     "sym": "INJ",
-    "px": 6.2,
-    "chg": 8.58,
-    "vol": 16898584.220000003,
+    "px": 6.182,
+    "chg": 8.15,
+    "vol": 16845920.3264,
     "verdict": "WAIT",
     "net": 5.6,
     "long": 2,
@@ -67976,23 +68040,10 @@
     "rs": 3
    },
    {
-    "sym": "TAO",
-    "px": 183.19,
-    "chg": 5.46,
-    "vol": 16795174.2868,
-    "verdict": "WAIT",
-    "net": -9.3,
-    "long": 1,
-    "short": 2,
-    "total": 7,
-    "rb": 2,
-    "rs": 3
-   },
-   {
     "sym": "ARB",
-    "px": 0.11464,
-    "chg": 6.69,
-    "vol": 16701644.34784,
+    "px": 0.11445,
+    "chg": 6.5,
+    "vol": 16722533.16405,
     "verdict": "WAIT",
     "net": -7.7,
     "long": 1,
@@ -68002,10 +68053,23 @@
     "rs": 3
    },
    {
+    "sym": "TAO",
+    "px": 183.11,
+    "chg": 5.56,
+    "vol": 16629257.333700001,
+    "verdict": "WAIT",
+    "net": -9.3,
+    "long": 1,
+    "short": 2,
+    "total": 7,
+    "rb": 2,
+    "rs": 3
+   },
+   {
     "sym": "LITE",
-    "px": 485.19,
-    "chg": 5.63,
-    "vol": 16691957.6067,
+    "px": 485.59,
+    "chg": 5.66,
+    "vol": 16623255.8849,
     "verdict": "WAIT",
     "net": -23.5,
     "long": 1,
@@ -68016,9 +68080,9 @@
    },
    {
     "sym": "OKB",
-    "px": 81.93,
-    "chg": 3.81,
-    "vol": 16143762.4848,
+    "px": 81.99,
+    "chg": 3.9,
+    "vol": 16125029.8731,
     "verdict": "WAIT",
     "net": 4.3,
     "long": 1,
@@ -68029,9 +68093,9 @@
    },
    {
     "sym": "NES",
-    "px": 0.2331,
-    "chg": 32.37,
-    "vol": 15725028.564,
+    "px": 0.232,
+    "chg": 31.07,
+    "vol": 15681350.96,
     "verdict": "WAIT",
     "net": 4.3,
     "long": 1,
@@ -68043,8 +68107,8 @@
    {
     "sym": "BLUR",
     "px": 0.010122,
-    "chg": 7.52,
-    "vol": 15722197.624140002,
+    "chg": 7.3,
+    "vol": 15653413.067040002,
     "verdict": "WAIT",
     "net": 23.3,
     "long": 2,
@@ -68055,9 +68119,9 @@
    },
    {
     "sym": "SQQQ",
-    "px": 49.17,
-    "chg": -6.84,
-    "vol": 14305726.314000001,
+    "px": 49.11,
+    "chg": -6.9,
+    "vol": 14232102.555,
     "verdict": "WAIT",
     "net": -4.3,
     "long": 0,
@@ -68068,9 +68132,9 @@
    },
    {
     "sym": "SLX",
-    "px": 0.03229,
-    "chg": -1.34,
-    "vol": 14037533.4135,
+    "px": 0.03215,
+    "chg": -0.8,
+    "vol": 13920125.995499998,
     "verdict": "WAIT",
     "net": 25.1,
     "long": 3,
@@ -68081,9 +68145,9 @@
    },
    {
     "sym": "UVXY",
-    "px": 24.95,
-    "chg": -7.93,
-    "vol": 13288292.655,
+    "px": 24.96,
+    "chg": -8.27,
+    "vol": 13218898.368,
     "verdict": "WAIT",
     "net": 10.7,
     "long": 2,
@@ -68094,9 +68158,9 @@
    },
    {
     "sym": "SKDD",
-    "px": 11.26,
-    "chg": -9.02,
-    "vol": 13249232.136,
+    "px": 11.223,
+    "chg": -9.25,
+    "vol": 13132010.976300001,
     "verdict": "WAIT",
     "net": -0.7,
     "long": 1,
@@ -68107,9 +68171,9 @@
    },
    {
     "sym": "XPL",
-    "px": 0.04793,
-    "chg": 8.27,
-    "vol": 12368595.8013,
+    "px": 0.04797,
+    "chg": 8.53,
+    "vol": 12344193.494099999,
     "verdict": "WAIT",
     "net": 15.0,
     "long": 2,
@@ -68120,9 +68184,9 @@
    },
    {
     "sym": "SPY",
-    "px": 721.2,
-    "chg": 2.01,
-    "vol": 12196999.308,
+    "px": 721.29,
+    "chg": 2.03,
+    "vol": 12179024.9274,
     "verdict": "WAIT",
     "net": 4.3,
     "long": 2,
@@ -68133,9 +68197,9 @@
    },
    {
     "sym": "OPG",
-    "px": 0.1574,
-    "chg": -8.82,
-    "vol": 11902336.16,
+    "px": 0.15675,
+    "chg": -7.45,
+    "vol": 11710737.6375,
     "verdict": "WAIT",
     "net": 7.7,
     "long": 1,
@@ -68146,9 +68210,9 @@
    },
    {
     "sym": "CRWV",
-    "px": 43.24,
-    "chg": 9.08,
-    "vol": 11636655.833999999,
+    "px": 43.29,
+    "chg": 8.99,
+    "vol": 11629562.8293,
     "verdict": "WAIT",
     "net": 16.3,
     "long": 2,
@@ -68159,9 +68223,9 @@
    },
    {
     "sym": "ONDO",
-    "px": 0.2866,
-    "chg": 7.02,
-    "vol": 11484351.466,
+    "px": 0.2865,
+    "chg": 7.1,
+    "vol": 11394159.434999999,
     "verdict": "WAIT",
     "net": 4.3,
     "long": 2,
@@ -68172,9 +68236,9 @@
    },
    {
     "sym": "STRK",
-    "px": 0.03069,
-    "chg": 5.39,
-    "vol": 10928530.78317,
+    "px": 0.03068,
+    "chg": 5.54,
+    "vol": 10877372.12224,
     "verdict": "WAIT",
     "net": 16.3,
     "long": 2,
@@ -68184,36 +68248,10 @@
     "rs": 3
    },
    {
-    "sym": "XLM",
-    "px": 0.12745,
-    "chg": 4.47,
-    "vol": 10814070.0495,
-    "verdict": "WAIT",
-    "net": -9.7,
-    "long": 1,
-    "short": 1,
-    "total": 7,
-    "rb": 2,
-    "rs": 3
-   },
-   {
-    "sym": "PONS",
-    "px": 0.08655,
-    "chg": 1.23,
-    "vol": 10760082.948,
-    "verdict": "WAIT",
-    "net": 0.5,
-    "long": 2,
-    "short": 1,
-    "total": 7,
-    "rb": 2,
-    "rs": 3
-   },
-   {
     "sym": "SHIB",
-    "px": 3.649e-06,
-    "chg": 5.46,
-    "vol": 10649957.5338,
+    "px": 3.647e-06,
+    "chg": 5.5,
+    "vol": 10669231.3952,
     "verdict": "WAIT",
     "net": 16.3,
     "long": 2,
@@ -68223,10 +68261,36 @@
     "rs": 2
    },
    {
+    "sym": "PONS",
+    "px": 0.08662,
+    "chg": 3.12,
+    "vol": 10489152.7518,
+    "verdict": "WAIT",
+    "net": 0.5,
+    "long": 2,
+    "short": 1,
+    "total": 7,
+    "rb": 2,
+    "rs": 3
+   },
+   {
+    "sym": "XLM",
+    "px": 0.12748,
+    "chg": 4.6,
+    "vol": 10380047.526800001,
+    "verdict": "WAIT",
+    "net": -9.7,
+    "long": 1,
+    "short": 1,
+    "total": 7,
+    "rb": 2,
+    "rs": 3
+   },
+   {
     "sym": "PENGU",
-    "px": 0.004449,
-    "chg": 7.46,
-    "vol": 10253708.6229,
+    "px": 0.004453,
+    "chg": 7.64,
+    "vol": 10262735.141700001,
     "verdict": "WAIT",
     "net": 5.6,
     "long": 2,
@@ -68237,9 +68301,9 @@
    },
    {
     "sym": "CXMT",
-    "px": 4.912,
-    "chg": 1.53,
-    "vol": 9734144.784,
+    "px": 4.914,
+    "chg": 1.61,
+    "vol": 9727778.969999999,
     "verdict": "SHORT",
     "net": -43.2,
     "long": 0,
@@ -68250,9 +68314,9 @@
    },
    {
     "sym": "TIA",
-    "px": 0.3409,
-    "chg": 8.12,
-    "vol": 9731202.1989,
+    "px": 0.3404,
+    "chg": 7.99,
+    "vol": 9701488.8444,
     "verdict": "WAIT",
     "net": 16.3,
     "long": 2,
@@ -68263,9 +68327,9 @@
    },
    {
     "sym": "DOT",
-    "px": 0.6735,
-    "chg": 5.33,
-    "vol": 9539532.7995,
+    "px": 0.6732,
+    "chg": 5.58,
+    "vol": 9395597.2572,
     "verdict": "WAIT",
     "net": 5.6,
     "long": 2,
@@ -68276,9 +68340,9 @@
    },
    {
     "sym": "ZRO",
-    "px": 1.0867,
-    "chg": 9.41,
-    "vol": 9206207.257,
+    "px": 1.0881,
+    "chg": 9.28,
+    "vol": 9211121.2206,
     "verdict": "WAIT",
     "net": 24.3,
     "long": 3,
@@ -68289,9 +68353,9 @@
    },
    {
     "sym": "EWY",
-    "px": 129.53,
-    "chg": 2.78,
-    "vol": 8766017.8774,
+    "px": 129.63,
+    "chg": 2.86,
+    "vol": 8759869.1022,
     "verdict": "WAIT",
     "net": -6.7,
     "long": 1,
@@ -68302,9 +68366,9 @@
    },
    {
     "sym": "MINIMAX",
-    "px": 12.19,
-    "chg": 10.62,
-    "vol": 7695283.6959999995,
+    "px": 12.2,
+    "chg": 10.51,
+    "vol": 7707037.68,
     "verdict": "WAIT",
     "net": 24.0,
     "long": 2,
@@ -68315,9 +68379,9 @@
    },
    {
     "sym": "CRV",
-    "px": 0.1768,
-    "chg": 4.43,
-    "vol": 7574270.943200001,
+    "px": 0.1766,
+    "chg": 4.5,
+    "vol": 7557276.471,
     "verdict": "WAIT",
     "net": 14.9,
     "long": 2,
@@ -68328,9 +68392,9 @@
    },
    {
     "sym": "USELESS",
-    "px": 0.07334,
+    "px": 0.07337,
     "chg": 11.59,
-    "vol": 7529769.3956,
+    "vol": 7506415.7322,
     "verdict": "WAIT",
     "net": 16.3,
     "long": 2,
@@ -68341,9 +68405,9 @@
    },
    {
     "sym": "ICP",
-    "px": 2.011,
-    "chg": 2.81,
-    "vol": 7408579.52371,
+    "px": 2.016,
+    "chg": 3.01,
+    "vol": 7407256.368960001,
     "verdict": "WAIT",
     "net": -7.7,
     "long": 1,
@@ -68354,9 +68418,9 @@
    },
    {
     "sym": "ORCL",
-    "px": 105.81,
-    "chg": 1.34,
-    "vol": 7365872.1534,
+    "px": 105.85,
+    "chg": 1.3,
+    "vol": 7354294.991,
     "verdict": "WAIT",
     "net": -24.3,
     "long": 1,
@@ -68367,9 +68431,9 @@
    },
    {
     "sym": "ME",
-    "px": 0.0421,
-    "chg": 18.26,
-    "vol": 7255705.681299999,
+    "px": 0.04209,
+    "chg": 18.43,
+    "vol": 7349022.045030001,
     "verdict": "WAIT",
     "net": 26.4,
     "long": 4,
