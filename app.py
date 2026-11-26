@@ -106,7 +106,7 @@ elif T: head.caption(f"📨 Telegram: ❌ problem. {T.get('last_error') or 'bot 
 else: head.caption("📨 Telegram: no status yet (upload the latest worker.py and run the scan once)")
 if S.get("paused"): st.warning("⏸ PAUSED: no new trades or alerts will start. Open trades are still managed. Send /resume on Telegram to restart.")
 st.caption("⚠️ Informational and statistical only. Virtual money, no real orders. Backtests show NO proven edge yet.")
-tH_, tAsk, tCH, tDD, tA, tW, tTH, tRP, tRV, tTM, tL, tHl, tS, tO, tB, tG = st.tabs(["🏠 Home", "💬 Ask", "📈 Chart", "🧭 Decision Desk", "📋 Analysis", "💰 Wallet", "📒 Trade History", "📑 Reports", "📦 Review", "🕒 Time", "🧠 Learning", "🩺 Health", "⚙️ Settings", "📡 Old signals", "📊 Backtests", "📘 Guide"])
+tH_, tAsk, tCT, tCH, tDD, tA, tW, tTH, tRP, tRV, tTM, tL, tHl, tS, tO, tB, tG = st.tabs(["🏠 Home", "💬 Ask", "👥 Chat", "📈 Chart", "🧭 Decision Desk", "📋 Analysis", "💰 Wallet", "📒 Trade History", "📑 Reports", "📦 Review", "🕒 Time", "🧠 Learning", "🩺 Health", "⚙️ Settings", "📡 Old signals", "📊 Backtests", "📘 Guide"])
 
 def position_card(t):
     px = (lp or t["entry"]) if t.get("sym", "BTC") == "BTC" else (t.get("last_px") or t["entry"]); ur = (px - t["entry"]) * t["side"] / t["risk"]; usd = pl_usd(t, px) + t.get("realized_usd", 0); m = t.get("mgmt")
@@ -330,9 +330,10 @@ with tTH:
             b_ = stats._block([r for r in _cp if stats.coin_of(r) == c_]); op_ = sum(1 for r in rows_ if r["source"] == "PAPER" and r["status"] == "OPEN" and stats.coin_of(r) == c_)
             _sc.append({"Coin": c_, "Closed": b_.get("n", 0), "Win %": b_.get("win_pct"), "Wins": b_.get("wins", 0), "Losses": b_.get("losses", 0), "Avg R": b_.get("mean_R"), "Net ₹": b_.get("net_inr"), "Profit factor": b_.get("profit_factor"), "Open now": op_})
         st.dataframe(pd.DataFrame(_sc), hide_index=True, use_container_width=True); st.caption("Under 30 trades per coin = noise: do not judge a coin by a few trades.")
-        coin_sel = st.selectbox("Show details for", ["All"] + _coins, index=(["All"] + _coins).index(COIN) if COIN in _coins else 0, key=f"th_{COIN}")
+        coin_sel = st.selectbox("Show details for (default: All coins)", ["All"] + _coins, index=0, key="th_coin")
         if coin_sel != "All": rows_ = [r for r in rows_ if stats.coin_of(r) == coin_sel]; rec = {r["id"]: r for r in rows_}
-        cl = [r for r in rows_ if r["source"] == "PAPER" and r["status"] == "CLOSED"]; wins = sum(1 for r in cl if (r.get("pnl_inr") or 0) > 0); net = sum(r.get("pnl_inr") or 0 for r in cl)
+        st.caption(f"📌 Neeche ke numbers (win rate, performance, table) is filter ke hain: **{coin_sel if coin_sel != 'All' else 'saare coins'}**. Saare coins ka total win rate hamesha 📑 Reports tab me dikhta hai.")
+        cl = [r for r in rows_ if r["source"] == "PAPER" and r["status"] == "CLOSED"]; wins = sum(1 for r in cl if (r.get("R") or 0) > 0); net = sum(r.get("pnl_inr") or 0 for r in cl)
         m = st.columns(5); m[0].metric("All trades", len(rows_)); m[1].metric("Open now", sum(r["status"] == "OPEN" for r in rows_)); m[2].metric("Paper closed", len(cl), f"{wins} win / {len(cl) - wins} loss"); m[3].metric("Paper net P/L", inr(net)); m[4].metric("Alert signals", sum(r["source"] == "SIGNAL" for r in rows_))
         with st.expander("📊 Performance (paper-wallet closed trades)", expanded=len(cl) > 0):
             A = stats.analyse(rec.values(), float((S.get("paper") or {}).get("wallet", {}).get("start", 20000))); o = A["overall"]; st.info("🧪 " + A["verdict"])
@@ -605,6 +606,10 @@ with tB:
         st.markdown(f"**Session Breakout (V8): {V8['verdict']}** (time classes pehle aadhe data se seekhe, test baaki aadhe par)")
         st.dataframe(pd.DataFrame({k: {"trades": v["test"].get("n"), "win %": v["test"].get("win_pct"), "avg R": v["test"].get("mean_R"), "lower 95%": v["test"].get("lo95"), "long avg R": v["long"].get("mean_R"), "short avg R": v["short"].get("mean_R")} for k, v in V8["variants"].items()}).T)
     else: st.caption("Session Breakout (V8) ka backtest abhi nahi chala: GitHub Actions > research > Run workflow.")
+
+with tCT:
+    import chat as CHAT
+    CHAT.render(st)
 
 with tAsk:
     if COIN != "BTC": st.info("ℹ️ Ask: sawal-jawab abhi sirf BTC par hai. ETH/SOL ke liye 'Decision Desk', 'Analysis' aur '🪙 Indication' dekho.")

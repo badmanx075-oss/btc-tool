@@ -250,3 +250,12 @@ Har (strategy, LONG/SHORT) bucket apne hi live results se khud band/chalu hota h
 - Settings `config.json` ke `auto_gate` me: enabled, window, min_trades, max_mean_R, max_z, reopen_shadows, reopen_mean_R. Band karne ke liye `{"auto_gate": {"enabled": false}}`.
 - Shadow plain stop/target par chalte hain (smart exit nahi), isliye ye sirf mota andaza hai. Koi data delete nahi hota. Review pack me `auto_gate` status aata hai.
 - Pehle se maujooda data par: Trend Pullback LONG (last 20: -0.22R, z -2.1) turant band hoga.
+
+## Update: A & V chat (26 Nov 2026)
+Dashboard me naya tab **👥 Chat**, password se secure. Tab kholte hi naam (A/V) + password maangta hai; bina login ke koi message na padh sakta hai na likh sakta hai.
+- **Password set karna zaroori hai** (code/GitHub me kabhi mat likhna, repo public hai): Streamlit Cloud → App → Settings → Secrets me likho:
+  `CHAT_PIN_A = "A-ka-password"` aur `CHAT_PIN_V = "V-ka-password"` (ya dono ke liye ek: `CHAT_PIN = "..."`). Save karo. Jab tak ye set nahi, chat band rehti hai.
+- 5 galat try par 5 minute ka lock. Logout button hai. Har naya browser/session me phir se login.
+- Naye message ~3 second me dikhte hain, dusra online hai ya nahi ye bhi dikhta hai.
+- Optional: `TG_TOKEN` + `TG_CHAT_ID` (bot wali same values) secrets me daalo to har message Telegram par bhi jayega (notification + permanent copy).
+- Limit: Streamlit Cloud app ko sula de ya redeploy kare to purani history ud sakti hai.
